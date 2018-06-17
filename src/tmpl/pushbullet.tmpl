@@ -1,0 +1,109 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#
+#proc genPushbullet(c: var TData): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="pushbullet" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="pushbullet">
+         
+          <h1>Pushbullet</h1>
+
+          <div class="pushbulletApi">
+
+            # let pushApi = getValue(db, sql"SELECT api FROM pushbullet_settings WHERE id = ?", "1")
+
+            <hr>
+
+            <h3>API</h3>
+
+            <div>
+              <label>API key</label>
+              <input class="form-control form-control-sm api key" value="$pushApi" placeholder="Your API key" />
+              <button class="btn btn-primary pushbulletApiUpdate">Update</button>
+            </div>
+
+          </div>
+
+          <hr>
+
+          <div class="pushbulletTemplates">
+            # let pushTemplates = getAllRows(db, sql"SELECT id, name, title, body FROM pushbullet_templates")
+
+            <h3>Pushbullet templates</h3>
+
+            <table class="pushbulletTemplates table">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Name</th>
+                  <th>Title</th>
+                  <th>Body</th>
+                  <th></th>
+                </tr>
+                <tr class="pushbulletTemplatesEdit">
+                  <td>
+                    <input class="form-control form-control-sm name" />
+                  </td>
+                  <td>
+                    <input class="form-control form-control-sm title" />
+                  </td>
+                  <td>
+                    <input class="form-control form-control-sm body" />
+                  </td>
+                  <td class="btn btn-success pushbulletTemplateAdd">
+                    Add
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
+                # for push in pushTemplates:
+                <tr class="pushbullet">
+                  <td>
+                    ${push[1]}
+                  </td>
+                  <td>
+                    ${push[2]}
+                  </td>
+                  <td>
+                    ${push[3]}
+                  </td>
+                  <td data-pushid="${push[0]}" class="btn btn-danger pushbulletTemplateDelete">
+                    Del
+                  </td>
+                </tr>
+                # end for
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+
+
+#end proc

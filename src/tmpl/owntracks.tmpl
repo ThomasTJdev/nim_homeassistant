@@ -1,0 +1,134 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#
+#
+#
+#proc genOwntracks(c: var TData): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="owntracksdevices" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      # let allWaypoints = getAllRows(db, sql"SELECT owntracks_waypoints.id, owntracks_waypoints.username, owntracks_waypoints.device_id, owntracks_waypoints.desc, owntracks_waypoints.lat, owntracks_waypoints.lon, owntracks_waypoints.rad, owntracks_waypoints.creation FROM owntracks_waypoints LEFT JOIN owntracks_devices ON owntracks_devices.username = owntracks_waypoints.username ORDER BY owntracks_devices.username ASC")
+      #
+      # let allDevices = getAllRows(db, sql"SELECT username, device_id, tracker_id, creation FROM owntracks_devices ORDER BY username DESC")
+
+      <div id="pagewrapper">
+        <div id="owntracksDevices">
+         
+          <h1>Owntracks</h1>
+
+          <div class="deviceList">
+            <h3>Devices</h3>
+            <table class="deviceList table">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Username</th>
+                  <th>Device ID</th>
+                  <th>Tracker ID</th>
+                  <th>Creation</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                # for device in allDevices:
+                <tr class="device">
+                  <td>
+                    ${device[0]}
+                  </td>
+                  <td>
+                    ${device[1]}
+                  </td>
+                  <td>
+                    ${device[2]}
+                  </td>
+                  <td>
+                    ${epochDate(device[3], "YYYY-MM-DD HH:mm")}
+                  </td>
+                  <td data-username="${device[0]}" class="btn btn-danger owntracksDeleteDevice">
+                    Del
+                  </td>
+                </tr>
+                # end for
+              </tbody>
+            </table>
+          </div>
+
+          <hr>
+
+          <div class="waypoints">
+            <h3>Waypoints</h3>
+            <table class="waypoints table table-bordered table-hover">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Username</th>
+                  <th>Device ID</th>
+                  <th>Description</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                  <th>Radius</th>
+                  <th>Creation</th>
+                  <th></th>
+                </tr>
+              </thead>
+
+              <tbody>
+              # for device in allWaypoints:
+                <tr class="waypoints ${device[0]}">
+                  <td>
+                    ${device[1]}
+                  </td>
+                  <td>
+                    ${device[2]}
+                  </td>
+                  <td>
+                    ${device[3]}
+                  </td>
+                  <td>
+                    ${device[4]}
+                  </td>
+                  <td>
+                    ${device[5]}
+                  </td>
+                  <td>
+                    ${device[6]}
+                  </td>
+                  <td>
+                    ${epochDate(device[7], "YYYY-MM-DD HH:mm")}
+                  </td>
+                  <td data-waypointid="${device[0]}" class="btn btn-danger owntracksDeleteWaypoint">
+                    Del
+                  </td>
+                </tr>
+              # end for
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+
+
+#end proc

@@ -1,0 +1,46 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#proc genLogin(c: var TData, errorMsg = ""): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="login" style="display: none;"></div>
+    <div class="wrapper">
+
+      <div id="pagewrapper">
+        <div id="login">
+         
+          <h1>Login</h1>
+
+          # if errorMsg != "":
+          <h3 style="color: red;">$errorMsg</h3>
+          # end if
+
+          <form method="POST" action="/login/do">
+            <input type="email" name="email" class="form-control" placeholder="Email" />
+            <input type="password" name="password" class="form-control" placeholder="Password" />
+            <button type="submit" class="btn btn-primary">Login</button>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+</body>
+#end proc

@@ -1,0 +1,120 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#
+#
+#
+#
+#proc genAlarmNumpad(c: var TData, onlyCode = false): string =
+# result = "" 
+# let alarmStatus = getValue(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
+#
+# var alarmPretty = ""
+# if alarmStatus == "disarmed":
+#   alarmPretty = "Disarmed"
+# elif alarmStatus == "armAway":
+#   alarmPretty = "Armed away"
+# elif alarmStatus == "armAway":
+#   alarmPretty = "Armed away"
+# elif alarmStatus == "ringing":
+#   alarmPretty = "Ringing"
+# elif alarmStatus == "triggered":
+#   alarmPretty = "Triggered"
+# else:
+#   alarmPretty = alarmStatus
+# end if
+
+
+<div class="modal fade" id="alarmModel" tabindex="-1" role="dialog" aria-labelledby="alarmModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="alarmModalLabel">Alarm password</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <div id="alarmNumpad" data-status="" data-onlycode="$onlyCode">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-12 inner">
+
+                # if onlyCode:
+                  <label>Current status: $alarmPretty</label>
+                  <select class="onlyCode form-control form-control-sm">
+                    <option value="disarmed">Disarm alarm</option>
+                    <option value="armAway">Arm away</option>
+                    <option value="armHome">Arm home</option>
+                  </select>
+                  <br>
+                # end if
+
+                <div class="row">
+                  <div class="col-12">
+                    <input type="password" disabled="disabled" class="form-control form-control-sm password" />
+                  </div>
+                </div>
+
+                <!-- Row 1 -->
+                <div class="row">
+                  <div class="col-4">
+                    <button type="button" class="btn btn-primary btn-sm alarmpad" data-num="1">1</button>
+                  </div>
+
+                  <div class="col-4">
+                    <button type="button" class="btn btn-primary btn-sm alarmpad" data-num="2">2</button>
+                  </div>
+
+                  <div class="col-4">
+                    <button type="button" class="btn btn-primary btn-sm alarmpad" data-num="3">3</button>
+                  </div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="row">
+                  <div class="col-4">
+                    <button type="button" class="btn btn-primary btn-sm alarmpad" data-num="4">4</button>
+                  </div>
+
+                  <div class="col-4">
+                    <button type="button" class="btn btn-primary btn-sm alarmpad" data-num="5">5</button>
+                  </div>
+
+                  <div class="col-4">
+                    <button type="button" class="btn btn-primary btn-sm alarmpad" data-num="6">6</button>
+                  </div>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="row">
+                  <div class="col-4">
+                    <button type="button" class="btn btn-primary btn-sm alarmpad" data-num="7">7</button>
+                  </div>
+
+                  <div class="col-4">
+                    <button type="button" class="btn btn-primary btn-sm alarmpad" data-num="8">8</button>
+                  </div>
+
+                  <div class="col-4">
+                    <button type="button" class="btn btn-primary btn-sm alarmpad" data-num="9">9</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary alarmSubmitCancel" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success alarmSubmit">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+#end proc

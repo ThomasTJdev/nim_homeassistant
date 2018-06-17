@@ -1,0 +1,95 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#
+#proc genCertificates(c: var TData): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="certificates" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      # let allCerts = getAllRows(db, sql"SELECT id, name, url, port, creation FROM certificates ORDER BY name ASC")
+
+      <div id="pagewrapper">
+        <div id="certificates">
+         
+          <h1>Certificates</h1>
+
+          <div class="certList">
+            <table class="certList table">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Name</th>
+                  <th>URL</th>
+                  <th>Port</th>
+                  <th>Creation</th>
+                  <th></th>
+                </tr>
+                <tr class="certItemEdit">
+                  <td>
+                    <input class="name" />
+                  </td>
+                  <td>
+                    <input class="url" />
+                  </td>
+                  <td>
+                    <input class="port" />
+                  </td>
+                  <td>
+                    <input disabled="disabled" />
+                  </td>
+                  <td class="btn btn-success certAddNew">
+                    Add
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
+                # for cert in allCerts:
+                <tr class="device" data-id="${cert[0]}">
+                  <td>
+                    ${cert[1]}
+                  </td>
+                  <td>
+                    ${cert[2]}
+                  </td>
+                  <td>
+                    ${cert[3]}
+                  </td>
+                  <td>
+                    ${epochDate(cert[4], "YYYY-MM-DD HH:mm")}
+                  </td>
+                  <td data-certid="${cert[0]}" class="btn btn-danger certDelete">
+                    Del
+                  </td>
+                </tr>
+                # end for
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+
+
+#end proc

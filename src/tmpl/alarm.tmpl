@@ -1,0 +1,214 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#proc genAlarm(c: var TData): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="alarm" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="alarm">
+         
+          <h1>Alarm</h1>
+
+          # let alarmCountdown = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
+          # let alarmArmtime = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "armtime")
+          <div class="alarmDetails">
+            <h3>Settings</h3>
+            <div>
+              <label>Alarm countdown (seconds)</label>
+              <input class="alarmCountdown form-control form-control-sm" value="$alarmCountdown" />
+              <button class="btn btn-primary alarmCountdownUpdate">Update</button>
+            </div>
+
+            <br>
+
+            <div>
+              <label>Arm time (time to get out)</label>
+              <input class="alarmArmtime form-control form-control-sm" value="$alarmArmtime" />
+              <button class="btn btn-primary alarmArmtimeUpdate">Update</button>
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="alarmPasswords">
+            # let allPasswords = getAllRows(db, sql"SELECT person.id, person.name, alarm_password.creation FROM alarm_password LEFT JOIN person ON person.id = alarm_password.userid")
+
+            <h3>Alarm password</h3>
+            <h5>Users with access to manage the alarm (only digits!)</h5>
+
+            # if c.rank == Admin:
+            #   let allUsers = getAllRows(db, sql"SELECT id, name FROM person")
+            <form method="GET" action="/alarm/do?action=adduser">
+              <input name="action" class="hide" value="adduser" />
+              <select name="userid" class="form-control form-control-sm">
+                # for person in allUsers:
+                  <option value="${person[0]}">${person[1]}</option>
+                # end for
+              </select>
+              <input name="password" class="password form-control form-control-sm" type="password" placeholder="Password" style="text-align: center" required />
+              <button type="submit" class="btn btn-primary">Save new user</button>
+            </form>
+            # end if
+
+            # if allPasswords.len() > 0:
+            <table class="alarmPasswords table table-bordered table-hover">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Username</th>
+                  <th>Creation</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                # for device in allPasswords:
+                <tr class="device">
+                  <td>
+                    ${device[1]}
+                  </td>
+                  <td>
+                    ${epochDate(device[2], "YYYY-MM-DD HH:mm")}
+                  </td>
+                  <td data-userid="${device[0]}" class="btn btn-danger alarmDeletePassword">
+                    Del
+                  </td>
+                </tr>
+                # end for
+              </tbody>
+            </table>
+            # else:
+            <div>Theres no users with assigned passwords</div>
+            # end if
+          </div>
+
+          <hr>
+
+          <div class="alarmActions">
+            # let allActions = getAllRows(db, sql"SELECT id, alarmstate, action, action_name, action_ref FROM alarm_actions")
+            #
+            # let pushAlarm = getAllRows(db, sql"SELECT id, name FROM pushbullet_templates")
+            #
+            # let mailAlarm = getAllRows(db, sql"SELECT id, name FROM mail_templates")
+            #
+            # let xiaomiAlarm = getAllRows(db, sql"SELECT xda.id, xda.name, xd.name FROM xiaomi_templates AS xda LEFT JOIN xiaomi_devices AS xd ON xd.sid = xda.sid ORDER BY xda.name")
+            #
+            # var select = ""
+            #
+            # for push in pushAlarm:
+            #   select.add("<option value='" & push[0] & "' data-element='pushbullet'>Pushbullet: " & push[1] & "</option>")
+            # end for
+            #
+            # for mail in mailAlarm:
+            #   select.add("<option value='" & mail[0] & "' data-element='mail'>Mail: " & mail[1] & "</option>")
+            # end for
+            #
+            # for xiaomi in xiaomiAlarm:
+            #   select.add("<option value='" & xiaomi[0] & "' data-element='xiaomi'>Xiaomi: " & xiaomi[1] & " (" & xiaomi[2] & ")</option>")
+            # end for
+
+            <h3>Alarm actions</h3>
+            <table class="alarmActions table table-bordered table-hover">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Alarm state</th>
+                  <th>Action</th>
+                  <th>Name</th>
+                  <th></th>
+                </tr>
+                <tr class="alarmItemAdd">
+                  <td>
+                    <select name="alarmstate" class="alarmstate form-control form-control-sm">
+                      <option value="disarmed">Disarmed</option>
+                      <option value="armAway">Arm away</option>
+                      <option value="armHome">Arm home</option>
+                      <option value="triggered">Triggered</option>
+                      <option value="ringing">Ringing</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select name="alarmaction" class="alarmaction form-control form-control-sm">
+                      $select
+                    </select>
+                  </td>
+                  <td>
+
+                  </td>
+                  <td class="btn btn-success alarmActionAdd">
+                    Add
+                  </td>
+                </tr>
+              </thead>
+
+              <tbody>
+              # var rowBefore = ""
+              # for action in allActions:
+              #  if rowBefore != action[2]:
+                <tr><td colspan="4" style="background-color: #bababa;"></td></tr>
+              #  end if
+              # rowBefore = action[2]
+              
+              <tr>
+                <td>${action[1]}</td>
+                <td>${action[2]}</td>
+                <td>${action[3]}</td>
+                <td data-actionid="${action[0]}" class="btn btn-danger alarmDeleteAction">Del</td>
+              </tr>
+              # end for
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+
+
+#end proc
+#
+#
+#
+#
+#
+#proc genAlarmCode(c: var TData): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <nav id="navbar" style="display: none;"></nav>
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="alarmNumpad" style="display: none;"></div>
+
+    <div class="wrapper">
+      ${genAlarmNumpad(c, true)}
+    </div>
+
+  </main>
+
+  ${genMainNotify()}
+
+</body>
+#end if

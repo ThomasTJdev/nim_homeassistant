@@ -1,0 +1,346 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#proc genXiaomiDevices(c: var TData): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="xiaomidevices" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+
+# let allSensors = getAllRows(db, sql"SELECT xdd.id, xd.sid, xd.name, xd.model, xdd.value_name, xdd.value_data, xdd.action, xdd.triggerAlarm FROM xiaomi_devices_data AS xdd LEFT JOIN xiaomi_devices AS xd ON xd.sid = xdd.sid ORDER BY xd.name ASC")
+#
+# let allActions = getAllRows(db, sql"SELECT xdd.id, xd.sid, xdd.name, xd.name, xd.model, xdd.value_name, xdd.value_data FROM xiaomi_templates AS xdd LEFT JOIN xiaomi_devices AS xd ON xd.sid = xdd.sid ORDER BY xd.name ASC")
+#
+# let allDevices = getAllRows(db, sql"SELECT xd.sid, xd.name, xd.model, xd.creation FROM xiaomi_devices AS xd ORDER BY xd.creation DESC")
+#
+# let gwApi = getAllRows(db, sql"SELECT gw.sid, gw.key, xi.name FROM xiaomi_api AS gw LEFT JOIN xiaomi_devices AS xi ON xi.sid = gw.sid")
+#
+#
+# var select = ""
+#
+# for device in allDevices:
+#   select.add("<option value='" & device[0] & "' data-element='xiaomi'>" & device[1] & " (" & device[0] & ")</option>")
+# end for
+
+
+
+      <div id="pagewrapper">
+        <div id="xiaomiDevices">
+         
+          <h1>Xiaomi devices</h1>
+
+          <div class="gatewayApi">
+            <h3>Gateway API</h3>
+
+            <p><i>You need the gateway api, if you want to write to the gateway, e.g. make the gateway play sounds. Otherwise you can only monitor sensors. <a href="https://www.domoticz.com/wiki/Xiaomi_Gateway_(Aqara)#Adding_the_Xiaomi_Gateway_to_Domoticz">Follow this tutorial</a></i></p>
+
+            # for gw in gwApi:
+              <div>
+                <label>${gw[2]}</label>
+                <input type="text" required value="${gw[1]}" class="key" />
+                <button data-sid="${gw[0]}" data-name="${gw[2]}" class="btn btn-primary xiaomiUpdateKey">Update</button>
+              </div>
+
+            # end for
+
+          </div>
+
+          <hr>
+
+          <div class="deviceList">
+            <h3>Available devices</h3>
+            <i>This is the devices, that are found on your network. You can update the details for each device. To auto discover new devices, click on the auto discover.</i>
+
+            <br>
+
+            <button class="btn btn-primary xiaomiDiscoverDevices">Auto discover</button>
+            
+            <br>
+            
+            <table class="deviceList table">
+              <thead>
+                <tr class="thead-dark">
+                  <th>SID</th>
+                  <th>Name</th>
+                  <th>Model</th>
+                  <th>Creation</th>
+                  <th></th>
+                </tr>
+                <tr class="xiaomiDeviceEdit">
+                  <td>
+                    <select name="alarmaction" class="xiaomiDeviceSid form-control form-control-sm">
+                      $select
+                    </select>
+                  </td>
+                  <td>
+                    <input class="name" />
+                  </td>
+                  <td>
+                    <input disabled="disabled" />
+                  </td>
+                  <td>
+                    <input disabled="disabled" />
+                  </td>
+                  <td class="btn btn-success xiaomiUpdateDevice">
+                    Update
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
+                # for device in allDevices:
+                <tr class="device">
+                  <td>
+                    ${device[0]}
+                  </td>
+                  <td>
+                    ${device[1]}
+                  </td>
+                  <td>
+                    ${device[2]}
+                  </td>
+                  <td>
+                    ${device[3]}
+                  </td>
+                  <td></td>
+                </tr>
+                # end for
+              </tbody>
+            </table>
+          </div>
+
+          <hr>
+
+          <div class="deviceActions">
+            <h3>Sensors</h3>
+            <h5>Only insert sensors which are used for monitoring, e.g. PIR, magnets, etc.</h5>
+            <table class="deviceActions table table-bordered table-hover">
+              <thead>
+                <tr class="thead-dark">
+                  <th>
+                    SID
+                  </th>
+                  <th>
+                    Name
+                  </th>
+                  <th>
+                    Model
+                  </th>
+                  <th>
+                    Value name
+                  </th>
+                  <th>
+                    Value data
+                  </th>
+                  <th>
+                    Action
+                  </th>
+                  <th>
+                    Trigger alarm
+                  </th>
+                  <th>
+                    
+                  </th>
+                </tr>
+
+                <tr class="xiaomiNewSensor">
+                  <td>
+                    <select name="alarmaction" class="xiaomiActionSid form-control form-control-sm">
+                      $select
+                    </select>
+                  </td>
+                  <td>
+                    <input disabled="disabled" class="name" />
+                  </td>
+                  <td>
+                    <input disabled="disabled" class="model" />
+                  </td>
+                  <td>
+                    <input class="valuename" />
+                  </td>
+                  <td>
+                    <input class="valuedata" />
+                  </td>
+                  <td>
+                    <input class="handling" />
+                  </td>
+                  <td>
+                    <input class="triggeralarm" />
+                  </td>
+                  <td class="btn btn-success xiaomiAddSensor">
+                    Save
+                  </td>
+                </tr>
+              </thead>
+
+              <tbody>
+              # for device in allSensors:
+                <tr class="device ${device[0]}">
+                  <td>
+                    ${device[1]}
+                  </td>
+                  <td>
+                    ${device[2]}
+                  </td>
+                  <td>
+                    ${device[3]}
+                  </td>
+                  <td>
+                    ${device[4]}
+                  </td>
+                  <td>
+                    ${device[5]}
+                  </td>
+                  <td>
+                    ${device[6]}
+                  </td>
+                  <td>
+                    ${device[7]}
+                  </td>
+                  <td data-xdid="${device[0]}" class="btn btn-danger xiaomiDeleteSensor">
+                    Del
+                  </td>
+                </tr>
+              # end for
+              </tbody>
+            </table>
+          </div>
+
+          <hr>
+
+          <div class="deviceActions">
+            <h3>Actions</h3>
+            <h5>Only insert devices with their actions - no sensors</h5>
+            <table class="deviceActions table table-bordered table-hover">
+              <thead>
+                <tr class="thead-dark">
+                  <th>
+                    SID
+                  </th>
+                  <th>
+                    Name
+                  </th>
+                  <th>
+                    Xiaomi name
+                  </th>
+                  <th>
+                    Model
+                  </th>
+                  <th>
+                    Value name
+                  </th>
+                  <th>
+                    Value data
+                  </th>
+                  <th>
+                    
+                  </th>
+                </tr>
+
+                <tr class="xiaomiNewAction">
+                  <td>
+                    <select name="alarmaction" class="xiaomiActionSid form-control form-control-sm">
+                      $select
+                    </select>
+                  </td>
+                  <td>
+                    <input class="name" />
+                  </td>
+                  <td>
+                    <input disabled="disabled" class="xiname" />
+                  </td>
+                  <td>
+                    <input disabled="disabled" class="model" />
+                  </td>
+                  <td>
+                    <input class="valuename" />
+                  </td>
+                  <td>
+                    <input class="valuedata" />
+                  </td>
+                  <td class="btn btn-success xiaomiAddAction">
+                    Save
+                  </td>
+                </tr>
+              </thead>
+
+              <tbody>
+              # for device in allActions:
+                <tr class="device ${device[0]}">
+                  <td>
+                    ${device[1]}
+                  </td>
+                  <td>
+                    ${device[2]}
+                  </td>
+                  <td>
+                    ${device[3]}
+                  </td>
+                  <td>
+                    ${device[4]}
+                  </td>
+                  <td>
+                    ${device[5]}
+                  </td>
+                  <td>
+                    ${device[6]}
+                  </td>
+                  <td data-xdid="${device[0]}" class="btn btn-danger xiaomiDeleteAction">
+                    Del
+                  </td>
+                </tr>
+              # end for
+              </tbody>
+            </table>
+          </div>
+
+          <div class="help">
+            <div class="color">
+              <p>To assign a RGB color, you have to use the Android() color format.</p>
+              <p>You can convert HEX to Android() at this <a href="https://convertingcolors.com/android-color-4294914304.html">website</a></p>
+              <ul>
+                <li>Red = 4294914304</li>
+                <li>Green = 4283359807</li>
+                <li>Purple = 4283637131</li>
+                <li>Yellow = 4292211292</li>
+                <li>Blue = 4283327469</li>
+                <li>Off = 0</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+
+
+#end proc
