@@ -49,7 +49,6 @@ proc certExpiraryAll*(db: DbConn) {.async.} =
 proc certDatabase*(db: DbConn) =
   ## Creates web certificates tables in database
 
-  # Devices
   if not db.tryExec(sql"""
   CREATE TABLE IF NOT EXISTS certificates (
     id INTEGER PRIMARY KEY,
