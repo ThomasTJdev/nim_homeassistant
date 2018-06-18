@@ -1,23 +1,18 @@
-/*style_parallax.css*/
-/*
-  Theme: Parallax
-  Do not change the lines above
-  This is the default stylesheet  
-
-  To use this themes parallax features
-*/
-
 /*
   Main elements
 */
 
-html {
-}
 
 body {
   background: whitesmoke;
   font-family: 'Poppins', sans-serif;
 }
+@media only screen and (max-width: 900px) {
+  body {
+    font-size: 85%;
+  }
+}
+
 p {
   font-family: 'Poppins', sans-serif;
 }
@@ -26,42 +21,12 @@ p {
   margin-top: 57px;
   padding-bottom: 10px;
 }
-/*
-#pagewrapper {
-  width: 100%;
-  color: black;
-  margin-left: auto;
-  margin-right: auto;
-}
-@media only screen and (max-width: 1200px) {
-  #pagewrapper {
-    width: 100%
-  }
-}
-
-#page {
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 72px;
-  margin-bottom: 96px;
-  padding: 0px 10px;
-}
-#page.true {
-  margin-top: 72px;
-}
-@media only screen and (max-width: 768px) {
-  #page {
-    margin-bottom: 0px;
-    margin-top: 35px;
-  }
-}*/
 
 footer {
   border-top: 1px solid #dee2e6;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
-  /*position: fixed;*/
   bottom: 0;
   display: block;
   width: 100%;
