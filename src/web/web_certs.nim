@@ -26,23 +26,14 @@ proc certExpiraryJson*(serverAddress, port: string) {.async.} =
   ## Dot . in serveraddress send in JSON response needs to be
   ## removed due to the use of serveraddress in CSS class
 
-  # This method does not work out of the box on Raspberry
-  #let output = execProcess("echo $((($(date --date \"$(date --date \"$(openssl s_client -connect " & serverAddress & ":" & port & " -servername " & serverAddress & " < /dev/null 2>/dev/null | openssl x509 -noout -enddate | sed -n 's/notAfter=//p')\")\" +%s)-$(date --date now +%s))/86400))")
-
-  #var sslOut = execProcess("echo $(date --date \"$(openssl s_client -connect " & serverAddress & ":" & port & " -servername " & serverAddress & " < /dev/null 2>/dev/null | openssl x509 -noout -enddate | sed -n 's/notAfter=//p')\" +\"%s\")").replace("\n", "")
-
   let daysToExpire = certExpiraryDaysTo(serverAddress, port)
 
   if not isDigit(daysToExpire):
     discard mqttSend("webutils", "wss/to", "{\"sslOut\": \"action\", \"element\": \"certexpiry\", \"server\": \"" & replace(serverAddress, ".", "") & "\", \"value\": \"error\"}")
 
   else:
-    #let formattedDate = split($((parseFloat(sslOut) - epochTime()) / 86400 ), ".")[0]
-  
     discard mqttSend("webutils", "wss/to", "{\"handler\": \"action\", \"element\": \"certexpiry\", \"server\": \"" & replace(serverAddress, ".", "") & "\", \"value\": \"" & daysToExpire & "\"}")
 
-  #discard mqttSend("webutils", "wss/to", res)
-  
 
 
 proc certExpiraryAll*(db: DbConn) {.async.} =
