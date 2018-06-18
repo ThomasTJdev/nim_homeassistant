@@ -4,17 +4,26 @@ import osproc, strutils, db_sqlite, asyncdispatch
 
 import ../mqtt/mqtt_func
 
+from times import epochTime
 
 proc certExpiraryJson*(serverAddress, port: string) {.async.} =
   ## Excecute openssl s_client and return dates until expire
 
-  let output = execProcess("echo $((($(date --date \"$(date --date \"$(openssl s_client -connect " & serverAddress & ":" & port & " -servername " & serverAddress & " < /dev/null 2>/dev/null | openssl x509 -noout -enddate | sed -n 's/notAfter=//p')\")\" +%s)-$(date --date now +%s))/86400))")
+  # This method does not work out of the box on Raspberry
+  #let output = execProcess("echo $((($(date --date \"$(date --date \"$(openssl s_client -connect " & serverAddress & ":" & port & " -servername " & serverAddress & " < /dev/null 2>/dev/null | openssl x509 -noout -enddate | sed -n 's/notAfter=//p')\")\" +%s)-$(date --date now +%s))/86400))")
+
+  var sslOut = execProcess("echo $(date --date \"$(openssl s_client -connect " & serverAddress & ":" & port & " -servername " & serverAddress & " < /dev/null 2>/dev/null | openssl x509 -noout -enddate | sed -n 's/notAfter=//p')\" +\"%s\")").replace("\n", "")
 
   var res = ""
-  if "unable to load" in output:
-    res = "{\"handler\": \"response\", \"value\": \"error\"}"
+  echo sslOut
+  if not isDigit(sslOut):
+    res = "{\"sslOut\": \"action\", \"element\": \"certexpiry\", \"server\": \"" & replace(serverAddress, ".", "") & "\", \"value\": \"error\"}"
+
   else:
-    res = "{\"handler\": \"action\", \"element\": \"certexpiry\", \"server\": \"" & replace(serverAddress, ".", "") & "\", \"value\": \"" & replace(output, "\n", "") & "\"}"  
+
+    let formattedDate = split($((parseFloat(sslOut) - epochTime()) / 86400 ), ".")[0]
+  
+    res = "{\"handler\": \"action\", \"element\": \"certexpiry\", \"server\": \"" & replace(serverAddress, ".", "") & "\", \"value\": \"" & formattedDate & "\"}"  
 
   discard mqttSend("webutils", "wss/to", res)
   
