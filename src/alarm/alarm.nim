@@ -211,8 +211,7 @@ proc alarmDatabase*(db: DbConn) =
     status TEXT,
     modified timestamp NOT NULL default (STRFTIME('%s', 'now'))
   );""")
-  #  echo " - Alarm DB: alarm table already exists"
-  #else:
+  
   if getAllRows(db, sql"SELECT id FROM alarm").len() <= 0:
     exec(db, sql"INSERT INTO alarm (status) VALUES (?)", "disarmed")
 
@@ -227,7 +226,6 @@ proc alarmDatabase*(db: DbConn) =
     creation timestamp NOT NULL default (STRFTIME('%s', 'now')),
     FOREIGN KEY (userid) REFERENCES person(id)
   );""")
-  #echo " - Alarm DB: alarm_history table already exists"
 
   # Alarm settings
   exec(db, sql"""
@@ -237,8 +235,7 @@ proc alarmDatabase*(db: DbConn) =
     value TEXT,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now'))
   );""")
-  #  echo " - Alarm DB: alarm_settings table already exists"
-  #else:
+  
   if getAllRows(db, sql"SELECT id FROM alarm_settings").len() <= 0:
     exec(db, sql"INSERT INTO alarm_settings (element, value) VALUES (?, ?)", "countdown", "20")
     exec(db, sql"INSERT INTO alarm_settings (element, value) VALUES (?, ?)", "armtime", "20")
@@ -279,3 +276,4 @@ proc alarmInit*(db: DbConn) =
 
 
 alarmInit(db)
+alarmDatabase(db)

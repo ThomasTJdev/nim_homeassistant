@@ -132,17 +132,16 @@ proc owntracksDatabase(db: DbConn) =
   ## Creates Xiaomi tables in database
 
   # Devices
-  if not db.tryExec(sql"""
+  exec(db, sql"""
   CREATE TABLE IF NOT EXISTS owntracks_devices (
     username TEXT PRIMARY KEY,
     device_id TEXT,
     tracker_id TEXT,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now'))
-  );""", []):
-    echo " - Owntracks DB: owntracks_devices table already exists"
+  );""")
 
   # Waypoints
-  if not db.tryExec(sql"""
+  exec(db, sql"""
   CREATE TABLE IF NOT EXISTS owntracks_waypoints (
     id INTEGER PRIMARY KEY,
     username TEXT,
@@ -153,11 +152,10 @@ proc owntracksDatabase(db: DbConn) =
     rad INTEGER,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now')),
     FOREIGN KEY (username) REFERENCES owntracks_devices(username)
-  );""", []):
-    echo " - Owntracks DB: owntracks_devices table already exists"
+  );""")
 
   # History
-  if not db.tryExec(sql"""
+  exec(db, sql"""
   CREATE TABLE IF NOT EXISTS owntracks_history (
     id INTEGER PRIMARY KEY,
     username TEXT,
@@ -168,8 +166,7 @@ proc owntracksDatabase(db: DbConn) =
     conn VARCHAR(10),
     creation timestamp NOT NULL default (STRFTIME('%s', 'now')),
     FOREIGN KEY (username) REFERENCES owntracks_devices(username)
-  );""", []):
-    echo " - Owntracks DB: owntracks_history table already exists"
+  );""")
 
 
 owntracksDatabase(db)

@@ -49,14 +49,13 @@ proc certExpiraryAll*(db: DbConn) {.async.} =
 proc certDatabase*(db: DbConn) =
   ## Creates web certificates tables in database
 
-  if not db.tryExec(sql"""
+  exec(db, sql"""
   CREATE TABLE IF NOT EXISTS certificates (
     id INTEGER PRIMARY KEY,
     name TEXT,
     url TEXT,
     port INTEGER,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now'))
-  );""", []):
-    echo " - Certificated DB: certificates table already exists"
+  );""")
 
 

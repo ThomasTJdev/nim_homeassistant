@@ -2,7 +2,6 @@
 
 import parseCfg, db_sqlite, os, strutils
 
-
   
 let dict = loadConfig("config/config.cfg")
 
@@ -90,11 +89,3 @@ proc conn*(): DbConn =
   except:
     echo "ERROR: Connection to DB could not be established"
     quit()
-
-
-
-# Connect on init
-# share db variable across
-
-#proc getDb*(): DbConn =
-#  return db

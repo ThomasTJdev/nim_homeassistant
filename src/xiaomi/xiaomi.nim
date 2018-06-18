@@ -344,7 +344,7 @@ proc xiaomiDatabase*(db: DbConn) =
   ## Creates Xiaomi tables in database
 
   # Devices
-  if not db.tryExec(sql"""
+  exec(db, sql"""
   CREATE TABLE IF NOT EXISTS xiaomi_devices (
     sid TEXT PRIMARY KEY,
     name TEXT,
@@ -352,22 +352,20 @@ proc xiaomiDatabase*(db: DbConn) =
     short_id TEXT,
     token TEXT,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now'))
-  );""", []):
-    echo " - Xiaomi DB: xiaomi_devices table already exists"
+  );""")
 
   # Gateway API
-  if not db.tryExec(sql"""
+  exec(db, sql"""
   CREATE TABLE IF NOT EXISTS xiaomi_api (
     sid TEXT PRIMARY KEY,
     key TEXT,
     token TEXT,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now')),
     FOREIGN KEY (sid) REFERENCES xiaomi_devices(sid)
-  );""", []):
-    echo " - Xiaomi DB: xiaomi_devices table already exists"
+  );""")
 
   # Sensors ( to be renamed )
-  if not db.tryExec(sql"""
+  exec(db, sql"""
   CREATE TABLE IF NOT EXISTS xiaomi_devices_data (
     id INTEGER PRIMARY KEY,
     sid TEXT,
@@ -377,11 +375,10 @@ proc xiaomiDatabase*(db: DbConn) =
     triggerAlarm TEXT,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now')),
     FOREIGN KEY (sid) REFERENCES xiaomi_devices(sid)
-  );""", []):
-    echo " - Xiaomi DB: xiaomi_devices_data table already exists"
+  );""")
 
   # Actions
-  if not db.tryExec(sql"""
+  exec(db, sql"""
   CREATE TABLE IF NOT EXISTS xiaomi_templates (
     id INTEGER PRIMARY KEY,
     sid TEXT,
@@ -390,11 +387,10 @@ proc xiaomiDatabase*(db: DbConn) =
     value_data TEXT,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now')),
     FOREIGN KEY (sid) REFERENCES xiaomi_devices(sid)
-  );""", []):
-    echo " - Xiaomi DB: xiaomi_devices_data table already exists"
+  );""")
 
   # History
-  if not db.tryExec(sql"""
+  exec(db, sql"""
   CREATE TABLE IF NOT EXISTS xiaomi_history (
     id INTEGER PRIMARY KEY,
     sid TEXT,
@@ -403,8 +399,7 @@ proc xiaomiDatabase*(db: DbConn) =
     data TEXT,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now')),
     FOREIGN KEY (sid) REFERENCES xiaomi_devices(sid)
-  );""", []):
-    echo " - Xiaomi DB: xiaomi_history table already exists"
+  );""")
 
 
 
@@ -432,3 +427,4 @@ proc xiaomiInit*(db: DbConn) =
   
 
 xiaomiInit(db)
+xiaomiDatabase(db)
