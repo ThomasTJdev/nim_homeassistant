@@ -4,7 +4,7 @@
     Websocket
 ________________________________*/
 var ws = "";
-var wsAddress = "192.168.1.20"
+var wsAddress = "127.0.0.1"
 var pageRefresh = false;
 var pageType    = $("#pageType").attr("data-type");
 var userID      = $("#pageType").attr("data-userid");
@@ -12,8 +12,8 @@ var userID      = $("#pageType").attr("data-userid");
 $(function() {
 
   if (pageType == "dashboard" || pageType == "alarmNumpad") {
-    if (wsAddress == "192.168.1.20") {
-      alert("Please change the Websocket address in js.js");
+    if (wsAddress == "127.0.0.1") {
+      console.log("Please change the Websocket address in js.js. Otherwise external will not connect.");
     }
     ws = new WebSocket("ws://" + wsAddress + ":25437", ["nimha"]);
   }
