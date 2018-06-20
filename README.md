@@ -11,6 +11,7 @@ Home Assistant in [Nim](https://nim-lang.org/)
 * OS stats
 * Pushbullet
 * Mailing
+* Cron jobs (timing)
 * Alarm system (combined with Xiaomi and Owntracks)
 * Interface in browser using websockets
 * .. more to come
@@ -45,6 +46,8 @@ Soon beta. The next steps (not chronological):
 3) Add more features, e.g. Sony Songpal, Yeelight
 4) When deleting templates, update templates users, e.g. alarm actions
 5) Google Maps API
+6) Add example usecases
+
 
 # Screenshot
 ![Blog](private/screenshots/dashboard.png)
