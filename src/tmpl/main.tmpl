@@ -146,7 +146,7 @@
 
 
 
-            <div class="item col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="item col-12 col-sm-6 col-md-6 col-lg-3">
               <div class="inner">
                 # let alarmStatus = getValue(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
                 # template alarmClass(status: string): string =
@@ -218,7 +218,7 @@
 
             # let certificates = getAllRows(db, sql"SELECT name, url, port FROM certificates ORDER BY name ASC")
             # if certificates.len() > 0:
-            <div class="item col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="item col-12 col-sm-6 col-md-6 col-lg-3">
               <div class="inner">
                 <div class="certexpiry">
                   <div class="heading">Cert expiration</div>
@@ -241,7 +241,7 @@
 
             # let pushAll = getAllRows(db, sql"SELECT id, name FROM pushbullet_templates")
             # if pushAll.len() > 0:
-            <div class="item col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="item col-12 col-sm-6 col-md-6 col-lg-3">
               <div class="inner">
                 <div class="pushbullet">
                   <div class="heading">Pushbullet</div>
@@ -265,7 +265,7 @@
 
             # let xiaomiDevices = getAllRows(db, sql"SELECT xdd.sid, xd.name, xdd.value_name, xdd.action FROM xiaomi_devices_data AS xdd LEFT JOIN xiaomi_devices AS xd ON xd.sid = xdd.sid WHERE xdd.triggerAlarm = ? ORDER BY xd.name ASC", "false")
             # if xiaomiDevices.len() > 0:
-            <div class="item col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="item col-12 col-sm-6 col-md-6 col-lg-3">
               <div class="inner">
                 <div class="xiaomi">
                   <div class="heading">Xiaomi device status</div>
@@ -285,7 +285,7 @@
 
 
 
-            <div class="item col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="item col-12 col-sm-6 col-md-6 col-lg-3">
               <div class="inner">
                 <div class="owntracks">
                   <div class="heading">Owntracks map <span class="owntracksRefresh badge badge-primary">Refresh</span></div>
@@ -299,7 +299,7 @@
 
             
 
-            <div class="item col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="item col-12 col-sm-6 col-md-6 col-lg-3">
               <div class="inner">
                 <div class="wsusers">
                   <div class="heading">Websocket users</div>
@@ -312,7 +312,7 @@
             </div>
 
 
-            <div class="item col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="item col-12 col-sm-6 col-md-6 col-lg-3">
               <div class="inner">
                 <div class="osstats">
                   <div class="heading">
