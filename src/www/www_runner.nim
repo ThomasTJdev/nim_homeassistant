@@ -11,9 +11,10 @@ import strutils
 import times
 import uri
 
-import recaptcha
-
 import cookies as libcookies
+
+import recaptcha
+import ../www/google_recaptcha
 
 import ../database/database
 import ../database/sql_safe
@@ -238,7 +239,7 @@ routes:
     when not defined(dev):
       if useCaptcha:
         if not await checkReCaptcha(@"g-recaptcha-response", c.req.ip):
-          resp genFormLogin(c, "Error: You need to verify, that you are not a robot!")
+          redirect("/login")
     
     let (loginB, loginS) = login(c, @"email", replace(@"password", " ", ""))
     if loginB:
