@@ -89,7 +89,7 @@ proc xiaomiListen() =
 
 
 when isMainModule:
-  sleep(2000) # Wait for other processes to start
+  sleep(1500) # Wait for other processes to start
   echo "Xiaomi multicast listener is started"
   xiaomiListen()
-  runForever()
+  #runForever()

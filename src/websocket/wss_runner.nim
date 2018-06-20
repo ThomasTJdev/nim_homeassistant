@@ -20,43 +20,26 @@ import mqtt
 import ../mqtt/mqtt_func
 
 
-type
-  ## Connection to the Gateway
-  WebsocketMessages* = object of RootObj
-    text*: string
-
-
 var db = conn()
 
 
-var wsmsg* {.inject.}: WebsocketMessages
-wsmsg.text = ""
-
-
-
-proc wsmsgAdd*(data: string) =
-
-  if data == "":
-    return
-
-  if wsmsg.text != "":
-    wsmsg.text.add(",")
-
-  wsmsg.text.add(data)
-
+var msgHi: seq[string] = @[]   
 
 
 proc wsmsgMessages*(): string =
 
-  if wsmsg.text == "":
-    #return "{\"pong\": \"nonews\"}"
+  if msgHi.len() == 0:
     return ""
+    
+  var json = ""
+  for element in msgHi:
+    if json != "":
+      json.add("," & element)
+    else:
+      json.add(element)
+  msgHi = @[]
 
-  result = "{\"handler\": \"history\", \"data\" :[" & wsmsg.text & "]}"
-  #result = wsmsg.text
-  wsmsg.text = ""
-  return result
-
+  return "{\"handler\": \"history\", \"data\" :[" & json & "]}"
 
 
 type
@@ -72,10 +55,6 @@ type
   Server = ref object
     clients: seq[Client]
     needsUpdate: bool
-
-
-
-let httpServer = newAsyncHttpServer()
 
 
 # Contains the clients
@@ -135,6 +114,9 @@ proc wsConnectedUsers(): string =
 proc wsSendConnectedUsers() {.async.} =
   ## Send JSON with connected users
 
+  msgHi.add(wsConnectedUsers())
+
+  #[
   let json = wsConnectedUsers()
 
   for client in server.clients:
@@ -147,6 +129,7 @@ proc wsSendConnectedUsers() {.async.} =
       echo("pong failed")
       await updateClientsNow()
       continue
+  ]#
 
 
 #[
@@ -167,6 +150,7 @@ proc wsSendMsg(msg: string) {.async.} =
 proc pong(server: Server) {.async.} =
   ## Send JSON with connected users
 
+  var updateClients = false
   while true:
     let json = wsmsgMessages()
     if not isNil(server.clients) and json != "":
@@ -178,10 +162,15 @@ proc pong(server: Server) {.async.} =
         yield fut
         if fut.failed:
           echo("WSS: Pong msg failed")
-          await updateClientsNow()
+          client.connected = false
+          updateClients = true
           continue
 
-    await sleepAsync(3000)
+    if updateClients:   
+      await updateClientsNow()
+      updateClients = false
+    
+    await sleepAsync(1500)
 
 
 template js(json: string): JsonNode =
@@ -230,44 +219,47 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
       info("Active users: " & $server.clients.len())
     
     while true:
-
+      
       let (opcode, data) = await myClient.ws.readData()
       try:
-        #when defined(dev):
-        #  echo "(opcode: ", opcode, ", data length: ", data.len, ")"
 
         myClient.lastMessage = epochTime()
 
         case opcode
         of Opcode.Text:
-          echo data
           let js = js(data)
+
+          # To be removed
           if js == parseJson("{}"):
             echo "WSS: Json failed"
             return
-          
+
+          # Check user access
           let userid = getValue(db, sql"SELECT userid FROM session WHERE ip = ? AND key = ? AND userid = ?", hostname, jn(js, "key"), jn(js, "userid"))
           let userstatus = getValue(db, sql"SELECT status FROM person WHERE id = ?", userid)
 
           if userstatus notin ["Admin", "Moderator", "Normal"]:
             echo "WSS: Client messed up in sid and userid"
+            myClient.connected = false
             break
 
-
-          if data == "ping":
-            discard updateClientsNow()
+          # Crashes - do I need you?
+          #if data == "ping":
+          #  discard updateClientsNow()
+          
           asyncCheck mqttSendAsync("wss", jn(parseJson(data), "element"), data)
+
         #of Opcode.Binary:
         #  waitFor myClient.ws.sendBinary(data)
         of Opcode.Close:
           let (closeCode, reason) = extractCloseData(data)
-          error("socket went away, close code: ", closeCode, ", reason: ", reason)
+          echo("socket went away, close code: ", closeCode, ", reason: ", reason)
           myClient.connected = false
           asyncCheck updateClientsNow()
           break
         else: 
           let (closeCode, reason) = extractCloseData(data)
-          error("case else, close code: ", closeCode, ", reason: ", reason)
+          echo("case else, close code: ", closeCode, ", reason: ", reason)
           myClient.connected = false
           asyncCheck updateClientsNow()
 
@@ -284,7 +276,6 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
     info(".. socket went away.")
   
     
-   
 
 proc messageArrived*(topicName: string, message: MQTTMessage): cint =
   ## Callback function for receiving the MQTT message
@@ -292,7 +283,8 @@ proc messageArrived*(topicName: string, message: MQTTMessage): cint =
   when defined(dev):
     echo "WSS: MQTT arrived: ", topicName, " ", message.payload, "\n"
   try:
-    wsmsgAdd(message.payload)
+    msgHi.add(message.payload)
+    
   except:
     echo "WSS: MQTT fail"
   
@@ -315,9 +307,21 @@ proc mqttStartListener() =
   mqttClientMain.connect(connectOptions)
   mqttClientMain.subscribe("wss/to", QOS0)
     
-#proc wss*() {.async.} = 
+
 when isMainModule:
   echo "Websocket main started"
   mqttStartListener()
   asyncCheck pong(server)
-  waitFor serve(httpServer, Port(25437), onRequest)
+
+  # Bad solution.. !!!
+  var httpServer: AsyncHttpServer
+  try:
+    httpServer = newAsyncHttpServer()
+    waitFor serve(httpServer, Port(25437), onRequest)
+
+  except IOError:
+    echo "IOError.. damn"
+
+  close(httpServer)
+
+  sleep(500)

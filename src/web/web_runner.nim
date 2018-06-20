@@ -1,9 +1,5 @@
 # Copyright 2018 - Thomas T. Jarløv
 
-# Copyright 2018 - Thomas T. Jarløv
-
-# Copyright 2018 - Thomas T. Jarløv
-
 import asyncdispatch
 import mqtt
 import strutils
@@ -26,7 +22,6 @@ proc mqttStartListener() =
       var message: MQTTMessage
       let timeout = mqttClientMainq.receive(topicName, message, 10000)
       if not timeout:
-        echo message.payload
         asyncCheck webParseMqtt(message.payload) 
         
     except:
