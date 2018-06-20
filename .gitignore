@@ -23,5 +23,6 @@ src/os/os_runner
 src/owntracks/owntracks_runner
 src/web/web_runner
 src/websocket/wss_runner
+src/www/www_runner
 src/xiaomi/xiaomi_listener
 src/xiaomi/xiaomi_runner
