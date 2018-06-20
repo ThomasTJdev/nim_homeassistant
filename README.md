@@ -47,6 +47,7 @@ Soon beta. The next steps (not chronological):
 4) When deleting templates, update templates users, e.g. alarm actions
 5) Google Maps API
 6) Add example usecases
+7) reCaptcha implementation
 
 
 # Screenshot
