@@ -2,16 +2,11 @@
 
 import asyncdispatch
 import db_sqlite
-#import events
 import jester
 import json
 import logging
 import macros
-#import mqtt
-#import net
 import os
-#import osproc
-#import streams
 import strutils
 import times
 import uri
@@ -20,25 +15,14 @@ import recaptcha
 
 import cookies as libcookies
 
-#import src/alarm/alarm
-import src/database/database
-import src/database/sql_safe
-#import src/mqtt/mqtt_func
-#import src/os/os_utils
-import src/mail/mail
-#import src/owntracks/owntracks
-#import src/pushbullet/pushbullet
-import src/users/password
-import src/users/user_add
-import src/users/user_check
-import src/utils/parsers
-#import src/web/certs
-#import src/websocket/websocket_server
-#import src/websocket/websocket_watch
-#import src/xiaomi/xiaomi
-import src/utils/dates
-
-
+import ../database/database
+import ../database/sql_safe
+import ../mail/mail
+import ../users/password
+import ../users/user_add
+import ../users/user_check
+import ../utils/parsers
+import ../utils/dates
 
 
 
@@ -208,15 +192,15 @@ proc daysForward*(days: int): DateTime =
       HTML pages
 __________________________________________________]#
 
-include "src/tmpl/alarm_numpad.tmpl"
-include "src/tmpl/main.tmpl"
-include "src/tmpl/alarm.tmpl"
-include "src/tmpl/users.tmpl"
-include "src/tmpl/mail.tmpl"
-include "src/tmpl/certificates.tmpl"
-include "src/tmpl/owntracks.tmpl"
-include "src/tmpl/pushbullet.tmpl"
-include "src/tmpl/xiaomi.tmpl"
+include "../tmpl/alarm_numpad.tmpl"
+include "../tmpl/main.tmpl"
+include "../tmpl/alarm.tmpl"
+include "../tmpl/users.tmpl"
+include "../tmpl/mail.tmpl"
+include "../tmpl/certificates.tmpl"
+include "../tmpl/owntracks.tmpl"
+include "../tmpl/pushbullet.tmpl"
+include "../tmpl/xiaomi.tmpl"
 
 
 

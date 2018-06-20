@@ -1,16 +1,12 @@
 # Copyright 2018 - Thomas T. Jarløv
 
-# Copyright 2018 - Thomas T. Jarløv
-
 import osproc, os, sequtils
-
 
 var runInLoop = true
 
-
-#var automation: Process
-#var www: Process
+var cron: Process
 var wss: Process
+var www: Process
 var xiaomiListener: Process
 var xiaomiRunner: Process
 var main: Process
@@ -20,13 +16,10 @@ var osstats: Process
 var webutils: Process
 
 proc handler() {.noconv.} =
-  ## Catch ctrl+c from user
-
   runInLoop = false
-  #kill(automation)
-  #kill(www)
+  kill(cron)
   kill(wss)
-  kill(main)
+  kill(www)
   kill(xiaomiRunner)
   kill(xiaomiListener)
   kill(alarm)
@@ -39,17 +32,18 @@ proc handler() {.noconv.} =
 setControlCHook(handler)
 
 
+
 proc launcherActivated() =
   # 1) Executing the main-program in a loop.
-  # 2) Each time the main-program quits, there's a check
-  # for a new version
+
   echo "Nim Home Assistant: Launcher initialized"
-  #automation = startProcess(getAppDir() & "/nimha_auto", options = {poParentStreams})
-  #www = startProcess(getAppDir() & "/nimha_main", options = {poParentStreams})
   wss = startProcess(getAppDir() & "/src/websocket/wss_runner", options = {poParentStreams})
   sleep(100)
 
-  main = startProcess(getAppDir() & "/nimha_main", options = {poParentStreams})
+  www = startProcess(getAppDir() & "/src/www/www_runner", options = {poParentStreams})
+  sleep(100)
+
+  cron = startProcess(getAppDir() & "/src/timing/cron_runner", options = {poParentStreams})
   sleep(100)
 
   alarm = startProcess(getAppDir() & "/src/alarm/alarm_runner", options = {poParentStreams})
@@ -71,136 +65,134 @@ proc launcherActivated() =
   echo "Starting monitor"
 
   while runInLoop:
-    #if fileExists(getAppDir() & "/websitecreator_main_new"):
-    #  moveFile(getAppDir() & "/websitecreator_main_new", getAppDir() & "/websitecreator_main")
-    #[if not running(automation):
-      www = startProcess(getAppDir() & "/nimha_auto")
-      echo "nimha_auto exited. In 1.5 seconds, the program starts again."
-
-      ]#
 
     sleep(3000)
 
     if not running(owntracks):
-      owntracks = startProcess(getAppDir() & "/src/owntracks/owntracks_runner")
-      echo "owntracks_runner exited. "
+      echo "owntracks_runner exited. Starting again.."
+      owntracks = startProcess(getAppDir() & "/src/owntracks/owntracks_runner", options = {poParentStreams})
 
     if not running(wss):
-      wss = startProcess(getAppDir() & "/src/websocket/wss_runner")
-      echo "wss_runner exited."
+      echo "wss_runner exited. Starting again.."
+      wss = startProcess(getAppDir() & "/src/websocket/wss_runner", options = {poParentStreams})
 
-    if not running(main):
-      echo "nimha_main exited. "
-      main = startProcess(getAppDir() & "/nimha_main", options = {poParentStreams})
+    if not running(www):
+      echo "www_runner exited. Starting again.."
+      www = startProcess(getAppDir() & "/src/www/www_runner", options = {poParentStreams})
 
     if not running(xiaomiRunner):
-      echo "xiaomi_runner exited. "
+      echo "xiaomi_runner exited. Starting again.."
       discard execCmd("pkill xiaomi_runner")
       kill(xiaomiListener)
       xiaomiRunner = startProcess(getAppDir() & "/src/xiaomi/xiaomi_runner", options = {poParentStreams})
+    
+    if not running(cron):
+      echo "cron_runner exited. Starting again.."
+      xiaomiRunner = startProcess(getAppDir() & "/src/timing/cron_runner", options = {poParentStreams})
 
     if not running(alarm):
-      echo "alarm_runner exited. "
+      echo "alarm_runner exited. Starting again.."
       discard execCmd("pkill alarm_runner")
       xiaomiRunner = startProcess(getAppDir() & "/src/alarm/alarm_runner", options = {poParentStreams})
 
     if not running(osstats):
-      echo "os_runner exited. "
+      echo "os_runner exited. Starting again.."
       osstats = startProcess(getAppDir() & "/src/os/os_runner", options = {poParentStreams})
 
     if not running(webutils):
-      echo "web_runner exited. "
+      echo "web_runner exited. Starting again.."
       osstats = startProcess(getAppDir() & "/src/web/web_runner", options = {poParentStreams})
 
     if not running(xiaomiListener):
-      echo "xiaomi_listener exited. "
+      echo "xiaomi_listener exited. Starting again.."
       xiaomiListener = startProcess(getAppDir() & "/src/xiaomi/xiaomi_listener", options = {poParentStreams})
-
-    
 
   echo "Nim Home Assistant: Quitted"
   quit()
 
 
-#if not fileExists(getAppDir() & "/nimha_auto") or not fileExists(getAppDir() & "/nimha_main") or not fileExists(getAppDir() & "/nimha_websocket") or 
-if not fileExists(getAppDir() & "/src/xiaomi/xiaomi_listener") or not fileExists(getAppDir() & "/src/xiaomi/xiaomi_runner") or not fileExists(getAppDir() & "/src/websocket/wss_runner") or not fileExists(getAppDir() & "/src/web/web_runner") or not fileExists(getAppDir() & "/src/os/os_runner") or not fileExists(getAppDir() & "/src/owntracks/owntracks_runner") or not fileExists(getAppDir() & "/src/alarm/alarm_runner") or not fileExists(getAppDir() & "/nimha_main") or defined(rc):
 
-  echo "Compiling"
-  #echo " - Using params:" & addArgs()
-  echo " - Using compile options in *.nim.cfg"
-  echo " "
-  echo " .. please wait while compiling"
-  
 
-  let outputOwntrack = execCmd("nim c " & getAppDir() & "/src/owntracks/owntracks_runner.nim")
+echo "Check if runners need compiling"
+echo " .. please wait while compiling"
+
+when defined(dev):
+  let devC = " -d:dev "  
+when not defined(dev):
+  let devC = " "  
+
+
+if not fileExists(getAppDir() & "/src/owntracks/owntracks_runner") or defined(rc) or defined(rcowntracks):
+  let outputOwntrack = execCmd("nim c " & devC & getAppDir() & "/src/owntracks/owntracks_runner.nim")
   if outputOwntrack == 1:
-    echo "\nAn error occured owntracks_runner"
+    echo "\nAn error occured owntracks_runner\n\n"
     quit()
   else:
-    echo "\n"
-    echo "owntracks_runner compiling done."
+    echo "owntracks_runner compiling done\n\n"
     
-    
-  let outputWSS = execCmd("nim c -d:ssl " & getAppDir() & "/src/websocket/wss_runner.nim")
+if not fileExists(getAppDir() & "/src/websocket/wss_runner") or defined(rc) or defined(rcwss):    
+  let outputWSS = execCmd("nim c -d:ssl " & devC & getAppDir() & "/src/websocket/wss_runner.nim")
   if outputWSS == 1:
-    echo "\nAn error occured wss_runner"
+    echo "\nAn error occured wss_runner\n\n"
     quit()
   else:
-    echo "\n"
-    echo "wss_runner compiling done."
-  
+    echo "wss_runner compiling done\n\n"
 
-  let outputAlarm = execCmd("nim c -d:ssl -d:sqlsafe -d:dev " & getAppDir() & "/src/alarm/alarm_runner.nim")
+if not fileExists(getAppDir() & "/src/timing/cron_runner") or defined(rc) or defined(rccron):
+  let outputAlarm = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/src/timing/cron_runner.nim")
   if outputAlarm == 1:
-    echo "\nAn error occured alarm_runner"
+    echo "\nAn error occured cron_runner\n\n"
+    quit()
+  else:
+    echo "cron_runner compiling done\n\n"
+
+if not fileExists(getAppDir() & "/src/alarm/alarm_runner") or defined(rc) or defined(rcalarm):
+  let outputAlarm = execCmd("nim c -d:ssl -d:sqlsafe " & devC & getAppDir() & "/src/alarm/alarm_runner.nim")
+  if outputAlarm == 1:
+    echo "\nAn error occured alarm_runner\n\n"
     quit()
   else:
     echo "alarm_runner compiling done\n\n"
 
-
-  let outputMain = execCmd("nim c -d:ssl -d:sqlsafe -d:dev " & getAppDir() & "/nimha_main.nim")
+if not fileExists(getAppDir() & "/src/www/www_runner") or defined(rc) or defined(rcwww):
+  let outputMain = execCmd("nim c -d:ssl -d:sqlsafe " & devC & getAppDir() & "/src/www/www_runner.nim")
   if outputMain == 1:
-    echo "\nAn error occured nimha_main"
+    echo "\nAn error occured www_runner\n\n"
     quit()
   else:
-    echo "nimha_main compiling done\n\n"
+    echo "www_runner compiling done\n\n"
 
-
-  let outputOs = execCmd("nim c -d:sqlsafe -d:dev " & getAppDir() & "/src/os/os_runner.nim")
+if not fileExists(getAppDir() & "/src/os/os_runner") or defined(rc) or defined(rcos):
+  let outputOs = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/src/os/os_runner.nim")
   if outputOs == 1:
-    echo "\nAn error occured os_runner"
+    echo "\nAn error occured os_runner\n\n"
     quit()
   else:
     echo "os_runner compiling done\n\n"
 
-  
-  let outputWebutils = execCmd("nim c -d:sqlsafe -d:dev " & getAppDir() & "/src/web/web_runner.nim")
+if not fileExists(getAppDir() & "/src/web/web_runner") or defined(rc) or defined(rcweb):
+  let outputWebutils = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/src/web/web_runner.nim")
   if outputWebutils == 1:
-    echo "\nAn error occured web_runner"
+    echo "\nAn error occured web_runner\n\n"
     quit()
   else:
     echo "web_runner compiling done\n\n"
   
-  let outputXiaomiRunner = execCmd("nim c -d:sqlsafe -d:dev " & getAppDir() & "/src/xiaomi/xiaomi_runner.nim")
+if not fileExists(getAppDir() & "/src/xiaomi/xiaomi_listener") or defined(rc) or defined(rcxrunner):
+  let outputXiaomiRunner = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/src/xiaomi/xiaomi_runner.nim")
   if outputXiaomiRunner == 1:
-    echo "\nAn error occured xiaomi_runner"
+    echo "\nAn error occured xiaomi_runner\n\n"
     quit()
   else:
-    echo "\n"
-    echo "xiaomi_runner compiling done."
+    echo "xiaomi_runner compiling done\n\n"
 
-
-  let outputXiaomiListener = execCmd("nim c -d:sqlsafe -d:dev " & getAppDir() & "/src/xiaomi/xiaomi_listener.nim")
+if not fileExists(getAppDir() & "/src/xiaomi/xiaomi_listener") or defined(rc) or defined(rcxlistener):
+  let outputXiaomiListener = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/src/xiaomi/xiaomi_listener.nim")
   if outputXiaomiListener == 1:
-    echo "\nAn error occured nimha_xiaomi"
+    echo "\nAn error occured nimha_xiaomi\n\n"
     quit()
   else:
-    echo "\n"
-
-    echo """outputXiaomiListener compiling done. 
-    
-    """
+    echo "outputXiaomiListener compiling done\n\n"
 
 
-else:
-  launcherActivated()
+launcherActivated()
