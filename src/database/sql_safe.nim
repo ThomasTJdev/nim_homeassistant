@@ -1,18 +1,40 @@
 # Copyright 2018 - Thomas T. Jarløv
 
-import db_sqlite
+import db_sqlite, random
+
+from os import sleep
+
+
+randomize()
 
 
 proc getValueSafe*(db: DbConn, query: SqlQuery, args: varargs[string, `$`]): string =
-  when not defined(dev) or defined(sqlsafe):
-    try:
-      return getValue(db, query, args)
-    except DbError:
-      echo(getCurrentExceptionMsg())
-      return ""
-
-  when defined(dev):
+  try:
     return getValue(db, query, args)
+  except DbError:
+    echo(getCurrentExceptionMsg())
+    return ""
+
+
+proc getValueSafeRetryHelper*(db: DbConn, query: SqlQuery, args: varargs[string, `$`]): string =
+  try:
+    return getValue(db, query, args)
+  except DbError:
+    echo(getCurrentExceptionMsg())
+    return "ERROR"
+
+
+proc getValueSafeRetry*(db: DbConn, query: SqlQuery, args: varargs[string, `$`]): string =
+  var counter = 0
+  var loop = true
+  while counter != 3 and loop:
+    let res = getValueSafeRetryHelper(db, query, args)
+    if res != "ERROR":
+      loop = false
+      return res
+    else:
+      inc(counter)
+      sleep(rand(50))
 
 
 proc getAllRowsSafe*(db: DbConn, query: SqlQuery, args: varargs[string, `$`]): seq[Row] =
