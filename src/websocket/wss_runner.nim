@@ -14,6 +14,7 @@ import times
 import websocket
 
 import ../database/database
+import ../database/sql_safe
 import ../utils/dates
 
 import mqtt
@@ -235,22 +236,19 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
             return
 
           # Check user access
-          let userid = getValue(db, sql"SELECT userid FROM session WHERE ip = ? AND key = ? AND userid = ?", hostname, jn(js, "key"), jn(js, "userid"))
-          let userstatus = getValue(db, sql"SELECT status FROM person WHERE id = ?", userid)
+          let userid = getValueSafeRetry(db, sql"SELECT userid FROM session WHERE ip = ? AND key = ? AND userid = ?", hostname, jn(js, "key"), jn(js, "userid"))
+          let userstatus = getValueSafeRetry(db, sql"SELECT status FROM person WHERE id = ?", userid)
 
           if userstatus notin ["Admin", "Moderator", "Normal"]:
             echo "WSS: Client messed up in sid and userid"
             myClient.connected = false
             break
 
-          # Crashes - do I need you?
-          #if data == "ping":
-          #  discard updateClientsNow()
-          
-          asyncCheck mqttSendAsync("wss", jn(parseJson(data), "element"), data)
+          if data == "ping":
+            discard
+          else:
+            asyncCheck mqttSendAsync("wss", jn(parseJson(data), "element"), data)
 
-        #of Opcode.Binary:
-        #  waitFor myClient.ws.sendBinary(data)
         of Opcode.Close:
           let (closeCode, reason) = extractCloseData(data)
           echo("socket went away, close code: ", closeCode, ", reason: ", reason)
