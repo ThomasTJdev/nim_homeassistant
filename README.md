@@ -37,12 +37,14 @@ Home Assistant in [Nim](https://nim-lang.org/)
 
 
 # Current status
-soon beta. The next steps:
+Soon beta. The next steps (not chronological):
 
 0) Add nimble file and highlight requirements
 1) Making it robust - the websocket is unstable
 2) More intuitive user input
 3) Add more features, e.g. Sony Songpal, Yeelight
+4) When deleting templates, update templates users, e.g. alarm actions
+5) Google Maps API
 
 # Screenshot
 ![Blog](private/screenshots/dashboard.png)
