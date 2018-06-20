@@ -15,6 +15,7 @@ $(function() {
     if (wsAddress == "127.0.0.1") {
       console.log("Please change the Websocket address in js.js. Otherwise external will not connect.");
     }
+    //ws = new WebSocket("ws://" + wsAddress + ":443", ["nimha"]);
     ws = new WebSocket("ws://" + wsAddress + ":25437", ["nimha"]);
   }
   
@@ -51,7 +52,7 @@ $(function() {
       $("#notification .inner").text("Websocket error");
       $("#notification").show();
       setTimeout(function(){ 
-        ws = new WebSocket("ws://" + wsAddress + ":25437", ["nimha"]);
+        ws = new WebSocket("wss://" + wsAddress + ":25437", ["nimha"]);
       }, 5000);
     }
   };
@@ -84,10 +85,9 @@ $(function() {
   }
 
   // Ping
-  /*window.setInterval(function(){
-    ws.send('{\"element\": \"ping\"}');
-  }, 60000);*/
-  //}, 5000);
+  window.setInterval(function(){
+    ws.send('{' + cookieSidJson() + '"element": "ping"}');
+  }, 10000);
 });
 
 function websocketHandler(obj) {
