@@ -37,9 +37,9 @@ $(function() {
       $("#notification .inner").css("background", "rgba(254, 147, 147, 0.87)");
       $("#notification .inner").css("top", $('#navbar').offset().top);
       $("#notification .inner").text("Websocket closed");
-      $("#notification").show(400);
+      $("#notification").show();
       setTimeout(function(){ 
-        location.reload();
+        ws = new WebSocket("ws://" + wsAddress + ":25437", ["nimha"]);
       }, 5000);
     }
   };
@@ -49,7 +49,10 @@ $(function() {
       $("#notification .inner").css("background", "rgba(254, 147, 147, 0.87)");
       $("#notification .inner").css("top", $('#navbar').offset().top);
       $("#notification .inner").text("Websocket error");
-      $("#notification").show(400);
+      $("#notification").show();
+      setTimeout(function(){ 
+        ws = new WebSocket("ws://" + wsAddress + ":25437", ["nimha"]);
+      }, 5000);
     }
   };
   
@@ -80,6 +83,7 @@ $(function() {
     ws.close();
   }
 
+  // Ping
   /*window.setInterval(function(){
     ws.send('{\"element\": \"ping\"}');
   }, 60000);*/
@@ -115,21 +119,6 @@ function websocketHandler(obj) {
 
     // Xiaomi
     else if (obj.element == "xiaomi") {
-      /*if (obj.value == "status") {
-        xiaomiRefreshStatus(obj, "status");
-      }
-      else if (obj.value == "voltage") {
-        xiaomiRefreshStatus(obj, "voltage");
-      }
-      else if (obj.value == "lux") {
-        xiaomiRefreshStatus(obj, "lux");
-      }
-      else if (obj.value == "motion") {
-        xiaomiRefreshStatus(obj, "motion");
-      }
-      else if (obj.value == "no_motion") {
-        xiaomiRefreshStatus(obj, "no_motion");
-      }*/
       if (obj.data['status']) {
         xiaomiRefreshStatus(obj, "status");
       }
@@ -470,7 +459,7 @@ function xiaomiRefreshInit() {
 function xiaomiRefreshStatus(obj, value) {
   
   // Hide object
-  $("." + obj.sid + ".device." + obj.value + " div.value").hide();
+  $("." + obj.sid + ".device." + value + " div.value").hide();
   
   // Assign new value
   if (value == "status") {
@@ -495,7 +484,7 @@ function xiaomiRefreshStatus(obj, value) {
   }
 
   // Show object
-  $("." + obj.sid + ".device." + obj.value + " div.value").show(200);
+  $("." + obj.sid + ".device." + value + " div.value").show(200);
 }
 
 // Xiaomi devices
@@ -648,7 +637,7 @@ function owntracksGmapInit(obj) {
       position: new google.maps.LatLng(waypoints[i][1], waypoints[i][2]),
       label: waypoints[i][0],
       map: map,
-      icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+      icon: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
     });
 
     // Create waypoint
