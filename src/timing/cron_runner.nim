@@ -2,13 +2,13 @@
 
 
 import parsecfg, db_sqlite, strutils, asyncdispatch, json, times
-import mqtt
+#import mqtt
 from os import sleep
 
 import ../database/database
 import ../database/sql_safe
 import ../mail/mail
-import ../mqtt/mqtt_func
+#import ../mqtt/mqtt_func
 import ../pushbullet/pushbullet
 import ../xiaomi/xiaomi
 

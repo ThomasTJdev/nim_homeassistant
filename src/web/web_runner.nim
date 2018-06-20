@@ -27,18 +27,10 @@ proc mqttStartListener() =
     except:
       mqttClientMainq.disconnect(1000)
       mqttClientMainq.destroy()
-      quit()
-
-  mqttClientMainq.disconnect(1000)
-  mqttClientMainq.destroy()
+      break
 
   echo "OS MQTT exited"
 
 
-proc listen() =
-  mqttStartListener()
-
-
 when isMainModule:
-  listen()
-  runForever()
+  mqttStartListener()

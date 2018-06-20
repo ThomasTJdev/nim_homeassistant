@@ -22,24 +22,16 @@ proc mqttStartListener() =
       var message: MQTTMessage
       let timeout = mqttClientMainq.receive(topicName, message, 10000)
       if not timeout:
-        echo message.payload
         asyncCheck owntracksParseMqtt(message.payload) 
         
     except:
       mqttClientMainq.disconnect(1000)
       mqttClientMainq.destroy()
-      quit()
+      break
 
-  mqttClientMainq.disconnect(1000)
-  mqttClientMainq.destroy()
 
   echo "Owntracks MQTT exited"
 
 
-proc listen() =
-  mqttStartListener()
-
-
 when isMainModule:
-  listen()
-  runForever()
+  mqttStartListener()
