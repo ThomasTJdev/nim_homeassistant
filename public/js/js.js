@@ -5,6 +5,8 @@
 ________________________________*/
 var ws          = "";
 var wsAddress   = "127.0.0.1"
+var wsPort      = "25437" // 443
+var wsProto     = "ws" // use "wss" for SSL connection
 var wsError     = false;
 var pageRefresh = false;
 var pageInit    = true;
@@ -20,8 +22,7 @@ function websocketInit() {
     if (wsAddress == "127.0.0.1") {
       console.log("Please change the Websocket address in js.js. Otherwise external will not connect.");
     }
-    //ws = new WebSocket("wss://" + wsAddress + ":443", ["nimha"]);
-    ws = new WebSocket("ws://" + wsAddress + ":25437", ["nimha"]);
+    ws = new WebSocket(wsProto + "://" + wsAddress + ":" + wsPort + "", ["nimha"]);
   }
   
   ws.onopen = function() {
