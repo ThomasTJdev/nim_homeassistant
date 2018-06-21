@@ -1,0 +1,108 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#proc genCron(c: var TData): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="cron" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="cron">
+         
+          <h1>Cron jobs</h1>
+
+          <div class="cronActions">
+            # let allActions = getAllRows(db, sql"SELECT id, element, action_name, action_ref, time, active FROM cron_actions")
+            #
+            # let pushAlarm = getAllRows(db, sql"SELECT id, name FROM pushbullet_templates")
+            #
+            # let mailAlarm = getAllRows(db, sql"SELECT id, name FROM mail_templates")
+            #
+            # let xiaomiAlarm = getAllRows(db, sql"SELECT xda.id, xda.name, xd.name FROM xiaomi_templates AS xda LEFT JOIN xiaomi_devices AS xd ON xd.sid = xda.sid ORDER BY xda.name")
+            #
+            # var select = ""
+            #
+            # for push in pushAlarm:
+            #   select.add("<option value='" & push[0] & "' data-element='pushbullet'>Pushbullet: " & push[1] & "</option>")
+            # end for
+            #
+            # for mail in mailAlarm:
+            #   select.add("<option value='" & mail[0] & "' data-element='mail'>Mail: " & mail[1] & "</option>")
+            # end for
+            #
+            # for xiaomi in xiaomiAlarm:
+            #   select.add("<option value='" & xiaomi[0] & "' data-element='xiaomi'>Xiaomi: " & xiaomi[1] & " (" & xiaomi[2] & ")</option>")
+            # end for
+
+            <h5>Time is set with 24H format with HH:mm, e.g. 22:02, 23:55.</h5>
+
+            <table class="cronActions table table-bordered table-hover">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Element</th>
+                  <th>Name</th>
+                  <th>Time</th>
+                  <th></th>
+                </tr>
+                <tr class="cronItemAdd">
+                  <td colspan="2">
+                    <select name="cronaction" class="cronaction form-control form-control-sm">
+                      $select
+                    </select>
+                  </td>
+                  <td class="time">
+                    <input name="crontime" class="crontime form-control form-control-sm" />
+                  </td>
+                  <td class="btn btn-success cronActionAdd">
+                    Add
+                  </td>
+                </tr>
+              </thead>
+
+              <tbody>
+              # var rowBefore = ""
+              #
+              # for action in allActions:
+              #  if rowBefore != action[2]:
+                <tr><td colspan="4" style="background-color: #bababa;"></td></tr>
+              #  end if
+              #
+              #  rowBefore = action[2]
+              
+              <tr>
+                <td>${action[1]}</td>
+                <td>${action[2]}</td>
+                <td class="time">${action[4]}</td>
+                <td data-cronid="${action[0]}" class="btn btn-danger cronDeleteAction">Del</td>
+              </tr>
+              # end for
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+
+#end proc
