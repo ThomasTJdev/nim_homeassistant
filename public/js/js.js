@@ -3,71 +3,71 @@
 /*
     Websocket
 ________________________________*/
-var ws = "";
-var wsAddress = "127.0.0.1"
+var ws          = "";
+var wsAddress   = "127.0.0.1"
+var wsError     = false;
 var pageRefresh = false;
+var pageInit    = true;
 var pageType    = $("#pageType").attr("data-type");
 var userID      = $("#pageType").attr("data-userid");
 
 $(function() {
+  websocketInit();  
+});
 
+function websocketInit() {
   if (pageType == "dashboard" || pageType == "alarmNumpad") {
     if (wsAddress == "127.0.0.1") {
       console.log("Please change the Websocket address in js.js. Otherwise external will not connect.");
     }
-    //ws = new WebSocket("ws://" + wsAddress + ":443", ["nimha"]);
+    //ws = new WebSocket("wss://" + wsAddress + ":443", ["nimha"]);
     ws = new WebSocket("ws://" + wsAddress + ":25437", ["nimha"]);
   }
   
   ws.onopen = function() {
-    // Web Socket is connected, send data using send()
     notify(jQuery.parseJSON('{"error": "false", "value": "Websocket connected"}'));
 
-    if (pageType == "dashboard") {
+    if (pageType == "dashboard" && pageInit == true) {
       ws.send('{' + cookieSidJson() + '"element": "main", "data": "connected"}');  
       ws.send('{' + cookieSidJson() + '"element": "owntracks", "action": "locations", "value": "init"}'); 
       ws.send('{' + cookieSidJson() + '"element": "osstats", "value": "refresh"}');
       ws.send('{' + cookieSidJson() + '"element": "webutils", "item": "certexpiry"}');  
       xiaomiRefreshInit()
     }
+
+    pageInit = false;
+
+    // Ping
+    window.setInterval(function(){
+      ws.send('{' + cookieSidJson() + '"element": "ping"}');
+    }, 10000);
   };
 
   ws.onclose = function() { 
-    if (pageRefresh != true) {
+    if (pageRefresh != true && wsError == false) {
       console.log("Connection is closed..."); 
-      $("#notification .inner").css("background", "rgba(254, 147, 147, 0.87)");
-      $("#notification .inner").css("top", $('#navbar').offset().top);
-      $("#notification .inner").text("Websocket closed");
-      $("#notification").show();
+      notify(jQuery.parseJSON('{"error": "false", "value": "Websocket closed"}'));
       setTimeout(function(){ 
-        ws = new WebSocket("ws://" + wsAddress + ":25437", ["nimha"]);
+        websocketInit();
       }, 5000);
     }
   };
+
   ws.onerror = function() { 
     if (pageRefresh != true) {
-      console.log("Connection is closed..."); 
-      $("#notification .inner").css("background", "rgba(254, 147, 147, 0.87)");
-      $("#notification .inner").css("top", $('#navbar').offset().top);
-      $("#notification .inner").text("Websocket error");
-      $("#notification").show();
+      wsError = true;
+      console.log("Error in connection..."); 
+      notify(jQuery.parseJSON('{"error": "false", "value": "Websocket error"}'));
       setTimeout(function(){ 
-        ws = new WebSocket("wss://" + wsAddress + ":25437", ["nimha"]);
+        websocketInit();
       }, 5000);
     }
   };
-  
-  
     
   ws.onmessage = function (response) { 
     console.log(response.data);
     var obj = jQuery.parseJSON(response.data);
 
-    // WHY?
-    if (obj.handler == "connection") {
-      ws.close();
-    }
-    
     // When history items are received, loop through all nested elements
     if (obj.handler == "history") {
       $.each(obj.data, function(key, objnest){
@@ -79,16 +79,11 @@ $(function() {
     }
   };
 
-  window.onbeforeunload = function(event) {
+  /*window.onbeforeunload = function(event) {
     pageRefresh = true;
     ws.close();
-  }
-
-  // Ping
-  window.setInterval(function(){
-    ws.send('{' + cookieSidJson() + '"element": "ping"}');
-  }, 10000);
-});
+  }*/
+}
 
 function websocketHandler(obj) {
   if (obj.handler == "noaction") {
@@ -438,7 +433,7 @@ $(function() {
 function xiaomiRefreshInit() {
   var sids = new Array();
 
-  var time = 200;
+  var time = 500;
 
   $(".xiaomiInner>.device").each(function(){
     var sid = $(this).find(".xiaomiRefresh").attr("data-sid");
@@ -452,7 +447,7 @@ function xiaomiRefreshInit() {
       setTimeout( function(){ 
         ws.send('{' + cookieSidJson() + '"element": "xiaomi", "action": "' + action + '", "sid": "' + sid + '", "value": "' + value + '"}')
       }, time);
-      time += 200;
+      time += 500;
     }
   });
 }

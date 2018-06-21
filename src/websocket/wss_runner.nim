@@ -145,7 +145,6 @@ proc wsSendMsg(msg: string) {.async.} =
       continue
     
     await client.socket.sendText(msg, false)
-]#
 
 
 proc pong(server: Server) {.async.} =
@@ -162,6 +161,35 @@ proc pong(server: Server) {.async.} =
         var fut = client.socket.sendText(json, false)
         yield fut
         if fut.failed:
+          echo("WSS: Pong msg failed")
+          client.connected = false
+          updateClients = true
+          continue
+
+    if updateClients:   
+      await updateClientsNow()
+      updateClients = false
+    
+    await sleepAsync(1500)
+]#
+
+
+proc pong(server: Server) {.async.} =
+  ## Send JSON with connected users
+
+  var updateClients = false
+  while true:
+    let json = wsmsgMessages()
+    
+    if not isNil(server.clients) and json != "":
+      for client in server.clients:
+
+        try:
+          if not client.connected: 
+            continue
+          await client.socket.sendText(json, false)
+          
+        except:
           echo("WSS: Pong msg failed")
           client.connected = false
           updateClients = true
@@ -221,8 +249,9 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
     
     while true:
       
-      let (opcode, data) = await myClient.ws.readData()
       try:
+        let (opcode, data) = await myClient.ws.readData()
+        #let (opcode, data) = await readData(myClient.socket, true)
 
         myClient.lastMessage = epochTime()
 
@@ -243,6 +272,9 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
             echo "WSS: Client messed up in sid and userid"
             myClient.connected = false
             break
+          
+          # Respond
+          await myClient.socket.sendText("{\"event\": \"received\"}", false)
 
           if data == "ping":
             discard
