@@ -130,6 +130,7 @@ if not fileExists(getAppDir() & "/src/owntracks/owntracks_runner") or defined(rc
   else:
     echo "owntracks_runner compiling done\n\n"
     
+# WSS_RUNNER NEEDS NIM 0.18.1
 if not fileExists(getAppDir() & "/src/websocket/wss_runner") or defined(rc) or defined(rcwss):    
   let outputWSS = execCmd("nim c -d:ssl " & devC & getAppDir() & "/src/websocket/wss_runner.nim")
   if outputWSS == 1:

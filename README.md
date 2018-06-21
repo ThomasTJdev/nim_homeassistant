@@ -18,6 +18,11 @@ Home Assistant in [Nim](https://nim-lang.org/)
 
 
 # How to
+
+***In the current beta nim version 0.18.0 and 0.18.1 is required!***
+
+***The wss_runner.nim needs version 0.18.1, you need to manually change that in nimha.nim***
+
 0) Install pre:
 - jester (nimble)
 - multicast (nimble)
