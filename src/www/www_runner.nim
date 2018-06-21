@@ -7,6 +7,7 @@ import json
 import logging
 import macros
 import os
+import parsecfg
 import strutils
 import times
 import uri
@@ -43,6 +44,9 @@ settings:
   port = Port(5000)
 
 
+let dict = loadConfig("config/secret.cfg")
+
+let gMapsApi = "?key=" & dict.getSectionValue("Google","mapsAPI")
 
 
 
