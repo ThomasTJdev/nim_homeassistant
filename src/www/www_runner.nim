@@ -200,6 +200,7 @@ __________________________________________________]#
 include "../tmpl/alarm_numpad.tmpl"
 include "../tmpl/main.tmpl"
 include "../tmpl/alarm.tmpl"
+include "../tmpl/cron.tmpl"
 include "../tmpl/users.tmpl"
 include "../tmpl/mail.tmpl"
 include "../tmpl/certificates.tmpl"
@@ -444,6 +445,31 @@ routes:
       exec(db, sql"DELETE FROM pushbullet_templates WHERE id = ?", @"pushid")
 
     redirect("/pushbullet")
+
+
+  get "/cron":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    resp genCron(c)
+
+
+  get "/cron/do":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    if @"action" == "addaction":
+      let query = "SELECT name FROM " & @"cronelement" & "_templates WHERE id = ?"
+      let name = getValue(db, sql(query), @"cronid")
+
+      exec(db, sql"INSERT INTO cron_actions (element, action_name, action_ref, time, active) VALUES (?, ?, ?, ?, ?)", @"cronelement", name, @"cronid", @"time", "true")
+
+    elif @"action" == "deleteaction":
+      exec(db, sql"DELETE FROM cron_actions WHERE id = ?", @"cronid")
+
+    redirect("/cron")
 
 
 

@@ -226,6 +226,24 @@ $(function() {
 });
 
 
+// Cron
+$(function() {
+  $( ".cronActionAdd" ).click(function() {
+    var time = $(".crontime").val();
+    var cronid = $(".cronaction").val();
+    var cronelement = $(".cronaction option:selected").attr("data-element");
+
+    location.href = "/cron/do?action=addaction&time=" + time + "&cronid=" + cronid + "&cronelement=" + cronelement;
+  });
+
+  $( ".cronDeleteAction" ).click(function() {
+    var cronid = $(this).attr("data-cronid");
+
+    location.href = "/cron/do?action=deleteaction&cronid=" + cronid;
+  });
+});
+
+
 // OS stats
 $(function() {
   $( "#osstatsRefresh" ).click(function() {
