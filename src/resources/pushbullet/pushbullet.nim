@@ -6,12 +6,11 @@ import asyncdispatch
 
 import db_sqlite, osproc, json, strutils, parsecfg
 import ../database/database
+import ../mqtt/mqtt_func
 
 
 var pushbulletAPI = ""
 
-
-# Db connection
 var db = conn()
 
 
@@ -24,13 +23,12 @@ proc pushbulletSendCurl(pushType = "note", title = "title", body = "body"): stri
 
 
 template jsonHasKey(data: string): bool =
+  ## Check JSON for "error" key
   try:
     if hasKey(parseJson(data), "error"):
       true
-
     else:
       false
-
   except:
     false
 
@@ -41,12 +39,11 @@ proc pushbulletHistory(db: DbConn, resp, title, body: string): string =
   if jsonHasKey(resp):
     exec(db, sql"INSERT INTO history (element, identificer, value, error) VALUES (?, ?, ?, ?)", "pushbullet", "send", resp, "1")
     
-    return "{\"handler\": \"response\", \"value\": \"Pushbullet error\", \"error\": \"true\"}"
+    mqttSend("wss/to", "pushbullet", "{\"handler\": \"response\", \"value\": \"Pushbullet error\", \"error\": \"true\"}")
 
   else:
     exec(db, sql"INSERT INTO history (element, identifier, value) VALUES (?, ?, ?)", "pushbullet", "send", "Notification delivered. Title: " & title & " - Body: " & body)
     
-    return "{\"handler\": \"response\", \"value\": \"Pushbullet msg send\"}"
 
 
 proc pushbulletSendDb*(db: DbConn, pushID: string) {.async.} =
@@ -58,6 +55,16 @@ proc pushbulletSendDb*(db: DbConn, pushID: string) {.async.} =
   discard pushbulletHistory(db, resp, push[0], push[1])
 
 
+
+proc pushbulletParseMqtt*(payload: string) {.async.} =
+  ## Receive raw JSON from MQTT and parse it
+
+  let js = parseJson(payload)
+
+  asyncCheck pushbulletSendDb(db, js["pushid"].getStr())
+
+
+#[
 proc pushbulletSend*(pushType, title, body: string) =
   ## Get certificate expiration date in special format
   ##
@@ -67,8 +74,9 @@ proc pushbulletSend*(pushType, title, body: string) =
   let resp = pushbulletSendCurl("note", title, body)
 
   discard pushbulletHistory(db, resp, title, body)
+]#
 
-
+#[
 proc pushbulletSendWebsocketDb*(db: DbConn, pushID: string): string =
   ## Sends a push from database
 
@@ -76,8 +84,9 @@ proc pushbulletSendWebsocketDb*(db: DbConn, pushID: string): string =
 
   let resp = pushbulletSendCurl("note", push[0], push[1])
   return pushbulletHistory(db, resp, push[0], push[1])
+]#
 
-
+#[
 proc pushbulletSendWebsocket*(pushType, title, body: string): string =
   ## Get certificate expiration date in special format
   ##
@@ -86,10 +95,15 @@ proc pushbulletSendWebsocket*(pushType, title, body: string): string =
 
   let resp = pushbulletSendCurl("note", title, body)
   return pushbulletHistory(db, resp, title, body)
-
+]#
 
 proc pushbulletUpdateApi*(db: DbConn) =
   pushbulletAPI = getValue(db, sql"SELECT api FROM pushbullet_settings WHERE id = ?", "1")
+
+
+proc pushbulletNewApi*(db: DbConn, api: string) =
+  exec(db, sql"UPDATE pushbullet_settings SET api = ? WHERE id = ?", api, "1")
+  pushbulletAPI = api
 
 
 proc pushbulletDatabase*(db: DbConn) =

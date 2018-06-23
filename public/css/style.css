@@ -1,8 +1,12 @@
 /*
-  Main elements
+    Nim Home Automation system
 */
 
 
+
+/*
+    Body
+______________________________*/
 body {
   background: whitesmoke;
   font-family: 'Poppins', sans-serif;
@@ -12,9 +16,17 @@ body {
     font-size: 85%;
   }
 }
-
 p {
   font-family: 'Poppins', sans-serif;
+}
+
+
+/*
+    Page wrappers
+______________________________*/
+.wrapper {
+  display: flex;
+  align-items: stretch;
 }
 #pagewrapper {
   width: 100%;
@@ -22,6 +34,11 @@ p {
   padding-bottom: 10px;
 }
 
+
+
+/*
+    Footer
+______________________________*/
 footer {
   border-top: 1px solid #dee2e6;
   margin-left: auto;
@@ -50,10 +67,19 @@ footer h5 {
   }
 }
 
+
+/*
+    Header
+______________________________*/
 header {
   display: flex;
   width: 100%;
 }
+
+
+/*
+    Navbar
+______________________________*/
 nav#navbar{
   background-color: transparent;
   border-bottom: 1px solid #dee2e6;
@@ -91,8 +117,9 @@ nav#navbar .navbar-toggler-icon {
   }
 }
 
-
-/* Navbar settings */
+/*
+  Navbar settings
+*/
 div#navbarSettings {
   z-index: 1000;
   top: 0;
@@ -108,8 +135,8 @@ div#navbarSettings .dropdown-menu a {
 
 
 /*
-  General items
-*/
+    Bootstrap override
+______________________________*/
 input {
   border: none;
   border-bottom: 1px solid grey;
@@ -126,12 +153,25 @@ button.btn {
   line-height: 12px;
   margin-top: 5px;
 }
+span.badge {
+  cursor: pointer;
+}
+span.badge:hover {
+  -webkit-box-shadow: 2px 0px 3px 0px rgba(171,171,171,1);
+  -moz-box-shadow: 2px 0px 3px 0px rgba(171,171,171,1);
+  box-shadow: 2px 0px 3px 0px rgba(171,171,171,1);
+}
+span.badge:active {
+  -webkit-box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.75);
+  box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.75);
+}
 
 
 
 /*
-  Saved notification
-*/
+    Notification
+______________________________*/
 #notification {
   display: none;
   position: absolute;
@@ -154,11 +194,10 @@ button.btn {
 
 
 
-.wrapper {
-  display: flex;
-  align-items: stretch;
-}
 
+/*
+    Sidebar
+______________________________*/
 nav#sidebar {
   min-width: 250px;
   max-width: 250px;
@@ -221,14 +260,18 @@ nav#sidebar .sidebar-header {
 
 
 
+/*
+    Global utils
+______________________________*/
 .hide {
   display: none;
 }
 
 
+
 /*
-    Login
-*/
+    Login 
+______________________________*/
 div#login {
   width: 250px;
   margin-left: auto;
@@ -245,9 +288,7 @@ div#login button {
 
 
 /*
-
     Dashboard 
-
 ______________________________*/
 
 /* Card items */
@@ -544,6 +585,8 @@ div#alarm table.alarmPasswords .alarmDeletePassword {
 */
 div#alarmModel div.modal-dialog {
   max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
 }
 div#alarmModel div.row div.col-4 {
   text-align: center;

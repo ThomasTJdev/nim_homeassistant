@@ -10,7 +10,6 @@
 ## - ringing
 
 import parsecfg, db_sqlite, strutils, asyncdispatch, json, times
-import mqtt
 
 import ../database/database
 import ../mail/mail
@@ -18,11 +17,6 @@ import ../mqtt/mqtt_func
 import ../pushbullet/pushbullet
 import ../users/password
 import ../xiaomi/xiaomi
-#import ../websocket/websocket_watch
-
-#let dict             = loadConfig("config/secret.cfg")
-#let s_alarmCountdown = dict.getSectionValue("Alarm","alarmCountdown")
-#let s_alarmPassword  = dict.getSectionValue("Alarm","alarmPassword")
 
 
 var alarmStatus = ""
@@ -51,7 +45,9 @@ proc alarmAction(db: DbConn, state: string) {.async.} =
     return
 
   for row in alarmActions:
-    echo row[0] & " - " & row[1]
+    when defined(dev):
+      echo "Alarm action: " & row[0] & " - id: " & row[1]
+
     if row[0] == "pushbullet":
       asyncCheck pushbulletSendDb(db, row[1])
 
@@ -60,7 +56,6 @@ proc alarmAction(db: DbConn, state: string) {.async.} =
 
     elif row[0] == "xiaomi":
       asyncCheck xiaomiWriteTemplate(db, row[1])
-
 
 
 
@@ -77,22 +72,6 @@ proc alarmSetStatus(db: DbConn, newStatus, trigger, device: string) =
   alarmStatus = newStatus
 
 
-#[
-proc alarmSetStatusWs(db: DbConn, newStatus: string): bool =
-  # Check that doors, windows, etc are ready
-  # Missing user_id
-
-  asyncCheck alarmAction(db, newStatus)
-
-  discard tryExec(db, sql"INSERT INTO alarm_history (status, trigger) VALUES (?, ?)", newStatus, "user")
-
-  discard tryExec(db, sql"UPDATE alarm SET status = ? WHERE id = ?", newStatus, "1")
-
-  alarmStatus = newStatus
-
-  return (true)
-]#
-
 
 proc alarmRinging*(db: DbConn, trigger, device: string) {.async.} =
   ## The alarm is ringing
@@ -102,16 +81,23 @@ proc alarmRinging*(db: DbConn, trigger, device: string) {.async.} =
 
   alarmSetStatus(db, "ringing", trigger, device)
 
-  #asyncCheck alarmAction(db, "ringing")
-  
-  discard mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"ringing\"}")
+  mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"ringing\"}")
 
 
 proc alarmTriggerTimer(cd: string) {.async.} = 
+  ## The alarm countdown timer
+  ## Currently used for not blocking to much..
+  ## 
+  ## To be changed
+
   var counter = 0
   while true:
     await sleepAsync(1000)
     inc(counter)
+    
+    when defined(dev):
+      echo "Alarm countdown: " & $counter & "/" & cd
+
     if counter == parseInt(cd) or alarmStatus != "triggered":
       break
 
@@ -124,19 +110,25 @@ proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
   when defined(dev):
     echo "Alarm: Status = triggered"
 
+  # Check if the armtime is done and
+  # activate the alarm
   let armTime = parseInt(getValue(db, sql"SELECT value FROM  alarm_settings WHERE element = ?", "armtime")) + alarmArmedTime
 
-  if armTime < toInt(epochTime()):
+  if armTime > toInt(epochTime()):
     when defined(dev):
       echo "Alarm: Triggered alarm cancelled to due to armtime"
     return
 
-  discard mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"triggered\"}")
+  # Send info about the alarm is triggered
+  mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"triggered\"}")
 
+  # Change the alarm status
   alarmSetStatus(db, "triggered", trigger, device)
 
+  # Add to history
   exec(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", "triggered", trigger, device)
 
+  # Start the countdown
   var countDown = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
 
   when defined(dev):
@@ -185,7 +177,7 @@ proc alarmParseMqtt*(payload: string) {.async.} =
       passOk = true
 
     if not passOk:
-      discard mqttSend("alarm", "wss/to", "{\"handler\": \"response\", \"value\": \"Wrong alarm password\", \"error\": \"true\"}")
+      mqttSend("alarm", "wss/to", "{\"handler\": \"response\", \"value\": \"Wrong alarm password\", \"error\": \"true\"}")
       return      
 
     let status = jn(js, "status")
@@ -198,7 +190,7 @@ proc alarmParseMqtt*(payload: string) {.async.} =
       alarmSetStatus(db, status, "user", "")
 
 
-    discard mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"" & status & "\"}")
+    mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"" & status & "\"}")
 
 
 proc alarmDatabase*(db: DbConn) =

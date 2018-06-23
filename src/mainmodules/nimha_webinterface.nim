@@ -15,16 +15,18 @@ import uri
 import cookies as libcookies
 
 import recaptcha
-import ../www/google_recaptcha
+import ../resources/www/google_recaptcha
 
-import ../database/database
-import ../database/sql_safe
-import ../mail/mail
-import ../users/password
-import ../users/user_add
-import ../users/user_check
-import ../utils/parsers
-import ../utils/dates
+import ../resources/database/database
+import ../resources/database/sql_safe
+import ../resources/mail/mail
+import ../resources/pushbullet/pushbullet
+import ../resources/users/password
+import ../resources/users/user_add
+import ../resources/users/user_check
+import ../resources/utils/parsers
+import ../resources/utils/dates
+
 
 
 
@@ -436,7 +438,7 @@ routes:
       redirect("/login")
 
     if @"action" == "updateapi":
-      exec(db, sql"UPDATE pushbullet_settings SET api = ? WHERE id = ?", @"api", "1")
+      pushbulletNewApi(db, @"api")
 
     elif @"action" == "addpush":
       exec(db, sql"INSERT INTO pushbullet_templates (name, title, body) VALUES (?, ?, ?)", @"name", @"title", @"body")

@@ -248,6 +248,33 @@ Due to the old version of cerbot, you have to mangle a little
 sudo certbot --authenticator standalone --installer nginx -d <domain> --pre-hook "service nginx stop" --post-hook "service nginx start"
 ```
 
+## GCC 8
+
+```
+git clone https://bitbucket.org/sol_prog/raspberry-pi-gcc-binary.git
+cd raspberry-pi-gcc-binary
+tar xf gcc-8.1.0.tar.bz2
+sudo mv gcc-8.1.0 /usr/local
+
+# Temporarily change path
+export PATH=/usr/local/gcc-8.1.0/bin:$PATH
+
+# Make link static
+echo 'export PATH=/usr/local/gcc-8.1.0/bin:$PATH' >> .bashrc
+source .bashrc
+
+# Check version
+gcc-8.1.0 --version
+
+# Symlink
+# *Original gcc-4.9 is placed in /usr/bin/gcc-4.9*
+sudo ln -sf /usr/local/gcc-8.1.0/bin/gcc-8.1.0 /usr/bin/gcc
+
+
+# Optional: Cleanup - if you need the space
+cd ..
+cd rm -r raspberry-pi-gcc-binary
+
 # Troubleshooting
 
 ## Xiaomi

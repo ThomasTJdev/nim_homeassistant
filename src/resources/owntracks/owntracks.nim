@@ -90,8 +90,8 @@ proc owntracksLastLocations(init = false) {.async.} =
     
   
   json.add("}")
-
-  discard mqttSend("owntracks", "wss/to", json)
+  
+  mqttSend("owntracks", "wss/to", json)
 
 
 

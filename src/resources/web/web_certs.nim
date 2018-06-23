@@ -29,10 +29,10 @@ proc certExpiraryJson*(serverAddress, port: string) {.async.} =
   let daysToExpire = certExpiraryDaysTo(serverAddress, port)
 
   if not isDigit(daysToExpire):
-    discard mqttSend("webutils", "wss/to", "{\"sslOut\": \"action\", \"element\": \"certexpiry\", \"server\": \"" & replace(serverAddress, ".", "") & "\", \"value\": \"error\"}")
+    mqttSend("webutils", "wss/to", "{\"sslOut\": \"action\", \"element\": \"certexpiry\", \"server\": \"" & replace(serverAddress, ".", "") & "\", \"value\": \"error\"}")
 
   else:
-    discard mqttSend("webutils", "wss/to", "{\"handler\": \"action\", \"element\": \"certexpiry\", \"server\": \"" & replace(serverAddress, ".", "") & "\", \"value\": \"" & daysToExpire & "\"}")
+    mqttSend("webutils", "wss/to", "{\"handler\": \"action\", \"element\": \"certexpiry\", \"server\": \"" & replace(serverAddress, ".", "") & "\", \"value\": \"" & daysToExpire & "\"}")
 
 
 

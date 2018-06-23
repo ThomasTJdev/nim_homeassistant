@@ -149,7 +149,7 @@ proc xiaomiReadDevice*(deviceSid: string) =
       when defined(dev):
         echo "DEV: " & xdata
       
-      discard mqttSend("xiaomi", "xiaomi/read_ack", xdata)
+      mqttSend("xiaomi", "xiaomi/read_ack", xdata)
       break
 
 
@@ -197,7 +197,7 @@ proc xiaomiDiscover*(db: DbConn, refreshDB = false) =
           echo data
         continue
       
-      discard mqttSend("xiaomi", "xiaomi/get_id_list_ack", xdata)
+      mqttSend("xiaomi", "xiaomi/get_id_list_ack", xdata)
       if getValue(db, sql"SELECT sid FROM xiaomi_devices WHERE sid = ?", sid) == "":
         exec(db, sql"INSERT INTO xiaomi_devices (sid, name, model, short_id) VALUES (?, ?, ?, ?)", sid, sid, jn(json, "model"), jn(json, "short_id"))
 
@@ -214,7 +214,7 @@ proc xiaomiDiscover*(db: DbConn, refreshDB = false) =
   when defined(dev):
     echo "DEV: \n" & pretty(parseJson("{\"xiaomi_devices\":[" & xiaomi_device & "]}"))
 
-  discard mqttSend("xiaomi", "xiaomi/get_id_list_ack", "{\"xiaomi_devices\":[" & xiaomi_device & "]}")
+  mqttSend("xiaomi", "xiaomi/get_id_list_ack", "{\"xiaomi_devices\":[" & xiaomi_device & "]}")
 
 
 
@@ -231,7 +231,7 @@ proc xiaomiCheckAlarmStatus(sid, value, xdata: string) {.async.} =
 
   if statusToTrigger == jn(st, value):
 
-    discard mqttSend("xiaomi", "alarm", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"triggered\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
+    mqttSend("xiaomi", "alarm", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"triggered\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
 
     when defined(dev):
       echo "XiaomiMqtt alarm: " & xdata & "\n"
@@ -316,7 +316,7 @@ proc xiaomiParseMqtt*(payload: string) {.async.} =
         asyncCheck xiaomiCheckAlarmStatus(sid, "status", xdata)
 
       # Add message
-      discard mqttSend("xiaomi", "wss/to", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"read\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
+      mqttSend("xiaomi", "wss/to", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"read\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
 
     when defined(dev):
       echo "XiaomiMqtt report: " & payload & "\n"

@@ -4,9 +4,9 @@
     Websocket
 ________________________________*/
 var ws          = "";
-var wsAddress   = "127.0.0.1"
+var wsAddress   = "192.168.1.20" // IP or url to websocket server
 var wsPort      = "25437" // 443
-var wsProto     = "ws" // use "wss" for SSL connection
+var wsProto     = "ws" // Use "wss" for SSL connection
 var wsError     = false;
 var pageRefresh = false;
 var pageInit    = true;
@@ -20,7 +20,7 @@ $(function() {
 function websocketInit() {
   if (pageType == "dashboard" || pageType == "alarmNumpad") {
     if (wsAddress == "127.0.0.1") {
-      console.log("Please change the Websocket address in js.js. Otherwise external will not connect.");
+      console.log("Please change the Websocket address in js.js. Otherwise external user will not connect.");
     }
     ws = new WebSocket(wsProto + "://" + wsAddress + ":" + wsPort + "", ["nimha"]);
   }
@@ -38,16 +38,16 @@ function websocketInit() {
 
     pageInit = false;
 
-    // Ping
+    /*/ Ping
     window.setInterval(function(){
       ws.send('{' + cookieSidJson() + '"element": "ping"}');
-    }, 10000);
+    }, 10000);*/
   };
 
   ws.onclose = function() { 
     if (pageRefresh != true && wsError == false) {
       console.log("Connection is closed..."); 
-      notify(jQuery.parseJSON('{"error": "false", "value": "Websocket closed"}'));
+      notify(jQuery.parseJSON('{"error": "true", "value": "Websocket closed"}'));
       setTimeout(function(){ 
         websocketInit();
       }, 5000);
@@ -58,7 +58,7 @@ function websocketInit() {
     if (pageRefresh != true) {
       wsError = true;
       console.log("Error in connection..."); 
-      notify(jQuery.parseJSON('{"error": "false", "value": "Websocket error"}'));
+      notify(jQuery.parseJSON('{"error": "true", "value": "Websocket error"}'));
       setTimeout(function(){ 
         websocketInit();
       }, 5000);
@@ -80,10 +80,6 @@ function websocketInit() {
     }
   };
 
-  /*window.onbeforeunload = function(event) {
-    pageRefresh = true;
-    ws.close();
-  }*/
 }
 
 function websocketHandler(obj) {
@@ -169,7 +165,7 @@ $(function() {
     $('#sidebar').toggleClass('active');
   });
   if ($(window).width() < 900) {
-    $('#sidebar').toggleClass('active');
+    $('#sidebar').removeClass('active');
   }
 });
 

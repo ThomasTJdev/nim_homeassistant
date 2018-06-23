@@ -2,15 +2,13 @@
 
 
 import parsecfg, db_sqlite, strutils, asyncdispatch, json, times
-#import mqtt
 from os import sleep
 
-import ../database/database
-import ../database/sql_safe
-import ../mail/mail
-#import ../mqtt/mqtt_func
-import ../pushbullet/pushbullet
-import ../xiaomi/xiaomi
+import ../resources/database/database
+import ../resources/database/sql_safe
+import ../resources/mail/mail
+import ../resources/pushbullet/pushbullet
+import ../resources/xiaomi/xiaomi
 
 
 var db = conn()
@@ -137,8 +135,9 @@ proc cronJob() =
   ## 
   ## Check every minute if an action is required
   ##
-  ## Currently using sleep - should be sleepAsync?
-  ## but it messes up the RPi CPU
+  ## Currently using sleep - should it be sleepAsync
+  ## and moved inside another main module? SleepAsync
+  ## messes up the RPi CPU
 
   echo "Cron main started"
 

@@ -34,4 +34,4 @@ proc osParseMqtt*(payload: string) {.async.} =
   let js = parseJson(payload)
 
   if js["value"].getStr() == "refresh":
-    discard mqttSend("os", "wss/to", osData())
+    mqttSend("os", "wss/to", osData())

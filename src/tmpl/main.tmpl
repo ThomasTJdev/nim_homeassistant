@@ -22,7 +22,11 @@
 # if c.loggedIn:
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.0/src/js.cookie.min.js" defer></script>
 
+# if gMapsApi == "":
+<script src="http://maps.google.com/maps/api/js" type="text/javascript" defer></script>
+# else:
 <script src="https://maps.google.com/maps/api/js$gMapsApi" type="text/javascript" defer></script>
+# end if
 
 <script src="/js/js.js" defer></script>
 # end if
@@ -35,25 +39,6 @@
   <div class="heading">
     <a id="sidebarToggle" class="navbar-brand">Nim Home Assistant</a>
   </div>
-  <!--<div id="navbarInside">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="collapsibleNavbar">
-      <a class="navbar-brand" href="/">Nim Home Assistant</a>
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" href="/">Frontpage</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/blog">Blog</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/p/about">About</a>
-        </li>
-      </ul>
-    </div>
-  </div>-->
 </nav>
 #end proc
 #
@@ -76,6 +61,7 @@
         <li><a href="/alarm">Alarm</a></li>
         <li><a href="/pushbullet">Pushbullet</a></li>
         <li><a href="/mail">Mail</a></li>
+        <li><a href="/cron">Cron jobs</a></li>
       </ul>
     <li><a href="https://github.com/ThomasTJdev/nim_homeassistant">Github</a></li>
     <li><a href="/logout">Logout</a></li>
