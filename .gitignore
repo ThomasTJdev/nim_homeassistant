@@ -29,3 +29,6 @@ src/mainmodules/nimha_xiaomilistener
 
 # Launcher
 nimha
+
+# VScode
+.vscode
