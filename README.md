@@ -1,6 +1,6 @@
 # Nim Homeassistant
 
-Home Assistant in [Nim](https://nim-lang.org/)
+Nim Home Assistant is a hub for combining multiple home automation devices and automating jobs. Nim Home Assistant is developed to run on a Raspberry Pi with a 7" touchscreen.
 
 
 # Features
@@ -19,44 +19,93 @@ Home Assistant in [Nim](https://nim-lang.org/)
 
 # How to
 
-***In the current beta nim version 0.18.0 and 0.18.1 is required!***
+## Caution
+ - Nim-lang >= 0.18.1 (devel) (check https://github.com/dom96/choosenim or on Raspberry Pi check the section below)
+ - Jester >= master (it is not available at Nimble yet. Clone and nimble install.)
 
-***The wss_runner.nim needs version 0.18.1, you need to manually change that in nimha.nim***
-
-0) Install pre:
-- jester (nimble)
+## Requirements
+### Prerequisite:
 - multicast (nimble)
 - bcrypt (nimble)
 - websocket (nimble)
-- mqtt (not on nimble: https://github.com/barnybug/nim-mqtt)
-- openssl
-- paho library (MQTT) (For Rapsberry Pi, see at the bottom)
+- openssl (on your system)
 - python (on your system)
 - pycrypto library (pip install pycrypto or how you like it: https://github.com/dlitz/pycrypto)
-- MQTT broker (see section below)
+- MQTT broker (see section below for Mosquitto)
 
-1) Clone the git
-2) Copy secret_default.cfg to secret.cfg and fill in the data
-3) Compile and run nimha.nim (`nim c -r nimha.nim`)
-4) Change the websocket IP in js.js, unless you use 127.0.0.1
-5) Access dashboard at 127.0.0.1:5000 (if you are using nginx, use your local ip)
+**Jester:**
+```
+git clone https://github.com/dom96/jester.git
+cd jester
+nimble install
+```
+**Nim-lang:**
+```
+choosenim devel
+```
+OR
+
+Follow https://github.com/nim-lang/Nim#compiling and then:
+```
+# Then link your nim exec to the newly compiled nim
+ln -sf /usr/bin/nim /the/path/to/nim/git/Nim/bin/nim
+ln -sf /usr/bin/nimble /the/path/to/nim/git/Nim/bin/nimble
+```
+
+## Setup
+**It is currently not possible to run NimHA without a webserver. To access NimHA you need to use your local ip (e.g. 192.168.1.20) - 127.0.0.1/localhost is not working.**
+
+### Clone the git (nimble is not ready yet)
+```
+git clone https://github.com/ThomasTJdev/nim_homeassistant.git
+cd nim_homeassistant
+```
+
+### Update your secret file:
+```
+cp config/secret_default.cfg config/secret.cfg
+
+# Open the file and insert your data
+nano config/secret.cfg
+```
+
+### Adjust the websocket address in the JS file
+```
+nano public/js/.js.js
+
+# Adjust
+var wsAddress   = "127.0.0.1" // IP or url to websocket server
+var wsProto     = "ws" // Use "wss" for SSL connection
+```
+
+### Compile and run:
+```
+# Use -d:dev to get all output
+nim c nimha.nim
+
+# From now on just run
+./nimha
+```
 
 
 # Current status
 Soon beta. The next steps (not chronological):
 
-0) Add nimble file and highlight requirements
-1) Making it robust - the websocket is unstable
-2) More intuitive user input
-3) Add more features, e.g. Sony Songpal, Yeelight
-4) When deleting templates, update templates users, e.g. alarm actions
-5) Google Maps API
-6) Add example usecases
-7) reCaptcha implementation
+- Run NimHA locally with access on 127.0.0.1
+- Add nimble file and highlight requirements
+- Add more features, e.g. Sony Songpal, Yeelight
+- When deleting templates, update templates users, e.g. alarm actions
+- Google Maps API in secret.cfg or table?
+- Make individual databases for each modules history. SQLite can not keep up with data which causes a locked database
+- Add example use cases
+- reCaptcha implementation
+
 
 
 # Screenshot
 ![Blog](private/screenshots/dashboard.png)
+
+
 
 # MQTT Broker
 
@@ -65,7 +114,13 @@ The whole setup depends on a MQTT broker, which connects all the different modul
 ## Installing and running Mosquitto MQTT broker
 
 ```
+# Install using your package manager
+
+# Raspberry Pi
 sudo apt install mosquitto mosquitto-clients
+
+# Arch
+sudo pacman -S mosquitto
 ```
 ### Add password
 ```
@@ -102,22 +157,8 @@ sudo mosquitto_passwd -c tmppwdfile username
 # insert into real passwd file
 ```
 
-# Raspberry pi
 
-The main purpose for Nim Home Assistant was to be light enough to run on small devices, e.g. a Raspberry Pi with a touchscreen.
-
-## Paho for Raspberry Pi:
-```bash
-sudo apt-get install cmake make gcc libssl-dev
-mkdir ~/home/pi/git && cd ~/git
-git clone https://github.com/eclipse/paho.mqtt.c.git
-cd paho.mqtt.c
-make
-sudo make install
-sudo ldconfig
-```
-
-## Nginx
+# Nginx
 
 ```
 sudo nano /etc/nginx/sites-enabled/default
@@ -129,16 +170,17 @@ sudo nginx -t
 sudo nginx -s reload
 ```
 
-### WWW server
+## WWW server
 
 ```nginx
 server {
   listen 443 ssl;
   server_name <domain> www.<domain>;
 
-  ssl on;
-  ssl_certificate /etc/letsencrypt/live/<domain>/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/<domain>/privkey.pem;
+  # These lines will be added by certbot. If not - add them manually after running certbot
+  #ssl on;
+  #ssl_certificate /etc/letsencrypt/live/<domain>/fullchain.pem;
+  #ssl_certificate_key /etc/letsencrypt/live/<domain>/privkey.pem;
 
   location / {
     root   /home/pi/nim_homeassistant/public;
@@ -170,7 +212,7 @@ server {
 }
 ```
 
-### Websocket
+## Websocket
 
 ```nginx
 upstream websocketproxy {
@@ -181,9 +223,10 @@ server {
     listen 443 ssl;
     server_name <domain>;
 
-    ssl on;
-    ssl_certificate /etc/letsencrypt/live/<domain>/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/<domain>/privkey.pem;
+    # These lines will be added by certbot. If not - add them manually after running certbot
+    #ssl on;
+    #ssl_certificate /etc/letsencrypt/live/<domain>/fullchain.pem;
+    #ssl_certificate_key /etc/letsencrypt/live/<domain>/privkey.pem;
 
     location / {
         proxy_http_version 1.1;
@@ -201,9 +244,9 @@ server {
 
 ```
 
-### MQTT
+## MQTT
 
-*Todo: SSL*
+*To do: SSL*
 ```nginx
 server {
     listen 8883;
@@ -217,7 +260,11 @@ server {
 ```
 
 
-## SSl certificate
+
+
+# SSl certificate
+
+## Raspberry pi
 
 ### Add to sources
 ```
@@ -248,35 +295,15 @@ Due to the old version of cerbot, you have to mangle a little
 sudo certbot --authenticator standalone --installer nginx -d <domain> --pre-hook "service nginx stop" --post-hook "service nginx start"
 ```
 
-## GCC 8
+## Linux
+
+Please use your package manager (install certbot-nginx) or visit https://certbot.eff.org/all-instructions for instructions.
+
+### Install certificate
+
+*Remember that your router must have port 80 open for the challenge*
 
 ```
-git clone https://bitbucket.org/sol_prog/raspberry-pi-gcc-binary.git
-cd raspberry-pi-gcc-binary
-tar xf gcc-8.1.0.tar.bz2
-sudo mv gcc-8.1.0 /usr/local
+sudo certbot --nginx -d domain.com -d www.domain.com
+```
 
-# Temporarily change path
-export PATH=/usr/local/gcc-8.1.0/bin:$PATH
-
-# Make link static
-echo 'export PATH=/usr/local/gcc-8.1.0/bin:$PATH' >> .bashrc
-source .bashrc
-
-# Check version
-gcc-8.1.0 --version
-
-# Symlink
-# *Original gcc-4.9 is placed in /usr/bin/gcc-4.9*
-sudo ln -sf /usr/local/gcc-8.1.0/bin/gcc-8.1.0 /usr/bin/gcc
-
-
-# Optional: Cleanup - if you need the space
-cd ..
-cd rm -r raspberry-pi-gcc-binary
-
-# Troubleshooting
-
-## Xiaomi
-
-Not getting any data from gateway: Check your firewall
