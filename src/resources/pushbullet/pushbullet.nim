@@ -53,6 +53,19 @@ proc pushbulletSendDb*(db: DbConn, pushID: string) {.async.} =
 
   let resp = pushbulletSendCurl("note", push[0], push[1])
   discard pushbulletHistory(db, resp, push[0], push[1])
+   
+
+
+proc pushbulletSendTest*(db: DbConn) {.async.} =
+  ## Sends a test pushmessage
+
+  let resp = pushbulletSendCurl("note", "Test title", "Test body")
+
+  if jsonHasKey(resp):
+    mqttSend("pushbullet", "wss/to", "{\"handler\": \"response\", \"value\": \"Pushbullet error\", \"error\": \"true\"}")
+
+  else:
+    mqttSend("pushbullet", "wss/to", "{\"handler\": \"response\", \"value\": \"Pushbullet msg send\", \"error\": \"false\"}")
 
 
 
@@ -61,7 +74,11 @@ proc pushbulletParseMqtt*(payload: string) {.async.} =
 
   let js = parseJson(payload)
 
-  asyncCheck pushbulletSendDb(db, js["pushid"].getStr())
+  if js["pushid"].getStr() == "test":
+    asyncCheck pushbulletSendTest(db)
+
+  else:
+    asyncCheck pushbulletSendDb(db, js["pushid"].getStr())
 
 
 #[

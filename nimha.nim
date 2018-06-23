@@ -104,7 +104,7 @@ if not fileExists(getAppDir() & "/src/mainmodules/nimha_cron") or defined(rc) or
 
 
 # Webinterface
-if not fileExists(getAppDir() & "/src/mainmodules/nimha_webinterface") or defined(rc) or defined(rcwww):
+if not fileExists(getAppDir() & "/src/mainmodules/nimha_webinterface") or defined(rc) or defined(rcwebinterface):
   let outputWww = execCmd("nim c -d:ssl -d:sqlsafe " & devC & getAppDir() & "/src/mainmodules/nimha_webinterface.nim")
   if outputWww == 1:
     echo "\nAn error occured nimha_webinterface\n\n"
@@ -114,7 +114,7 @@ if not fileExists(getAppDir() & "/src/mainmodules/nimha_webinterface") or define
 
 
 # Gateway
-if not fileExists(getAppDir() & "/src/mainmodules/nimha_gateway") or defined(rc) or defined(rcmqtt):
+if not fileExists(getAppDir() & "/src/mainmodules/nimha_gateway") or defined(rc) or defined(rcgateway):
   let outputGateway = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/src/mainmodules/nimha_gateway.nim")
   if outputGateway == 1:
     echo "\nAn error occured nimha_gateway\n\n"

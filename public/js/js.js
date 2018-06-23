@@ -18,7 +18,7 @@ $(function() {
 });
 
 function websocketInit() {
-  if (pageType == "dashboard" || pageType == "alarmNumpad") {
+  if (pageType == "dashboard" || pageType == "alarmNumpad" || pageType == "pushbullet") {
     if (wsAddress == "127.0.0.1") {
       console.log("Please change the Websocket address in js.js. Otherwise external user will not connect.");
     }
@@ -195,7 +195,7 @@ ________________________________*/
 // Pushbullet
 $(function() {
   $( "#pushbulletTest" ).click(function() {
-    ws.send('{' + cookieSidJson() + '"element": "pushbullet", "action": "testmessage", "type": "note", "title": "Push", "body": "Me"}');  
+    ws.send('{' + cookieSidJson() + '"element": "pushbullet", "action": "message", "pushid": "test"}');  
   });
 
   $( ".pushbulletSend" ).click(function() {

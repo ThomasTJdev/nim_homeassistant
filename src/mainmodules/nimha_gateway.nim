@@ -55,7 +55,11 @@ proc mosquittoParse(payload: string) {.async.} =
   of "wss/to":
     if isNil(ws):
       setupWs()
-    waitFor ws.sendText(message, false)
+
+    if not isNil(ws):
+      waitFor ws.sendText(message, false)
+    else:
+      echo "Gateway: Error, websocket not connected"
 
   of "history":
     # Add history to var and every nth update database with it.
