@@ -5,8 +5,8 @@
 ________________________________*/
 var ws          = "";
 var wsAddress   = "127.0.0.1" // IP or url to websocket server
-var wsPort      = "25437" // 443
 var wsProto     = "ws" // Use "wss" for SSL connection
+var wsPort      = "25437" // 443
 var wsError     = false;
 var pageRefresh = false;
 var pageInit    = true;
