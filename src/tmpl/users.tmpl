@@ -30,6 +30,14 @@
           <form method="POST" action="/login/do">
             <input type="email" name="email" class="form-control" placeholder="Email" />
             <input type="password" name="password" class="form-control" placeholder="Password" />
+
+            #if useCaptcha:
+            <div id="recaptcha">
+              <div class="g-recaptcha" data-sitekey="${recaptchaSiteKey}" data-theme="light" style="transform:scale(0.93);-webkit-transform:scale(0.93);transform-origin:0 0;-webkit-transform-origin:0 0;"></div>
+              <script src="https://www.google.com/recaptcha/api.js" async defer></script>      
+            </div>
+            #end if
+
             <button type="submit" class="btn btn-primary">Login</button>
           </form>
 
