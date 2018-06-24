@@ -23,7 +23,7 @@ import ../resources/xiaomi/xiaomi
 var ws: AsyncWebSocket
 
 var localhostKey = ""
-
+  
 
 proc setupWs() =
   ## Setup connection to WS
