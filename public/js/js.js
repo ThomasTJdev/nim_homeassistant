@@ -5,7 +5,7 @@
 ________________________________*/
 var ws          = "";
 var wsAddress   = "127.0.0.1" // IP or url to websocket server
-var wsProto     = "ws" // Use "wss" for SSL connection
+var wsProtocol  = "ws" // Use "wss" for SSL connection
 var wsPort      = "25437" // 443
 var wsError     = false;
 var pageRefresh = false;
@@ -22,7 +22,7 @@ function websocketInit() {
     if (wsAddress == "127.0.0.1") {
       console.log("Please change the Websocket address in js.js. Otherwise external user will not connect.");
     }
-    ws = new WebSocket(wsProto + "://" + wsAddress + ":" + wsPort + "", ["nimha"]);
+    ws = new WebSocket(wsProtocol + "://" + wsAddress + ":" + wsPort + "", ["nimha"]);
   }
   
   ws.onopen = function() {
@@ -42,9 +42,11 @@ function websocketInit() {
     window.setInterval(function(){
       ws.send('{' + cookieSidJson() + '"element": "ping"}');
     }, 10000);*/
+    websocketKeepAlive();
   };
 
-  ws.onclose = function() { 
+  ws.onclose = function() {
+    websocketCancelKeepAlive();
     if (pageRefresh != true && wsError == false) {
       console.log("Connection is closed..."); 
       notify(jQuery.parseJSON('{"error": "true", "value": "Websocket closed"}'));
@@ -55,6 +57,7 @@ function websocketInit() {
   };
 
   ws.onerror = function() { 
+    websocketCancelKeepAlive();
     if (pageRefresh != true) {
       wsError = true;
       console.log("Error in connection..."); 
@@ -79,8 +82,22 @@ function websocketInit() {
       websocketHandler(obj)
     }
   };
-
 }
+
+
+
+/* Ping to keep alive */
+var pingRun;
+function websocketKeepAlive() { 
+  var pingRun = window.setInterval(function(){
+    ws.send('{' + cookieSidJson() + '"element": "ping"}');
+  }, 10000);
+}  
+function websocketCancelKeepAlive() {  
+    clearInterval(pingRun)
+}
+
+
 
 function websocketHandler(obj) {
   if (obj.handler == "noaction") {
@@ -157,8 +174,9 @@ function cookieSidJson() {
 }
 
 
+
 /*
-    Base elements
+    Sidebar
 ________________________________*/
 $(function() {
   $( "#sidebarToggle" ).click(function() {
@@ -168,6 +186,7 @@ $(function() {
     $('#sidebar').removeClass('active');
   }
 });
+
 
 
 /*
@@ -189,10 +208,10 @@ function notify(obj) {
 }
 
 
+
 /*
-    Base elements
+    Pushbullet
 ________________________________*/
-// Pushbullet
 $(function() {
   $( "#pushbulletTest" ).click(function() {
     ws.send('{' + cookieSidJson() + '"element": "pushbullet", "action": "message", "pushid": "test"}');  
@@ -222,7 +241,10 @@ $(function() {
 });
 
 
-// Cron
+
+/*
+    Cron
+________________________________*/
 $(function() {
   $( ".cronActionAdd" ).click(function() {
     var time = $(".crontime").val();
@@ -240,7 +262,10 @@ $(function() {
 });
 
 
-// OS stats
+
+/*
+    OS stats
+________________________________*/
 $(function() {
   $( "#osstatsRefresh" ).click(function() {
     ws.send('{' + cookieSidJson() + '"element": "osstats", "value": "refresh"}');  
@@ -259,7 +284,10 @@ function osstatsRefresh(obj) {
 }
 
 
-// Cert expiration
+
+/*
+    Cert
+________________________________*/
 $(function() {
   $( ".certRefresh" ).click(function() {
     var server = $(this).attr("data-server");
@@ -287,7 +315,10 @@ function certRefresh(obj) {
 }
 
 
-// Mail
+
+/*
+    Mail
+________________________________*/
 $(function() {
   $( ".mailTestmail" ).click(function() {
     var recipient = $(".testmail.recipient").val();
@@ -319,7 +350,10 @@ $(function() {
 });
 
 
-// Alarm status
+
+/*
+    Alarm
+________________________________*/
 $(function() {
   if (pageType == "alarmNumpad") {
     $('#alarmModel').modal('show');
@@ -430,7 +464,9 @@ function alarmSetStatus(obj) {
 
 
 
-// Xiaomi read & discover
+/*
+    Xiaomi
+________________________________*/
 $(function() {
   $( ".xiaomiRefresh" ).click(function() {
     var sid = $(this).attr("data-sid");
@@ -549,7 +585,9 @@ $(function() {
 
 
 
-// Websocket
+/*
+    Websocket
+________________________________*/
 function websocketConnectedUsers(obj) {
   console.log("Updating websocket users")
   
@@ -572,8 +610,9 @@ function websocketConnectedUsers(obj) {
 }
 
 
+
 /*
-    Google map
+    Owntracks Google map
 ________________________________*/
 $(function() {
   $( ".owntracksRefresh" ).click(function() {
