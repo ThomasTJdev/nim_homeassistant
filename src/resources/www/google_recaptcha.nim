@@ -1,6 +1,9 @@
 # Copyright 2018 - Thomas T. Jarløv
 
-import recaptcha, parsecfg, asyncdispatch, os
+import recaptcha, parsecfg, asyncdispatch
+
+from os import getAppDir
+from strutils import replace
 
 
 var
@@ -9,7 +12,7 @@ var
   
 
 # Using config.ini
-let dict = loadConfig("config/secret.cfg")
+let dict = loadConfig(replace(getAppDir(), "/src/mainmodules", "") & "/config/secret.cfg")
 
 # Web settings
 let recaptchaSecretKey = dict.getSectionValue("reCAPTCHA","Secretkey")

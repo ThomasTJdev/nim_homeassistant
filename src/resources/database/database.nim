@@ -2,7 +2,7 @@
 
 import parseCfg, db_sqlite, os, strutils
 
-let dict = loadConfig("config/secret.cfg")
+let dict = loadConfig(replace(getAppDir(), "/src/mainmodules", "") & "/config/secret.cfg")
 
 let db_user = dict.getSectionValue("Database","user")
 let db_pass = dict.getSectionValue("Database","pass")

@@ -8,7 +8,7 @@ import strutils
 import streams
 import websocket
 
-from os import sleep
+from os import sleep, getAppDir
 
 import ../resources/alarm/alarm
 import ../resources/mqtt/mqtt_func
@@ -33,7 +33,7 @@ proc setupWs() =
   ws = waitFor newAsyncWebsocketClient("127.0.0.1", Port(25437), path = "/", protocols = @["nimha"])
 
   # Set WSS key for communication without verification on 127.0.0.1
-  var dict = loadConfig("config/secret.cfg")
+  var dict = loadConfig(replace(getAppDir(), "/src/mainmodules", "") & "/config/secret.cfg")
   localhostKey = dict.getSectionValue("Websocket", "wsLocalKey")
 
 
