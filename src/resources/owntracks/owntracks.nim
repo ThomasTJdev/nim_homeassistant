@@ -16,7 +16,7 @@ let homeLat = dict.getSectionValue("Home","lat")
 let homeLon = dict.getSectionValue("Home","lon")
 
 
-proc owntracksAddWaypoints(db: DbConn, topic, data: string) {.async.} =
+proc owntracksAddWaypoints(topic, data: string) {.async.} =
   ## Add owntrack waypoints to DB
 
   let js = parseJson(data)
@@ -123,9 +123,13 @@ proc owntracksParseMqtt*(payload, topic: string) {.async.} =
 
   let js = parseJson(payload)
 
-  # Update with last location
+  # Update with last location or waypoints
   if hasKey(js, "_type"):
-    asyncCheck owntracksHistoryAdd(topic, payload)
+    if jn(js, "_type") == "location":
+      asyncCheck owntracksHistoryAdd(topic, payload)
+    
+    elif jn(js, "_type") == "waypoints":
+      asyncCheck owntracksAddWaypoints(topic, payload)
 
   # Send data to websocket
   elif js["value"].getStr() == "init":
