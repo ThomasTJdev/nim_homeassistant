@@ -14,6 +14,8 @@ import uri
 
 import cookies as libcookies
 
+from osproc import execProcess
+
 import recaptcha
 import ../resources/www/google_recaptcha
 
@@ -40,14 +42,12 @@ var db = conn()
 
 
 
-
 # Jester port
 settings:
   port = Port(5000)
 
 
 let dict = loadConfig("config/secret.cfg")
-
 let gMapsApi = "?key=" & dict.getSectionValue("Google","mapsAPI")
 
 
@@ -495,9 +495,9 @@ __________________________________________________]#
 
 when isMainModule:
   setControlCHook(handler)
-  # Add admin user
-  if "newuser" in commandLineParams():
-    createAdminUser(db, commandLineParams())
+  
+  let hostIp = execProcess("ifconfig | grep -Eo 'inet (addr:)?([0-9]*\\.){3}[0-9]*' | grep -Eo '([0-9]*\\.){3}[0-9]*' | grep -v '127.0.0.1'")
+  echo "\nAccess the webinterface on " & replace(hostIp, "\n", "") & ":5000\n"
     
   #[
   # Save startup time
