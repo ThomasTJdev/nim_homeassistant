@@ -14,7 +14,7 @@ requires "jester >= 0.2.0" # master - git clone it
 requires "recaptcha >= 1.0.2"
 requires "bcrypt >= 0.2.1"
 requires "multicast >= 0.1.1"
-requires "websocket >= 0.13.0"
+requires "websocket >= 0.3.1"
 
 
 import distros
@@ -24,8 +24,7 @@ task setup, "Setup started":
     echo "Cannot run on Windows"
     quit()
 
-  if not fileExists("config/config.cfg"):
-    exec "cp config/secret_default.cfg config/secret.cfg"
+  echo "\nJester: Please ensure that jester is installed from GIT\n"
   
 before install:
     setupTask()
