@@ -10,11 +10,13 @@ import src/resources/users/user_add
 import src/resources/database/database
 
 # Import procs to generate database tables
-from src/resources/alarm/alarm import alarmDatabase
-from src/resources/mail/mail import mailDatabase
-from src/resources/owntracks/owntracks import owntracksDatabase
-from src/resources/xiaomi/xiaomi import xiaomiDatabase
-from src/mainmodules/nimha_cron import cronDatabase
+import src/resources/database/modules/alarm_database
+import src/resources/database/modules/cron_database
+import src/resources/database/modules/mail_database
+import src/resources/database/modules/owntracks_database
+import src/resources/database/modules/pushbullet_database
+import src/resources/database/modules/xiaomi_database
+
 
 var runInLoop = true
 
@@ -25,7 +27,8 @@ var www: Process
 var xiaomiList: Process
 
 
-let dict = loadConfig("config/secret.cfg")
+let secretDir = getAppDir() & "/config/secret.cfg"
+let dict = loadConfig(secretDir)
 
 
 proc handler() {.noconv.} =
@@ -44,9 +47,9 @@ setControlCHook(handler)
 proc secretCfg() =
   ## Check if secret.cfg exists
 
-  if not fileExists("config/secret.cfg"):
-    copyFile("config/secret_default.cfg", "config/secret.cfg")
-    echo "\nYour secret.cfg has been generated at config/secret.cfg. Please fill in your data\n"
+  if not fileExists(secretDir):
+    copyFile(getAppDir() & "/config/secret_default.cfg", secretDir)
+    echo "\nYour secret.cfg has been generated at " & secretDir & ". Please fill in your data\n"
 
 proc updateJsFile() = 
   ## Updates the JS file with Websocket details from secret.cfg
@@ -71,8 +74,12 @@ proc checkMosquittoBroker() =
   ## Check is the path to Mosquitto broker exists else quit
 
   var mosquitto: File
-  if not mosquitto.open(dict.getSectionValue("MQTT","mqttPath")):
-    echo "Mosquitto broker: Error in path. No file found at " & dict.getSectionValue("MQTT","mqttPath") & "\n"
+  if not mosquitto.open(dict.getSectionValue("MQTT", "mqttPath")):
+    echo "\n\nMosquitto broker: Error in path. No file found at " & dict.getSectionValue("MQTT","mqttPath") & "\n"
+    quit()
+
+  if dict.getSectionValue("MQTT", "mqttIp") == "":
+    echo "\n\nMosquitto broker: Missing connection details - You have not update secret.cfg with your details. Please insert your data in " & getAppDir() & "/config/secret_default.cfg to continue\n"
     quit()
 
 
@@ -86,6 +93,7 @@ proc createDbTables() =
   alarmDatabase(db)
   mailDatabase(db)
   owntracksDatabase(db)
+  pushbulletDatabase(db)
   xiaomiDatabase(db)
   cronDatabase(db)
 
@@ -203,8 +211,8 @@ proc requirements() =
   updateJsFile()
   checkMosquittoBroker()
   createDbTables()
-  compileIt()
-  launcherActivated()
+  #compileIt()
+  #launcherActivated()
 
 
 requirements()

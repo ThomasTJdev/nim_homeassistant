@@ -24,7 +24,13 @@ task setup, "Setup started":
     echo "Cannot run on Windows"
     quit()
 
-  echo "\nJester: Please ensure that jester is installed from GIT\n"
-  
+  if not fileExists("config/secret.cfg"):
+    exec "cp config/secret_default.cfg config/secret.cfg"
+
 before install:
-    setupTask()
+  setupTask()
+
+after install:
+  echo "\n\nJester: Please ensure that jester is installed from GIT\n"
+
+  echo "secret.cfg: Please update secret.cfg with your details. The file is located in the nimble package directory at config/secret.cfg\n"
