@@ -47,7 +47,7 @@ var server = Server(
 
 # Set key for communication without verification on 127.0.0.1
 # When using setSectionKey formatting and comments are deleted..
-let localhostKey = makeSalt()
+let localhostKey = replace(makeSalt(), "\"", "")
 let localhostKeyLen = localhostKey.len()
 for fn in [replace(getAppDir(), "/src/mainmodules", "") & "/config/secret.cfg"]:
   fn.writeFile fn.readFile.replace(re("wsLocalKey = \".*\""), "wsLocalKey = \"" & localhostKey & "\"")
