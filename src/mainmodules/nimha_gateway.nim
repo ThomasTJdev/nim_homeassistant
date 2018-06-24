@@ -3,6 +3,7 @@
 
 import asyncdispatch
 import osproc
+import parsecfg
 import strutils
 import streams
 import websocket
@@ -18,7 +19,11 @@ import ../resources/web/web_utils
 import ../resources/xiaomi/xiaomi
 
 
+
 var ws: AsyncWebSocket
+
+var localhostKey = ""
+
 
 proc setupWs() =
   ## Setup connection to WS
@@ -26,6 +31,10 @@ proc setupWs() =
   echo "Mosquitto MAIN ws connection started"
 
   ws = waitFor newAsyncWebsocketClient("127.0.0.1", Port(25437), path = "/", protocols = @["nimha"])
+
+  # Set WSS key for communication without verification on 127.0.0.1
+  var dict = loadConfig("config/secret.cfg")
+  localhostKey = dict.getSectionValue("Websocket", "wsLocalKey")
 
 
 proc mosquittoParse(payload: string) {.async.} =
@@ -57,7 +66,7 @@ proc mosquittoParse(payload: string) {.async.} =
       setupWs()
 
     if not isNil(ws):
-      waitFor ws.sendText(message, false)
+      waitFor ws.sendText(localhostKey & message, false)
     else:
       echo "Gateway: Error, websocket not connected"
 

@@ -9,6 +9,7 @@ import logging
 import os
 import osproc
 import parsecfg
+import re
 import strutils
 import streams
 import times
@@ -17,14 +18,47 @@ import websocket
 import ../resources/database/database
 import ../resources/database/sql_safe
 import ../resources/mqtt/mqtt_func
+import ../resources/users/password
 import ../resources/utils/dates
+
+
+type
+  Client = ref object
+    ws: AsyncWebSocket
+    socket: AsyncSocket
+    connected: bool
+    hostname: string
+    lastMessage: float
+    history: string
+    wsSessionStart: int
+    key: string
+    userStatus: string
+
+  Server = ref object
+    clients: seq[Client]
+    needsUpdate: bool
+
+
+# Contains the clients
+var server = Server(
+    clients: @[]
+  )
+
+
+# Set key for communication without verification on 127.0.0.1
+# When using setSectionKey formatting and comments are deleted..
+let localhostKey = makeSalt()
+let localhostKeyLen = localhostKey.len()
+for fn in ["config/secret.cfg"]:
+  fn.writeFile fn.readFile.replace(re("wsLocalKey = \".*\""), "wsLocalKey = \"" & localhostKey & "\"")
+
 
 
 var db = conn()
 
 
-var msgHi: seq[string] = @[]   
 
+var msgHi: seq[string] = @[]   
 
 proc wsmsgMessages*(): string =
 
@@ -41,26 +75,6 @@ proc wsmsgMessages*(): string =
 
   return "{\"handler\": \"history\", \"data\" :[" & json & "]}"
 
-
-type
-  Client = ref object
-    ws: AsyncWebSocket
-    socket: AsyncSocket
-    connected: bool
-    hostname: string
-    lastMessage: float
-    rapidMessageCount: int
-    history: string
-
-  Server = ref object
-    clients: seq[Client]
-    needsUpdate: bool
-
-
-# Contains the clients
-var server = Server(
-    clients: @[]
-  )
 
 
 proc newClient(ws: AsyncWebSocket, socket: AsyncSocket, hostname: string): Client =
@@ -204,9 +218,8 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
         let (opcode, data) = await myClient.ws.readData()
         #let (opcode, data) = await readData(myClient.socket, true)
 
-        # WARNING - There is no security check for localhost
-        if myClient.hostname == "127.0.0.1":
-          msgHi.add(data)
+        if myClient.hostname == "127.0.0.1" and data.substr(0, localhostKeyLen-1) == localhostKey:
+          msgHi.add(data.substr(localhostKeyLen, data.len()))
           
         else:
 
@@ -218,17 +231,21 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
 
             # To be removed
             if js == parseJson("{}"):
-              echo "WSS: Json failed"
+              echo "WSS: Parsing JSON failed"
               return
 
-            # Check user access
-            let userid = getValueSafeRetry(db, sql"SELECT userid FROM session WHERE ip = ? AND key = ? AND userid = ?", hostname, jn(js, "key"), jn(js, "userid"))
-            let userstatus = getValueSafeRetry(db, sql"SELECT status FROM person WHERE id = ?", userid)
+            # Check user access. Current check is set to every 5 minutes (300s) - if user account is deleted, connection will be terminated
+            if myClient.wsSessionStart + 300 < toInt(epochTime()) or myClient.key == "" or myClient.userStatus == "":
+              let key = jn(js, "key")
+              let userid = getValueSafeRetry(db, sql"SELECT userid FROM session WHERE ip = ? AND key = ? AND userid = ?", hostname, key, jn(js, "userid"))
+              myClient.userStatus = getValueSafeRetry(db, sql"SELECT status FROM person WHERE id = ?", userid)
+              myClient.wsSessionStart = toInt(epochTime())
+              myClient.key = key
 
-            if userstatus notin ["Admin", "Moderator", "Normal"]:
-              echo "WSS: Client messed up in sid and userid"
-              myClient.connected = false
-              break
+              if myClient.userStatus notin ["Admin", "Moderator", "Normal"]:
+                echo "WSS: Client messed up in sid and userid"
+                myClient.connected = false
+                break
             
             # Respond
             await myClient.socket.sendText("{\"event\": \"received\"}", false)
@@ -258,8 +275,10 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
         break
 
 
-    await myClient.ws.close()
     myClient.connected = false
+    myClient.key = ""
+    myClient.userStatus = ""
+    await myClient.ws.close()
     info(".. socket went away.")
   
     
