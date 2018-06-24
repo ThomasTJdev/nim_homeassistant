@@ -42,26 +42,23 @@ proc mosquittoParse(payload: string) {.async.} =
 
   let topicName = payload.split(" ")[0]
   let message   = payload.replace(topicName & " ", "")
-  case topicName
-  of "alarm":
+  #case topicName
+  if topicName == "alarm":
     asyncCheck alarmParseMqtt(message)
 
-  of "osstats":
+  elif topicName == "osstats":
     asyncCheck osParseMqtt(message)
 
-  of "owntracks":
-    asyncCheck owntracksParseMqtt(message)
-
-  of "pushbullet":
+  elif topicName == "pushbullet":
     asyncCheck pushbulletParseMqtt(message)
 
-  of "webutils":
+  elif topicName == "webutils":
     asyncCheck webParseMqtt(message)
 
-  of "xiaomi":
+  elif topicName == "xiaomi":
     asyncCheck xiaomiParseMqtt(message) 
 
-  of "wss/to":
+  elif topicName == "wss/to":
     if isNil(ws):
       setupWs()
 
@@ -70,7 +67,10 @@ proc mosquittoParse(payload: string) {.async.} =
     else:
       echo "Gateway: Error, websocket not connected"
 
-  of "history":
+  elif topicName.substr(0, 8) == "owntracks":
+    asyncCheck owntracksParseMqtt(message)
+
+  elif topicName == "history":
     # Add history to var and every nth update database with it.
     # SQLite can not cope with all the data, which results in
     # database is locked, and history elements are discarded
@@ -98,7 +98,6 @@ proc mosquittoSub() =
 
     when not defined(dev):
       asyncCheck mosquittoParse(readLine(outputStream(mqttProcess)))
-
 
 
 setupWs()
