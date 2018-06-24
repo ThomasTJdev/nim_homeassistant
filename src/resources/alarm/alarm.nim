@@ -142,13 +142,13 @@ proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
     if alarmStatus == "triggered":
       asyncCheck alarmRinging(db, trigger, device)
 
-  
 
 
 proc alarmGetStatus*(db: DbConn): string =
   ## Get alarm status
 
   return getValue(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
+
 
 
 proc alarmParseMqtt*(payload: string) {.async.} =
@@ -164,8 +164,7 @@ proc alarmParseMqtt*(payload: string) {.async.} =
   elif action == "activate":
     var passOk = false
     let passwordEnabled = getAllRows(db, sql"SELECT id FROM alarm_password")
-    echo jn(js, "password")
-    echo jn(js, "userid")
+
     if passwordEnabled.len() > 0:
       let password = jn(js, "password")
 
