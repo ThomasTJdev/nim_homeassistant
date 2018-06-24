@@ -96,7 +96,7 @@ proc owntracksLastLocations(init = false) {.async.} =
 
 
 
-proc owntracksHistoryAdd(db: DbConn, topic, data: string) {.async.} =
+proc owntracksHistoryAdd(topic, data: string) {.async.} =
   ## Add owntrack element to database
 
   let js = parseJson(data)
@@ -118,13 +118,19 @@ proc owntracksHistoryAdd(db: DbConn, topic, data: string) {.async.} =
     exec(db, sql"INSERT INTO owntracks_history (device_id, username, tracker_id, lat, lon, conn) VALUES (?, ?, ?, ?, ?, ?)", deviceID, username, trackerID, lat, lon, conn)
 
 
-proc owntracksParseMqtt*(payload: string) {.async.} =
+proc owntracksParseMqtt*(payload, topic: string) {.async.} =
   ## Parse owntracks MQTT
 
   let js = parseJson(payload)
 
-  if js["value"].getStr() == "init":
+  # Update with last location
+  if hasKey(js, "_type"):
+    asyncCheck owntracksHistoryAdd(topic, payload)
+
+  # Send data to websocket
+  elif js["value"].getStr() == "init":
     asyncCheck owntracksLastLocations(true)
+
   else:
     asyncCheck owntracksLastLocations()
 

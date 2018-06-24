@@ -68,7 +68,7 @@ proc mosquittoParse(payload: string) {.async.} =
       echo "Gateway: Error, websocket not connected"
 
   elif topicName.substr(0, 8) == "owntracks":
-    asyncCheck owntracksParseMqtt(message)
+    asyncCheck owntracksParseMqtt(message, topicName)
 
   elif topicName == "history":
     # Add history to var and every nth update database with it.
