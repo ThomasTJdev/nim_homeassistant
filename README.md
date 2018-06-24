@@ -1,6 +1,6 @@
 # Nim Homeassistant
 
-Nim Home Assistant is a hub for combining multiple home automation devices and automating jobs. Nim Home Assistant is developed to run on a Raspberry Pi with a 7" touchscreen.
+Nim Home Assistant is a hub for combining multiple home automation devices and automating jobs. Nim Home Assistant is developed to run on a Raspberry Pi with a 7" touchscreen, mobile devices and on large screens.
 
 
 # Features
@@ -19,86 +19,103 @@ Nim Home Assistant is a hub for combining multiple home automation devices and a
 
 # How to
 
-## Caution
- - Nim-lang >= 0.18.1 (devel) (check https://github.com/dom96/choosenim or on Raspberry Pi check the section below)
- - Jester >= master (it is not available at Nimble yet. Clone and nimble install.)
-
 ## Requirements
-### Prerequisite:
+
+### Nim-lang
+Nim-lang >= 0.18.1 (devel)
+```
+# Choosenim - https://github.com/dom96/choosenim
+choosenim devel
+
+# Or (e.g. for Raspberry pi)
+# Follow https://github.com/nim-lang/Nim#compiling and
+# then link your nim exec to the newly compiled nim
+ln -sf /the/path/to/nim/git/Nim/bin/nim /usr/bin/nim
+ln -sf /the/path/to/nim/git/Nim/bin/nimble /usr/bin/nimble
+```
+
+### Jester
+Jester >= master
+
+*Currently not available on nimble*
+
+```
+git clone https://github.com/dom96/jester.git
+cd jester
+nimble install
+```
+
+### Other prerequisite:
 - multicast (nimble)
 - bcrypt (nimble)
 - websocket (nimble)
 - openssl (on your system)
 - python (on your system)
 - pycrypto library (pip install pycrypto or how you like it: https://github.com/dlitz/pycrypto)
-- MQTT broker (see section below for Mosquitto)
+- Mosquitto MQTT (see section below for installing)
+- Firewall - open ports: 443 (SSL) and 8883 (MQTT)
 
-**Jester:**
-```
-git clone https://github.com/dom96/jester.git
-cd jester
-nimble install
-```
-**Nim-lang:**
-```
-choosenim devel
-```
-OR
 
-Follow https://github.com/nim-lang/Nim#compiling and then:
-```
-# Then link your nim exec to the newly compiled nim
-ln -sf /usr/bin/nim /the/path/to/nim/git/Nim/bin/nim
-ln -sf /usr/bin/nimble /the/path/to/nim/git/Nim/bin/nimble
-```
+
 
 ## Setup
-**It is currently not possible to run NimHA without a webserver. To access NimHA you need to use your local ip (e.g. 192.168.1.20) - 127.0.0.1/localhost is not working.**
+**To access NimHA you need to use your local ip (e.g. 192.168.1.20) - it is not possible to access at 127.0.0.1.**
 
-### Clone the git (nimble is not ready yet)
+### Clone the git or use Nimble
+**Clone:**
 ```
 git clone https://github.com/ThomasTJdev/nim_homeassistant.git
 cd nim_homeassistant
+
+# Use -d:dev to get all output
+nim c nimha.nim
+```
+**Nimble:**
+```
+nimble install nim_homeassistant (insert current version)
+cd ~/.nimble/pkgs/nimha-0.1.1
 ```
 
 ### Update your secret file:
 ```
-cp config/secret_default.cfg config/secret.cfg
-
 # Open the file and insert your data
 nano config/secret.cfg
 ```
 
-### Adjust the websocket address in the JS file
-```
-nano public/js/.js.js
 
-# Adjust
-var wsAddress   = "127.0.0.1" // IP or url to websocket server
-var wsProto     = "ws" // Use "wss" for SSL connection
+### Start your MQTT broker
+See the section below for installing Mosquitto MQTT broker or just start your broker:
+```
+sudo systemctl start mosquitto
 ```
 
-### Compile and run:
+### Run and add an admin user
 ```
-# Use -d:dev to get all output
-nim c nimha.nim
+# Run and add an admin user (only 1 admin user is allowed)
+./nimha newuser -u:username -p:password -e:my@email.com
 
-# From now on just run
+# Just run
 ./nimha
+
+# Access the interface at
+<lanip>:5000
 ```
+
 
 
 # Current status
-Soon beta. The next steps (not chronological):
+**Beta**
 
-- Run NimHA locally with access on 127.0.0.1
-- Add nimble file and highlight requirements
+To do (not chronological):
+
+- When deleting action-templates from e.g. alarm, delete on cascade
+- Add nimble file
 - Add more features, e.g. Sony Songpal, Yeelight
-- When deleting templates, update templates users, e.g. alarm actions
+- Add delete on cascade
 - Google Maps API in secret.cfg or table?
 - Make individual databases for each modules history. SQLite can not keep up with data which causes a locked database
+- Add a history page
 - Add example use cases
-- reCaptcha implementation
 
 
 
@@ -109,7 +126,7 @@ Soon beta. The next steps (not chronological):
 
 # MQTT Broker
 
-The whole setup depends on a MQTT broker, which connects all the different modules. You can use any broker. The following shows how to use Mosquitto.
+The whole setup depends on a MQTT broker, which connects all the different modules. The current setup requires Mosquitto.
 
 ## Installing and running Mosquitto MQTT broker
 
@@ -246,16 +263,17 @@ server {
 
 ## MQTT
 
-*To do: SSL*
-```nginx
-server {
-    listen 8883;
-    server_name <domain>;
+**MISSING**: How to use nginx and SSL certificate with Mosquitto MQTT.
 
-    location / {
-      proxy_pass http://127.0.0.1:8883;
-    }
-}
+```nginx
+#server {
+#    listen 8883;
+#    server_name <domain>;
+
+#    location / {
+#      proxy_pass http://127.0.0.1:8883;
+#    }
+#}
 
 ```
 
