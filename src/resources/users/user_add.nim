@@ -3,12 +3,15 @@
 import os, strutils, db_sqlite
 
 
+import ../database/database
 import ../users/password
 
 
-proc createAdminUser*(db: DbConn, args: seq[string]) = 
+proc createAdminUser*(args: seq[string]) = 
   ## Create new admin user
   ## Input is done through stdin
+
+  var db = conn()
   
   echo("User: Checking if any Admin exists in DB")
   let anyAdmin = getAllRows(db, sql"SELECT id FROM person WHERE status = ?", "Admin")
