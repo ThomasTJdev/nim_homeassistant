@@ -73,7 +73,7 @@ nim c nimha.nim
 **Nimble:**
 ```
 nimble install nim_homeassistant (insert current version)
-cd ~/.nimble/pkgs/nimha-0.1.1
+cd ~/.nimble/pkgs/nimha-0.1.0
 ```
 
 ### Update your secret file:
