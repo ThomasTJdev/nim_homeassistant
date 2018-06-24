@@ -3,6 +3,7 @@
 import os
 import osproc
 import parsecfg
+import re
 import sequtils
 import strutils
 
@@ -62,10 +63,10 @@ proc updateJsFile() =
   let wsProtocolFrom  = "var wsProtocol  = \"ws\""
   let wsPortFrom      = "var wsPort      = \"25437\""
   
-  for fn in ["public/js/js.js"]:
-    fn.writeFile fn.readFile.replace(wsAddressFrom, wsAddressTo)
-    fn.writeFile fn.readFile.replace(wsProtocolFrom, wsProtocolTo)
-    fn.writeFile fn.readFile.replace(wsPortFrom, wsPortTo)
+  for fn in [getAppDir() & "/public/js/js.js"]:
+    fn.writeFile fn.readFile.replace(re("var wsAddress   = \".*\""), wsAddressTo)
+    fn.writeFile fn.readFile.replace(re("var wsProtocol  = \".*\""), wsProtocolTo)
+    fn.writeFile fn.readFile.replace(re("var wsPort      = \".*\""), wsPortTo)
 
   echo "Javascript: File updated with websocket connection details\n"
 
@@ -109,6 +110,7 @@ proc launcherActivated() =
 
   wss     = startProcess(getAppDir() & "/src/mainmodules/nimha_websocket", options = {poParentStreams})
   # Gateway may first be started after wss
+  sleep(200)
   gateway = startProcess(getAppDir() & "/src/mainmodules/nimha_gateway", options = {poParentStreams})
   www     = startProcess(getAppDir() & "/src/mainmodules/nimha_webinterface", options = {poParentStreams})
   cron    = startProcess(getAppDir() & "/src/mainmodules/nimha_cron", options = {poParentStreams})
