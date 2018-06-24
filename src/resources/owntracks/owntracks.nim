@@ -128,20 +128,21 @@ proc owntracksParseMqtt*(payload: string) {.async.} =
     asyncCheck owntracksLastLocations()
 
 
-proc owntracksDatabase(db: DbConn) =
+proc owntracksDatabase*(db: DbConn) =
   ## Creates Xiaomi tables in database
 
   # Devices
-  exec(db, sql"""
+  if not tryExec(db, sql"""
   CREATE TABLE IF NOT EXISTS owntracks_devices (
     username TEXT PRIMARY KEY,
     device_id TEXT,
     tracker_id TEXT,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now'))
-  );""")
+  );"""):
+    echo "ERROR: Owntracks device table could not be created"
 
   # Waypoints
-  exec(db, sql"""
+  if not tryExec(db, sql"""
   CREATE TABLE IF NOT EXISTS owntracks_waypoints (
     id INTEGER PRIMARY KEY,
     username TEXT,
@@ -152,10 +153,11 @@ proc owntracksDatabase(db: DbConn) =
     rad INTEGER,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now')),
     FOREIGN KEY (username) REFERENCES owntracks_devices(username)
-  );""")
+  );"""):
+    echo "ERROR: Owntracks waypoints table could not be created"
 
   # History
-  exec(db, sql"""
+  if not tryExec(db, sql"""
   CREATE TABLE IF NOT EXISTS owntracks_history (
     id INTEGER PRIMARY KEY,
     username TEXT,
@@ -166,7 +168,7 @@ proc owntracksDatabase(db: DbConn) =
     conn VARCHAR(10),
     creation timestamp NOT NULL default (STRFTIME('%s', 'now')),
     FOREIGN KEY (username) REFERENCES owntracks_devices(username)
-  );""")
+  );"""):
+    echo "ERROR: Owntracks history table could not be created"
 
 
-owntracksDatabase(db)

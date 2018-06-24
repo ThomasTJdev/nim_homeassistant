@@ -175,7 +175,6 @@ proc cronDatabase*(db: DbConn) =
 
 
 when isMainModule:
-  cronDatabase(db)
   sleep(5000)
   cronJob()
   runForever()

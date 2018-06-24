@@ -2,15 +2,13 @@
 
 import parseCfg, db_sqlite, os, strutils
 
-  
-let dict = loadConfig("config/config.cfg")
+let dict = loadConfig("config/secret.cfg")
 
-let db_user* = dict.getSectionValue("Database","user")
-let db_pass* = dict.getSectionValue("Database","pass")
-let db_name* = dict.getSectionValue("Database","name")
-let db_host* = dict.getSectionValue("Database","host")
+let db_user = dict.getSectionValue("Database","user")
+let db_pass = dict.getSectionValue("Database","pass")
+let db_name = dict.getSectionValue("Database","name")
+let db_host = replace(getAppDir(), "/src/mainmodules", "") & "/" & dict.getSectionValue("Database","host")
 let db_folder = dict.getSectionValue("Database","folder")
-
 
 proc generateDB*(db: DbConn) =
  

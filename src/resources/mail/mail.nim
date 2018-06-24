@@ -112,7 +112,7 @@ proc mailDatabase*(db: DbConn) =
   ## Creates mail tables in database
 
   # Mail settings
-  exec(db, sql"""
+  if not tryExec(db, sql"""
   CREATE TABLE IF NOT EXISTS mail_settings (
     id INTEGER PRIMARY KEY,
     address TEXT,
@@ -121,12 +121,14 @@ proc mailDatabase*(db: DbConn) =
     user TEXT,
     password TEXT,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now'))
-  );""")
+  );"""):
+    echo "ERROR: Mail settings table could not be created"
+
   if getAllRows(db, sql"SELECT id FROM mail_settings").len() <= 0:
     exec(db, sql"INSERT INTO mail_settings (address, port, fromaddress, user, password) VALUES (?, ?, ?, ?, ?)", "smtp.com", "537", "mail@mail.com", "mailer", "secret")
 
   # Mail templates
-  exec(db, sql"""
+  if not tryExec(db, sql"""
   CREATE TABLE IF NOT EXISTS mail_templates (
     id INTEGER PRIMARY KEY,
     name TEXT,
@@ -134,8 +136,9 @@ proc mailDatabase*(db: DbConn) =
     subject TEXT,
     body TEXT,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now'))
-  );""")
+  );"""):
+    echo "ERROR: Mail templates table could not be created"
 
 
-mailDatabase(db)
+
 mailUpdateParameters(db)
