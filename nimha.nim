@@ -211,8 +211,8 @@ proc requirements() =
   updateJsFile()
   checkMosquittoBroker()
   createDbTables()
-  #compileIt()
-  #launcherActivated()
+  compileIt()
+  launcherActivated()
 
 
 requirements()
