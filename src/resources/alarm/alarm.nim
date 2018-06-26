@@ -18,8 +18,6 @@ import ../pushbullet/pushbullet
 import ../users/password
 import ../xiaomi/xiaomi
 
-#TEST
-import alarmCount
 var alarmStatus = ""
 var alarmArmedTime = toInt(epochTime())
 
