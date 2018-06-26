@@ -57,7 +57,7 @@ nimble install
 - bcrypt (nimble)
 - websocket (nimble)
 - openssl (on your system)
-- python (on your system)
+- python 3 (on your system. It will be called with `python3`)
 - pycrypto library (pip install pycrypto or how you like it: https://github.com/dlitz/pycrypto)
 - Mosquitto MQTT (see section below for installing)
 - Firewall - open ports: 443 (SSL) and 8883 (MQTT)
@@ -128,6 +128,7 @@ To do (not chronological):
 - Implement "plugin-module" for easy installation of new modules
 - Live page (show messages on the fly or history as they come)
 - Test page (allow for predefined or custom MQTT messages)
+- User defined path for python3
 - Add support for IP-cams
 - Move documentation and help pages (not existing yet) to another place, e.g. readthedocs
 
