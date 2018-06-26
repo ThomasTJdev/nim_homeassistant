@@ -1,7 +1,14 @@
 # Nim Homeassistant
 
-Nim Home Assistant is a hub for combining multiple home automation devices and automating jobs. Nim Home Assistant is developed to run on a Raspberry Pi with a 7" touchscreen, mobile devices and on large screens.
+Nim Home Assistant (NimHA) is a hub for combining multiple home automation devices and automating jobs. Nim Home Assistant is developed to run on a Raspberry Pi with a 7" touchscreen, mobile devices and on large screens.
 
+## Current status
+
+> NimHA is currently in **BETA**.
+
+Work before reaching stable (some might be missing - please add an issue):
+- Avoid database lock error (multiple connections at the same time - which SQLite does not like)
+- The alarm module's countdown proc() is currently not working (this means that when the alarm has been triggered, it will immediately go into ringing mode)
 
 # Features
 * MQTT
@@ -59,7 +66,7 @@ nimble install
 
 
 ## Setup
-**To access NimHA you need to use your local ip (e.g. 192.168.1.20) - it is not possible to access at 127.0.0.1.**
+**To access NimHA you need to use your local ip (run ifconfig or hostname -i to find it, e.g. 192.168.1.20) - it is not possible to access at 127.0.0.1.**
 
 ### Clone the git or use Nimble
 **Clone:**
@@ -72,13 +79,17 @@ nim c nimha.nim
 ```
 **Nimble:**
 ```
-nimble install nim_homeassistant (insert current version)
-cd ~/.nimble/pkgs/nimha-0.1.0
+nimble install nim_homeassistant
+cd ~/.nimble/pkgs/nimha-0.1.0 #(insert current version)
 ```
 
 ### Update your secret file:
 ```
 # Open the file and insert your data
+#  - The Mosquitto details are required
+#  - The websocket detalis are required. If you are running
+#    if locally, the default options are ok
+
 nano config/secret.cfg
 ```
 
@@ -89,7 +100,7 @@ See the section below for installing Mosquitto MQTT broker or just start your br
 sudo systemctl start mosquitto
 ```
 
-### Run and add an admin user
+### Run NimHA (and add an admin user)
 ```
 # Run and add an admin user (only 1 admin user is allowed)
 ./nimha newuser -u:username -p:password -e:my@email.com
@@ -97,25 +108,28 @@ sudo systemctl start mosquitto
 # Just run
 ./nimha
 
-# Access the interface at
+# Access the web interface in your browser at:
 <lanip>:5000
 ```
 
 
 
-# Current status
-**Beta**
+# To do
 
 To do (not chronological):
 
 - When deleting action-templates from e.g. alarm, delete on cascade
-- Add nimble file
 - Add more features, e.g. Sony Songpal, Yeelight
-- Add delete on cascade
 - Google Maps API in secret.cfg or table?
 - Make individual databases for each modules history. SQLite can not keep up with data which causes a locked database
-- Add a history page
-- Add example use cases
+- Add a history page (combined with individual databases?)
+- Help pages for each "module" (Add example use cases, how to, etc. E.g. when using owntracks, the MQTT topic needs to be "owntracks/\<user>/\<device>")
+- Split up "modules" so end user can choose which to activate
+- Implement "plugin-module" for easy installation of new modules
+- Live page (show messages on the fly or history as they come)
+- Test page (allow for predefined or custom MQTT messages)
+- Add support for IP-cams
+- Move documentation and help pages (not existing yet) to another place, e.g. readthedocs
 
 
 
@@ -176,6 +190,8 @@ sudo mosquitto_passwd -c tmppwdfile username
 
 
 # Nginx
+
+The following Nginx setup is essential when you are exposing NimHA to the internet. 
 
 ```
 sudo nano /etc/nginx/sites-enabled/default
@@ -282,33 +298,34 @@ server {
 
 # SSl certificate
 
+How to obtain a SSL certificate on a Raspberry Pi or on a PC (e.g. Arch Linux).
+
 ## Raspberry pi
 
 ### Add to sources
 ```
 sudo nano /etc/apt/sources.list
-```
-### Append
-```
+
+# Append to the bottom
 deb http://ftp.debian.org/debian jessie-backports main
 ```
 ### Add keys
+Run the following commands
 ```
 gpg --keyserver pgpkeys.mit.edu --recv-key  8B48AD6246925553
 gpg -a --export 8B48AD6246925553 | sudo apt-key add -
 gpg --keyserver pgpkeys.mit.edu --recv-key  7638D0442B90D010
 gpg -a --export 7638D0442B90D010 | sudo apt-key add -
 ```
-### Update source
-```
-sudo apt update
-```
 ### Install
 ```
+sudo apt update
 sudo apt-get install python-certbot-nginx -t jessie-backports
 ```
-### Obtaining certificate
-Due to the old version of cerbot, you have to mangle a little
+### Obtain the certificate
+Due to the old version of cerbot, you have to hack a little. Change <domain> with your domain.
+
+*Remember that your router must have port 80 open for the challenge*
 ```
 sudo certbot --authenticator standalone --installer nginx -d <domain> --pre-hook "service nginx stop" --post-hook "service nginx start"
 ```
@@ -317,11 +334,38 @@ sudo certbot --authenticator standalone --installer nginx -d <domain> --pre-hook
 
 Please use your package manager (install certbot-nginx) or visit https://certbot.eff.org/all-instructions for instructions.
 
-### Install certificate
+### Obtain certificate
 
 *Remember that your router must have port 80 open for the challenge*
 
 ```
-sudo certbot --nginx -d domain.com -d www.domain.com
+sudo certbot --nginx -d <domain> -d <domain>
 ```
+
+_____
+
+# Modules
+
+The following sections describes the different modules.
+
+# Alarm
+
+To access only the alarm panel (numpad) go to:
+
+```
+<domain>/code
+```
+
+# Xiaomi
+
+Tested Xiaomi devices. Other devices should work.
+
+- [Gateway](https://www.lightinthebox.com/en/p/xiao-mi-multi-function-gateway-16-million-color-night-light-remote-control-connect-other-intelligent-devices_p5362296.html?prm=1.18.104.0)
+- [Door/window sensor](https://www.lightinthebox.com/en/p/xiao-mi-door-and-window-sensor-millet-intelligent-home-suite-household-door-and-window-alarm-used-with-multi-function-gateway_p5362299.html?prm=1.18.104.0)
+- [PIR sensor](https://www.lightinthebox.com/en/p/xaomi-aqara-human-body-sensor-infrared-detector-platform-infrared-detectorforhome_p6599215.html?prm=1.18.104.0)
+
+
+# Pushbullet
+
+You need an API, which you can get here: [Create account and get you API](https://www.pushbullet.com/)
 
