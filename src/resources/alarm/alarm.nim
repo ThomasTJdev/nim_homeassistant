@@ -18,7 +18,8 @@ import ../pushbullet/pushbullet
 import ../users/password
 import ../xiaomi/xiaomi
 
-
+#TEST
+import alarmCount
 var alarmStatus = ""
 var alarmArmedTime = toInt(epochTime())
 
@@ -83,8 +84,8 @@ proc alarmRinging*(db: DbConn, trigger, device: string) {.async.} =
 
   mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"ringing\"}")
 
-
-proc alarmTriggerTimer(cd: string) {.async.} = 
+#[ Currently not working
+proc alarmTriggerTimer(cd: string, db: DbConn, trigger, device: string) {.async.}  = 
   ## The alarm countdown timer
   ## Currently used for not blocking to much..
   ## 
@@ -92,7 +93,7 @@ proc alarmTriggerTimer(cd: string) {.async.} =
 
   var counter = 0
   while true:
-    await sleepAsync(1000)
+    waitFor sleepAsync(1000)
     inc(counter)
     
     when defined(dev):
@@ -100,6 +101,7 @@ proc alarmTriggerTimer(cd: string) {.async.} =
 
     if counter == parseInt(cd) or alarmStatus != "triggered":
       break
+]#
 
 
 
@@ -134,13 +136,7 @@ proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
   when defined(dev):
     echo "Alarm: Countdown starting, " & countDown
 
-  var f = alarmTriggerTimer(countDown)
-  while not f.finished:
-    poll(1000)
-    
-  if f.finished:
-    if alarmStatus == "triggered":
-      asyncCheck alarmRinging(db, trigger, device)
+  asyncCheck alarmRinging(db, trigger, device)
 
 
 
