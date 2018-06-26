@@ -3,6 +3,8 @@
 import json, sequtils, strutils, net, sets, asyncdispatch, db_sqlite, osproc
 import multicast
 
+from os import getappdir
+
 import ../database/database
 import ../database/sql_safe
 import ../utils/parsers
@@ -94,8 +96,8 @@ proc xiaomiGatewayLight*(db: DbConn, color = "0") =
 
   if gwData[0] != "" and gwData[1] != "":
     var key = ""
-    key = execProcess("python src/xiaomi/xiaomi_key.py " & gwData[2] & " " & gwData[1])
-    
+    key = execProcess("python " & replace(getAppDir(), "/src/mainmodules", "") & "/src/resources/xiaomi/xiaomi_key.py " & gwData[2] & " " & gwData[1])
+
     discard xiaomiSocket.sendTo(xiaomiMulticast, xiaomiPort, "{\"cmd\": \"write\", \"sid\": \"7811dcb8d102\", \"data\": {\"key\": \"" & replace(key, "\n", "") & "\", \"rgb\": " & color & "} }")
     
 
