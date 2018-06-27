@@ -294,8 +294,10 @@ routes:
       redirect("/login")
 
     if @"action" == "addsensor":
-      let triggerAlarm = if @"triggeralarm" == "true": "true" else: "false"
-      let valuedata = if @"triggeralarm" == "true": @"valuedata" else: ""
+      let triggerAlarm = if @"triggeralarm" notin ["armAway", "armHome"]: "false" else: @"triggeralarm"
+
+      let valuedata = if @"triggeralarm" == "false": "" else: @"valuedata"
+
       exec(db, sql"INSERT INTO xiaomi_devices_data (sid, value_name, value_data, action, triggerAlarm) VALUES (?, ?, ?, ?, ?)", @"sid", @"valuename", valuedata, @"handling", triggerAlarm)
 
     elif @"action" == "deletesensor":
@@ -480,9 +482,6 @@ routes:
 __________________________________________________]#
 
 proc handler() {.noconv.} =
-  #xiaomiClose()
-  #mqttListenClose()
-  #execSafe(db, sql"INSERT INTO mainevents (event, value) VALUES (?, ?)", "end", "main", toInt(epochTime()))
   quit(1)
 
 

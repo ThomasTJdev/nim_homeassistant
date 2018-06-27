@@ -18,7 +18,7 @@ import ../pushbullet/pushbullet
 import ../users/password
 import ../xiaomi/xiaomi
 
-var alarmStatus = ""
+var alarmStatus* = ""
 var alarmArmedTime = toInt(epochTime())
 
 var db = conn()

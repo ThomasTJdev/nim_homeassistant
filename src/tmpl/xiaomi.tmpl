@@ -181,10 +181,17 @@
                     <input class="valuedata" />
                   </td>
                   <td>
-                    <input class="handling" />
+                    <select name="alarmhandling" class="xiaomiHandlingAlarm form-control form-control-sm">
+                      <option value="read" selected>Read</option>
+                      <option value="report">Report</option>
+                    </select>
                   </td>
                   <td>
-                    <input class="triggeralarm" />
+                    <select name="alarmtrigger" class="xiaomiTriggerAlarm form-control form-control-sm">
+                      <option value="false" selected>False</option>
+                      <option value="armAway">Arm away</option>
+                      <option value="armHome">Arm home</option>
+                    </select>
                   </td>
                   <td class="btn btn-success xiaomiAddSensor">
                     Save
