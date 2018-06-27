@@ -343,6 +343,36 @@ Please use your package manager (install certbot-nginx) or visit https://certbot
 sudo certbot --nginx -d <domain> -d <domain>
 ```
 
+
+# systemctl
+
+Create a new file called nimha.service inside /lib/systemd/system/nimha.service
+
+```
+[Unit]
+Description=nimha
+#After=network.target # Depending if you want the network to run first
+Wants=mosquitto.service # Mosquitto MQTT broker needs to be up an running
+
+[Service]
+User=user # MODIFY - Insert your username
+Type=simple
+WorkingDirectory=/home/<user>/.nimble/pkgs/nimha-0.1.0/ # MODIFY
+ExecStart=/home/<user>/.nimble/pkgs/nimha-0.1.0/nimha # MODIFY
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable auto start and start it:
+```
+sudo systemctl enable nimha
+sudo systemctl start nimha
+sudo systemctl status nimha
+```
+
 _____
 
 # Modules
