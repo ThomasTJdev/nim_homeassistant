@@ -4,7 +4,7 @@
     Websocket
 ________________________________*/
 var ws          = "";
-var wsAddress   = "127.0.0.1";
+var wsAddress   = "192.168.1.20";
 var wsProtocol  = "ws";
 var wsPort      = "25437";
 var wsError     = false;
@@ -540,8 +540,11 @@ $(function() {
     var sid = $(".xiaomiNewSensor .xiaomiActionSid option:selected").val();
     var valuename = $(".xiaomiNewSensor .valuename").val();
     var valuedata = $(".xiaomiNewSensor .valuedata").val();
-    var handling = $(".xiaomiNewSensor .handling").val();
-    var triggeralarm = $(".xiaomiNewSensor .triggeralarm").val();
+    var handling = $(".xiaomiNewSensor .xiaomiHandlingAlarm option:selected").val();
+    var triggeralarm = $(".xiaomiNewSensor .xiaomiTriggerAlarm option:selected").val();
+    if (triggeralarm == "false") {
+      valuedata = "";
+    }
 
     location.href = "/xiaomi/devices/do?action=addsensor&sid=" + sid + "&valuename=" + valuename + "&valuedata=" + valuedata + "&handling=" + handling + "&triggeralarm=" + triggeralarm;
   });
