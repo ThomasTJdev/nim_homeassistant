@@ -56,7 +56,7 @@ proc mosquittoParse(payload: string) {.async.} =
     asyncCheck webParseMqtt(message)
 
   elif topicName == "xiaomi":
-    asyncCheck xiaomiParseMqtt(message) 
+    asyncCheck xiaomiParseMqtt(message, alarmStatus) 
 
   elif topicName == "wss/to":
     if isNil(ws):

@@ -220,11 +220,13 @@ proc xiaomiDiscover*(db: DbConn, refreshDB = false) =
 
 
 
-proc xiaomiCheckAlarmStatus(sid, value, xdata: string) {.async.} =
+proc xiaomiCheckAlarmStatus(sid, value, xdata, alarmStatus: string) {.async.} =
   ## Check if the triggered device should trigger the alarm
 
-  # Check the alarm
-  let statusToTrigger = getValueSafe(db, sql"SELECT value_data FROM xiaomi_devices_data WHERE sid = ? AND triggerAlarm = ?", sid, "true")
+  if alarmStatus notin ["armAway", "armHome"]:
+    return
+
+  let statusToTrigger = getValueSafe(db, sql"SELECT value_data FROM xiaomi_devices_data WHERE sid = ? AND triggerAlarm = ?", sid, alarmStatus)
 
   if statusToTrigger == "":
     return
@@ -240,7 +242,7 @@ proc xiaomiCheckAlarmStatus(sid, value, xdata: string) {.async.} =
   
       
 
-proc xiaomiParseMqtt*(payload: string) {.async.} =
+proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
   ## Parse the MQTT
 
   var js: JsonNode
@@ -315,7 +317,7 @@ proc xiaomiParseMqtt*(payload: string) {.async.} =
         value = "illumination"
       
       if value in ["status", "motion"] and value != "no_motion":
-        asyncCheck xiaomiCheckAlarmStatus(sid, "status", xdata)
+        asyncCheck xiaomiCheckAlarmStatus(sid, "status", xdata, alarmStatus)
 
       # Add message
       mqttSend("xiaomi", "wss/to", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"read\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
