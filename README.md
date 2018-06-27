@@ -79,7 +79,7 @@ nim c nimha.nim
 ```
 **Nimble:**
 ```
-nimble install nim_homeassistant
+nimble install nimha
 cd ~/.nimble/pkgs/nimha-0.1.0 #(insert current version)
 ```
 
