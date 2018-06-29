@@ -346,6 +346,8 @@ sudo certbot --nginx -d <domain> -d <domain>
 
 # systemctl
 
+## Service file
+
 Create a new file called nimha.service inside /lib/systemd/system/nimha.service
 
 ```
@@ -371,6 +373,33 @@ Enable auto start and start it:
 sudo systemctl enable nimha
 sudo systemctl start nimha
 sudo systemctl status nimha
+```
+
+## Restart with crontab
+
+Due to currently unknown bug, Xiaomi listener likes a restart once in while. Add the following to restart NimHA every hour:
+
+```
+sudo crontab -e
+
+# Append to bottom:
+0 * * * * systemctl restart nimha
+```
+
+## Auto open chromium on boot
+
+When using a Raspberry Pi touchscreen, you'll might like chromium to start up on boot and navigate to the page:
+
+```
+nano ~/.bashrc
+
+# Append **one** of the following
+# A normal browser:
+chromium-browser <domain>
+# Kiosk mode:
+chromium-browser --kiosk <domain>
+# Or go full kiosk
+chromium-browser --kiosk --incognito --disable-pinch --overscroll-history-navigation=0 <domain>
 ```
 
 _____
