@@ -4,7 +4,7 @@ import parsecfg
 from os import getAppDir
 from strutils import replace
 
-let dict              = loadConfig(replace(getAppDir(), "/src/mainmodules", "") & "/config/secret.cfg")
+let dict              = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
 let s_mqttIp*         = dict.getSectionValue("MQTT","mqttIp")
 let s_mqttPort*       = dict.getSectionValue("MQTT","mqttPort")
 let s_mqttUsername*   = dict.getSectionValue("MQTT","mqttUsername")

@@ -78,7 +78,7 @@ proc xiaomiSoundPlay*(db: DbConn, ringtone = "8", volume = "4") =
 
   if gwData[0] != "" and gwData[1] != "":
 
-    let key = execProcess("python3 " & replace(getAppDir(), "/src/mainmodules", "") & "/src/resources/xiaomi/xiaomi_key.py " & gwData[2] & " " & gwData[1])
+    let key = execProcess("python3 " & replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/nimhapkg/resources/xiaomi/xiaomi_key.py " & gwData[2] & " " & gwData[1])
     discard xiaomiSocket.sendTo(xiaomiMulticast, xiaomiPort, "{\"cmd\": \"write\", \"sid\": \"7811dcb8d102\", \"data\": { \"key\": \"" & replace(key, "\n", "") & "\", \"mid\": " & ringtone & ", \"vol\": " & volume & "} }")
 
 
@@ -87,7 +87,7 @@ proc xiaomiSoundStop*(db: DbConn) =
 
   if gwData[0] != "" and gwData[1] != "":
 
-    let key = execProcess("python3 " & replace(getAppDir(), "/src/mainmodules", "") & "/src/resources/xiaomi/xiaomi_key.py " & gwData[2] & " " & gwData[1])
+    let key = execProcess("python3 " & replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/nimhapkg/resources/xiaomi/xiaomi_key.py " & gwData[2] & " " & gwData[1])
     discard xiaomiSocket.sendTo(xiaomiMulticast, xiaomiPort, "{\"cmd\": \"write\", \"sid\": \"7811dcb8d102\", \"data\": {\"key\": \"" & replace(key, "\n", "") & "\", \"mid\": 10000} }")
     
 
@@ -96,7 +96,7 @@ proc xiaomiGatewayLight*(db: DbConn, color = "0") =
 
   if gwData[0] != "" and gwData[1] != "":
     var key = ""
-    key = execProcess("python3 " & replace(getAppDir(), "/src/mainmodules", "") & "/src/resources/xiaomi/xiaomi_key.py " & gwData[2] & " " & gwData[1])
+    key = execProcess("python3 " & replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/nimhapkg/resources/xiaomi/xiaomi_key.py " & gwData[2] & " " & gwData[1])
 
     discard xiaomiSocket.sendTo(xiaomiMulticast, xiaomiPort, "{\"cmd\": \"write\", \"sid\": \"7811dcb8d102\", \"data\": {\"key\": \"" & replace(key, "\n", "") & "\", \"rgb\": " & color & "} }")
     

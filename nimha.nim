@@ -7,16 +7,16 @@ import re
 import sequtils
 import strutils
 
-import src/resources/users/user_add
-import src/resources/database/database
+import nimhapkg/resources/users/user_add
+import nimhapkg/resources/database/database
 
 # Import procs to generate database tables
-import src/resources/database/modules/alarm_database
-import src/resources/database/modules/cron_database
-import src/resources/database/modules/mail_database
-import src/resources/database/modules/owntracks_database
-import src/resources/database/modules/pushbullet_database
-import src/resources/database/modules/xiaomi_database
+import nimhapkg/resources/database/modules/alarm_database
+import nimhapkg/resources/database/modules/cron_database
+import nimhapkg/resources/database/modules/mail_database
+import nimhapkg/resources/database/modules/owntracks_database
+import nimhapkg/resources/database/modules/pushbullet_database
+import nimhapkg/resources/database/modules/xiaomi_database
 
 
 var runInLoop = true
@@ -108,13 +108,13 @@ proc launcherActivated() =
 
   echo "Nim Home Assistant: Starting launcher"
 
-  wss     = startProcess(getAppDir() & "/src/mainmodules/nimha_websocket", options = {poParentStreams})
+  wss     = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_websocket", options = {poParentStreams})
   # Gateway may first be started after wss
   sleep(200)
-  gateway = startProcess(getAppDir() & "/src/mainmodules/nimha_gateway", options = {poParentStreams})
-  www     = startProcess(getAppDir() & "/src/mainmodules/nimha_webinterface", options = {poParentStreams})
-  cron    = startProcess(getAppDir() & "/src/mainmodules/nimha_cron", options = {poParentStreams})
-  xiaomiList  = startProcess(getAppDir() & "/src/mainmodules/nimha_xiaomilistener", options = {poParentStreams})
+  gateway = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway", options = {poParentStreams})
+  www     = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_webinterface", options = {poParentStreams})
+  cron    = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_cron", options = {poParentStreams})
+  xiaomiList  = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_xiaomilistener", options = {poParentStreams})
 
   echo "Nim Home Assistant: Launcher initialized"
 
@@ -124,25 +124,25 @@ proc launcherActivated() =
 
     if not running(wss):
       echo "nimha_websocket exited. Starting again.."
-      wss = startProcess(getAppDir() & "/src/mainmodules/nimha_websocket", options = {poParentStreams})
+      wss = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_websocket", options = {poParentStreams})
 
     # Gateway may first be started, when wss is running.
     # Otherwise it will miss the connection
     if not running(gateway) and running(wss):
       echo "main exited. Starting again.."
-      gateway = startProcess(getAppDir() & "/src/mainmodules/nimha_gateway", options = {poParentStreams})
+      gateway = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway", options = {poParentStreams})
 
     if not running(www):
       echo "nimha_webinterface exited. Starting again.."
-      www = startProcess(getAppDir() & "/src/mainmodules/nimha_webinterface", options = {poParentStreams})
+      www = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_webinterface", options = {poParentStreams})
 
     if not running(cron):
       echo "nimha_cron exited. Starting again.."
-      cron = startProcess(getAppDir() & "/src/mainmodules/nimha_cron", options = {poParentStreams})
+      cron = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_cron", options = {poParentStreams})
 
     if not running(xiaomiList):
       echo "nimha_xiaomilistener exited. Starting again.."
-      xiaomiList = startProcess(getAppDir() & "/src/mainmodules/nimha_xiaomilistener", options = {poParentStreams})
+      xiaomiList = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_xiaomilistener", options = {poParentStreams})
 
   echo "Nim Home Assistant: Quitted"
 
@@ -159,8 +159,8 @@ proc compileIt() =
 
     
   # Websocket
-  if not fileExists(getAppDir() & "/src/mainmodules/nimha_websocket") or defined(rc) or defined(rcwss):    
-    let outputWSS = execCmd("nim c -d:ssl " & devC & getAppDir() & "/src/mainmodules/nimha_websocket.nim")
+  if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_websocket") or defined(rc) or defined(rcwss):    
+    let outputWSS = execCmd("nim c -d:ssl " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_websocket.nim")
     if outputWSS == 1:
       echo "\nAn error occured nimha_websocket\n\n"
       quit()
@@ -169,8 +169,8 @@ proc compileIt() =
 
 
   # Cron jobs
-  if not fileExists(getAppDir() & "/src/mainmodules/nimha_cron") or defined(rc) or defined(rccron):
-    let outputAlarm = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/src/mainmodules/nimha_cron.nim")
+  if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_cron") or defined(rc) or defined(rccron):
+    let outputAlarm = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_cron.nim")
     if outputAlarm == 1:
       echo "\nAn error occured nimha_cron\n\n"
       quit()
@@ -179,8 +179,8 @@ proc compileIt() =
 
 
   # Webinterface
-  if not fileExists(getAppDir() & "/src/mainmodules/nimha_webinterface") or defined(rc) or defined(rcwebinterface):
-    let outputWww = execCmd("nim c -d:ssl -d:sqlsafe " & devC & getAppDir() & "/src/mainmodules/nimha_webinterface.nim")
+  if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_webinterface") or defined(rc) or defined(rcwebinterface):
+    let outputWww = execCmd("nim c -d:ssl -d:sqlsafe " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_webinterface.nim")
     if outputWww == 1:
       echo "\nAn error occured nimha_webinterface\n\n"
       quit()
@@ -189,8 +189,8 @@ proc compileIt() =
 
 
   # Gateway
-  if not fileExists(getAppDir() & "/src/mainmodules/nimha_gateway") or defined(rc) or defined(rcgateway):
-    let outputGateway = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/src/mainmodules/nimha_gateway.nim")
+  if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway") or defined(rc) or defined(rcgateway):
+    let outputGateway = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_gateway.nim")
     if outputGateway == 1:
       echo "\nAn error occured nimha_gateway\n\n"
       quit()
@@ -199,8 +199,8 @@ proc compileIt() =
 
 
   # Xiaomi listener
-  if not fileExists(getAppDir() & "/src/mainmodules/nimha_xiaomilistener") or defined(rc) or defined(rcxlistener):
-    let outputXiaomiListener = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/src/mainmodules/nimha_xiaomilistener.nim")
+  if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_xiaomilistener") or defined(rc) or defined(rcxlistener):
+    let outputXiaomiListener = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_xiaomilistener.nim")
     if outputXiaomiListener == 1:
       echo "\nAn error occured nimha_xiaomi\n\n"
       quit()

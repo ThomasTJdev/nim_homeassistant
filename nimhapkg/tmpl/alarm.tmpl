@@ -98,7 +98,7 @@
           <hr>
 
           <div class="alarmActions">
-            # let allActions = getAllRows(db, sql"SELECT id, alarmstate, action, action_name, action_ref FROM alarm_actions")
+            # let allActions = getAllRows(db, sql"SELECT id, alarmstate, action, action_name, action_ref FROM alarm_actions ORDER BY action")
             #
             # let pushAlarm = getAllRows(db, sql"SELECT id, name FROM pushbullet_templates")
             #

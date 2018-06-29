@@ -12,7 +12,7 @@ var
   
 
 # Using config.ini
-let dict = loadConfig(replace(getAppDir(), "/src/mainmodules", "") & "/config/secret.cfg")
+let dict = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
 
 # Web settings
 let recaptchaSecretKey = dict.getSectionValue("reCAPTCHA","Secretkey")

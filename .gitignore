@@ -21,11 +21,11 @@ nimcache
 config/secret.cfg
 
 # Main modules
-src/mainmodules/nimha_cron
-src/mainmodules/nimha_gateway
-src/mainmodules/nimha_webinterface
-src/mainmodules/nimha_websocket
-src/mainmodules/nimha_xiaomilistener
+nimhapkg/mainmodules/nimha_cron
+nimhapkg/mainmodules/nimha_gateway
+nimhapkg/mainmodules/nimha_webinterface
+nimhapkg/mainmodules/nimha_websocket
+nimhapkg/mainmodules/nimha_xiaomilistener
 
 # Launcher
 nimha

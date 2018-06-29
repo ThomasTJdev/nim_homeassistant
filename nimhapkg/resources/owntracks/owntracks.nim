@@ -11,7 +11,7 @@ from os import getAppDir
 var db = conn()
 
 
-let dict    = loadConfig(replace(getAppDir(), "/src/mainmodules", "") & "/config/secret.cfg")
+let dict    = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
 let homeLat = dict.getSectionValue("Home","lat")
 let homeLon = dict.getSectionValue("Home","lon")
 

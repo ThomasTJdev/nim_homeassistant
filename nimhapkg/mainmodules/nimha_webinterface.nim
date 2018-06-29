@@ -47,7 +47,7 @@ settings:
   port = Port(5000)
 
 
-let dict = loadConfig(replace(getAppDir(), "/src/mainmodules", "") & "/config/secret.cfg")
+let dict = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
 let gMapsApi = "?key=" & dict.getSectionValue("Google","mapsAPI")
 
 

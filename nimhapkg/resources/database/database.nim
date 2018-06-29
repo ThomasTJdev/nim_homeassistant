@@ -2,12 +2,12 @@
 
 import parseCfg, db_sqlite, os, strutils
 
-let dict = loadConfig(replace(getAppDir(), "/src/mainmodules", "") & "/config/secret.cfg")
+let dict = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
 
 let db_user = dict.getSectionValue("Database","user")
 let db_pass = dict.getSectionValue("Database","pass")
 let db_name = dict.getSectionValue("Database","name")
-let db_host = replace(getAppDir(), "/src/mainmodules", "") & "/" & dict.getSectionValue("Database","host")
+let db_host = replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & dict.getSectionValue("Database","host")
 let db_folder = dict.getSectionValue("Database","folder")
 
 proc generateDB*(db: DbConn) =

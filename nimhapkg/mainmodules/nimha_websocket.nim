@@ -49,7 +49,7 @@ var server = Server(
 # When using setSectionKey formatting and comments are deleted..
 let localhostKey = replace(makeSalt(), "\"", "")
 let localhostKeyLen = localhostKey.len()
-for fn in [replace(getAppDir(), "/src/mainmodules", "") & "/config/secret.cfg"]:
+for fn in [replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg"]:
   fn.writeFile fn.readFile.replace(re("wsLocalKey = \".*\""), "wsLocalKey = \"" & localhostKey & "\"")
 
 

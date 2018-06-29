@@ -33,7 +33,7 @@ proc setupWs() =
   ws = waitFor newAsyncWebsocketClient("127.0.0.1", Port(25437), path = "/", protocols = @["nimha"])
 
   # Set WSS key for communication without verification on 127.0.0.1
-  var dict = loadConfig(replace(getAppDir(), "/src/mainmodules", "") & "/config/secret.cfg")
+  var dict = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
   localhostKey = dict.getSectionValue("Websocket", "wsLocalKey")
 
 

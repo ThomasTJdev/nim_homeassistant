@@ -27,14 +27,8 @@ proc sendMailNow*(subject, message, recipient: string) {.async.} =
   #  return
   const otherHeaders = @[("Content-Type", "text/html; charset=\"UTF-8\"")]  
   
-  echo "mail1"
   var client = newAsyncSmtp(useSsl = true, debug = false)
-  echo "mail2"
-  echo smtpUser
-  echo smtpPassword
-  echo smtpPort
   await client.connect(smtpAddress, Port(parseInt(smtpPort)))
-  echo "mail3"
   
   await client.auth(smtpUser, smtpPassword)
   
@@ -61,15 +55,14 @@ proc sendMailDb*(db: DbConn, mailID: string) {.async.} =
   ## Get data from mail template and send
   ## Uses Sync Socket
 
+  when defined(dev):
+    echo "Dev: Mail start"
+
   let mail = getRow(db, sql"SELECT recipient, subject, body FROM mail_templates WHERE id = ?", mailID)
-  #asyncCheck sendMailNow(mail[1], mail[2], mail[0])
 
   let recipient = mail[0]
   let subject   = mail[1]
   let message   = mail[2]
-
-  when defined(dev):
-    echo "Dev: Mail start"
 
   const otherHeaders = @[("Content-Type", "text/html; charset=\"UTF-8\"")]  
   
@@ -93,7 +86,6 @@ proc sendMailDb*(db: DbConn, mailID: string) {.async.} =
 
   when defined(dev):
     echo "Email send"
-
 
 
 proc mailUpdateParameters*(db: DbConn) =
