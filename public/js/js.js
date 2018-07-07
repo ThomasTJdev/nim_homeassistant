@@ -38,21 +38,17 @@ function websocketInit() {
 
     pageInit = false;
 
-    /*/ Ping
-    window.setInterval(function(){
-      ws.send('{' + cookieSidJson() + '"element": "ping"}');
-    }, 10000);*/
     websocketKeepAlive();
   };
 
   ws.onclose = function() {
     websocketCancelKeepAlive();
     if (pageRefresh != true && wsError == false) {
-      console.log("Connection is closed..."); 
+      console.log("Connection is closed... Trying to reconnecting in 10 seconds."); 
       notify(jQuery.parseJSON('{"error": "true", "value": "Websocket closed"}'));
       setTimeout(function(){ 
         websocketInit();
-      }, 5000);
+      }, 10000);
     }
   };
 
@@ -60,11 +56,11 @@ function websocketInit() {
     websocketCancelKeepAlive();
     if (pageRefresh != true) {
       wsError = true;
-      console.log("Error in connection..."); 
+      console.log("Error in connection... Trying to reconnecting in 60 seconds."); 
       notify(jQuery.parseJSON('{"error": "true", "value": "Websocket error"}'));
       setTimeout(function(){ 
         websocketInit();
-      }, 5000);
+      }, 60000);
     }
   };
     
@@ -72,13 +68,16 @@ function websocketInit() {
     console.log(response.data);
     var obj = jQuery.parseJSON(response.data);
 
-    // When history items are received, loop through all nested elements
-    if (obj.handler == "history") {
+    if (obj.handler == "history")
+    {
+      // History items, loop through all nested elements
       $.each(obj.data, function(key, objnest){
         websocketHandler(objnest)
       });
     }
-    else {
+    else 
+    {
+      // Single object
       websocketHandler(obj)
     }
   };
@@ -89,9 +88,9 @@ function websocketInit() {
 /* Ping to keep alive */
 var pingRun;
 function websocketKeepAlive() { 
-  var pingRun = window.setInterval(function(){
+  pingRun = window.setInterval(function(){
     ws.send('{' + cookieSidJson() + '"element": "ping"}');
-  }, 10000);
+  }, 30000);
 }  
 function websocketCancelKeepAlive() {  
     clearInterval(pingRun)
