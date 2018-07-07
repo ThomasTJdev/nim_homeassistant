@@ -1,5 +1,10 @@
 # Copyright 2018 - Thomas T. Jarløv
 
+## Websocket for communicating with browser.
+## Data is delivered from a websocket client
+## on 127.0.0.1. Data is sent within a static
+## loop every 1,5 second to the browser.
+
 import asyncdispatch
 import asynchttpserver
 import asyncnet
@@ -137,9 +142,6 @@ proc pong(server: Server) {.async.} =
   ## This is used for to ensure, that the socket
   ## can follow the pace with messages. Without
   ## this it crashes.
-  ##
-  ## INFO! It is not testet, if this is needed
-  ## after changing MQTT input to socket input
 
   var updateClients = false
   while true:
