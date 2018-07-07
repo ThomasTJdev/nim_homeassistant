@@ -10,7 +10,7 @@ skipDirs      = @["private"]
 
 # Dependencies
 requires "nim >= 0.18.1"
-requires "jester >= 0.2.0" # master - git clone it
+requires "jester >= 0.3.0"
 requires "recaptcha >= 1.0.2"
 requires "bcrypt >= 0.2.1"
 requires "multicast >= 0.1.1"
@@ -31,6 +31,4 @@ before install:
   setupTask()
 
 after install:
-  echo "\n\nJester: Please ensure that jester is installed from GIT\n"
-
   echo "secret.cfg: Please update secret.cfg with your details. The file is located in the nimble package directory at config/secret.cfg\n"

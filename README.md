@@ -41,20 +41,10 @@ ln -sf /the/path/to/nim/git/Nim/bin/nim /usr/bin/nim
 ln -sf /the/path/to/nim/git/Nim/bin/nimble /usr/bin/nimble
 ```
 
-### Jester
-Jester >= master
-
-*Currently not available on nimble*
-
-```
-git clone https://github.com/dom96/jester.git
-cd jester
-nimble install
-```
-
 ### Other prerequisite:
-- multicast (nimble)
 - bcrypt (nimble)
+- jester (nimble)
+- multicast (nimble)
 - websocket (nimble)
 - openssl (on your system)
 - python 3 (on your system. It will be called with `python3`)
