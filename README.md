@@ -352,7 +352,7 @@ Type=simple
 WorkingDirectory=/home/<user>/.nimble/pkgs/nimha-0.1.0/ # MODIFY
 ExecStart=/home/<user>/.nimble/pkgs/nimha-0.1.0/nimha # MODIFY
 Restart=always
-RestartSec=3
+RestartSec=15
 
 [Install]
 WantedBy=multi-user.target
