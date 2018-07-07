@@ -28,7 +28,7 @@ var localhostKey = ""
 proc setupWs() =
   ## Setup connection to WS
 
-  echo "Mosquitto MAIN ws connection started"
+  echo "Mosquitto Client Websocket connection started"
 
   ws = waitFor newAsyncWebsocketClient("127.0.0.1", Port(25437), path = "/", protocols = @["nimha"])
 
@@ -65,7 +65,7 @@ proc mosquittoParse(payload: string) {.async.} =
     if not isNil(ws):
       waitFor ws.sendText(localhostKey & message, false)
     else:
-      echo "Gateway: Error, websocket not connected"
+      echo "Gateway: Error, client websocket not connected"
 
   elif topicName.substr(0, 8) == "owntracks":
     asyncCheck owntracksParseMqtt(message, topicName)
