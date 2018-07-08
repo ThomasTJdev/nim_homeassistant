@@ -336,6 +336,11 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
   
       xiaomiSendReadCmd(js["sid"].getStr(), value)
 
+    elif js["action"].getStr() == "template":
+      let value = js["value"].getStr()
+
+      asyncCheck xiaomiWriteTemplate(db, value)
+
     when defined(dev):
       echo "XiaomiMqtt wss: " & payload & "\n"
 

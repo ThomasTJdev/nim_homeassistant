@@ -18,7 +18,7 @@ $(function() {
 });
 
 function websocketInit() {
-  if (pageType == "dashboard" || pageType == "alarmNumpad" || pageType == "pushbullet") {
+  if (pageType == "dashboard" || pageType == "alarmNumpad" || pageType == "pushbullet" || pageType == "xiaomidevices") {
     if (wsAddress == "127.0.0.1") {
       console.log("Please change the Websocket address in js.js. Otherwise external user will not connect.");
     }
@@ -551,7 +551,7 @@ $(function() {
   // Delete sensor
   $( ".xiaomiDeleteSensor" ).click(function() {
     var id = $(this).attr("data-xdid");
-    location.href = "/xiaomi/devices/do?action=deletesensor&id=" + id
+    location.href = "/xiaomi/devices/do?action=deletesensor&id=" + id;
   });
 
   // Add action
@@ -564,10 +564,16 @@ $(function() {
     location.href = "/xiaomi/devices/do?action=addaction&sid=" + sid + "&name=" + name + "&valuename=" + valuename + "&valuedata=" + valuedata;
   });
 
+  // Run action
+  $( ".xiaomiRunAction" ).click(function() {
+    var id = $(this).attr("data-xdid");
+    ws.send('{' + cookieSidJson() + '"element": "xiaomi", "action": "template", "value": "' + id + '"}');
+  });
+
   // Delete action
   $( ".xiaomiDeleteAction" ).click(function() {
     var id = $(this).attr("data-xdid");
-    location.href = "/xiaomi/devices/do?action=deleteaction&id=" + id
+    location.href = "/xiaomi/devices/do?action=deleteaction&id=" + id;
   });
 
   // Update device name

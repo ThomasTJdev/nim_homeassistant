@@ -261,6 +261,9 @@
                   <th>
                     
                   </th>
+                  <th>
+                    
+                  </th>
                 </tr>
 
                 <tr class="xiaomiNewAction">
@@ -283,6 +286,9 @@
                   </td>
                   <td>
                     <input class="valuedata" />
+                  </td>
+                  <td>
+
                   </td>
                   <td class="btn btn-success xiaomiAddAction">
                     Save
@@ -311,6 +317,9 @@
                   <td>
                     ${device[6]}
                   </td>
+                  <td data-xdid="${device[0]}" class="btn-primary xiaomiRunAction" style="cursor: pointer;">
+                    Run
+                  </td>
                   <td data-xdid="${device[0]}" class="btn btn-danger xiaomiDeleteAction">
                     Del
                   </td>
@@ -322,6 +331,7 @@
 
           <div class="help">
             <div class="color">
+              <p>Only ringtone and rgb are available in action value name.</p>
               <p>To assign a RGB color, you have to use the Android() color format.</p>
               <p>You can convert HEX to Android() at this <a href="https://convertingcolors.com/android-color-4294914304.html">website</a></p>
               <ul>
