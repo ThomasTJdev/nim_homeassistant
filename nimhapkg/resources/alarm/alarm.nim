@@ -103,7 +103,8 @@ proc alarmTriggerTimer(cd: string, db: DbConn, trigger, device: string) {.async.
 
 
 
-proc alarmTriggered*(db: DbConn, trigger, device: string): bool =
+#proc alarmTriggered*(db: DbConn, trigger, device: string): bool =
+proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
   ## The alarm has been triggereds
   # Missing user_id
 
@@ -117,31 +118,41 @@ proc alarmTriggered*(db: DbConn, trigger, device: string): bool =
   if armTime > toInt(epochTime()):
     when defined(dev):
       echo "Alarm: Triggered alarm cancelled to due to armtime"
-    return false
   
   else:
     when defined(dev):
       echo "Alarm: Triggered alarm true - armtime done"
-    return true
 
   # Due to non-working async trigger countdown, skip it at the moment
 
   # Change the alarm status
-  #alarmSetStatus(db, "triggered", trigger, device)
+  alarmSetStatus(db, "triggered", trigger, device)
 
   # Add to history
-  #exec(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", "triggered", trigger, device)
+  exec(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", "triggered", trigger, device)
 
   # Send info about the alarm is triggered
-  #mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"triggered\"}")
+  mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"triggered\"}")
 
   # Start the countdown
-  #var countDown = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
+  var countDown = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
+  asyncCheck alarmRinging(db, trigger, device)
+  #[
+  var counter = 0
+  while true:
+    await sleepAsync(1000)
+    inc(counter)
+    
+    when defined(dev):
+      echo "Alarm countdown: " & $counter & "/" & countDown
 
-  #when defined(dev):
-  #  echo "Alarm: Countdown starting, " & countDown
+    if counter == parseInt(countDown):
+      asyncCheck alarmRinging(db, trigger, device)
+      break
 
-  #asyncCheck alarmRinging(db, trigger, device)
+    if alarmStatus != "triggered":
+      break
+  ]#
 
 
 
@@ -160,8 +171,9 @@ proc alarmParseMqtt*(payload: string) {.async.} =
   let action = jn(js, "action")
 
   if action == "triggered" and alarmStatus in ["armAway", "armHome"]:
-    if alarmTriggered(db, jn(js, "value"), jn(js, "sid")):
-      asyncCheck alarmRinging(db, jn(js, "value"), jn(js, "sid"))
+    #if alarmTriggered(db, jn(js, "value"), jn(js, "sid")):
+    #  asyncCheck alarmRinging(db, jn(js, "value"), jn(js, "sid"))
+    asyncCheck alarmTriggered(db, jn(js, "value"), jn(js, "sid"))
 
   elif action == "activate":
     var passOk = false
