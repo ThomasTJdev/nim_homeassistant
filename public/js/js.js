@@ -629,7 +629,14 @@ $(function() {
 
   $( ".owntracksDeleteDevice" ).click(function() {
     var username = $(this).attr("data-username");
-    location.href = "/owntracks/do?action=deletedevice&username=" + username;
+    var deviceid = $(this).attr("data-deviceid");
+    location.href = "/owntracks/do?action=deletedevice&username=" + username + "&deviceid=" + deviceid;
+  });
+
+  $( ".owntracksClearhistoryDevice" ).click(function() {
+    var username = $(this).attr("data-username");
+    var deviceid = $(this).attr("data-deviceid");
+    location.href = "/owntracks/do?action=clearhistory&username=" + username + "&deviceid=" + deviceid;
   });
 
   $( ".owntracksDeleteWaypoint" ).click(function() {

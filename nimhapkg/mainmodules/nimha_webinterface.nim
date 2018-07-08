@@ -332,7 +332,11 @@ routes:
       redirect("/login")
 
     if @"action" == "deletedevice":
-      exec(db, sql"DELETE FROM owntracks_devices WHERE username = ?", @"username")
+      exec(db, sql"DELETE FROM owntracks_devices WHERE username = ? AND device_id = ?", @"username", @"deviceid")
+      exec(db, sql"DELETE FROM owntracks_history WHERE username = ? AND device_id = ?", @"username", @"deviceid")
+
+    elif @"action" == "clearhistory":
+      exec(db, sql"DELETE FROM owntracks_history WHERE username = ? AND device_id = ?", @"username", @"deviceid")
 
     elif @"action" == "deletewaypoint":
       exec(db, sql"DELETE FROM owntracks_waypoints WHERE id = ?", @"waypointid")

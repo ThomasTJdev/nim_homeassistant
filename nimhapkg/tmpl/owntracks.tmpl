@@ -27,6 +27,7 @@
       # let allDevices = getAllRows(db, sql"SELECT username, device_id, tracker_id, creation FROM owntracks_devices ORDER BY username DESC")
 
       <div id="pagewrapper">
+
         <div id="owntracksDevices">
          
           <h1>Owntracks</h1>
@@ -40,6 +41,8 @@
                   <th>Device ID</th>
                   <th>Tracker ID</th>
                   <th>Creation</th>
+                  <th>Saved locations</th>
+                  <th></th>
                   <th></th>
                 </tr>
               </thead>
@@ -58,7 +61,13 @@
                   <td>
                     ${epochDate(device[3], "YYYY-MM-DD HH:mm")}
                   </td>
-                  <td data-username="${device[0]}" class="btn btn-danger owntracksDeleteDevice">
+                  <td>
+                    ${getAllRows(db, sql"SELECT id FROM owntracks_history WHERE username = ? AND device_id = ?", device[0], device[1]).len()}
+                  </td>
+                  <td data-username="${device[0]}" data-deviceid="${device[1]}" class="btn-primary owntracksClearhistoryDevice" style="cursor: pointer;">
+                    Del history
+                  </td>
+                  <td data-username="${device[0]}" data-deviceid="${device[1]}" class="btn btn-danger owntracksDeleteDevice">
                     Del
                   </td>
                 </tr>
