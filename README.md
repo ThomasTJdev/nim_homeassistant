@@ -19,6 +19,7 @@ Work before reaching stable (some might be missing - please add an issue):
 * Pushbullet
 * Mailing
 * Cron jobs (timing)
+* RSS reader
 * Alarm system (combined with Xiaomi and Owntracks)
 * Interface in browser using websockets
 * .. more to come
