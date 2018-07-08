@@ -16,6 +16,7 @@ import nimhapkg/resources/database/modules/cron_database
 import nimhapkg/resources/database/modules/mail_database
 import nimhapkg/resources/database/modules/owntracks_database
 import nimhapkg/resources/database/modules/pushbullet_database
+import nimhapkg/resources/database/modules/rss_database
 import nimhapkg/resources/database/modules/xiaomi_database
 
 
@@ -23,6 +24,7 @@ var runInLoop = true
 
 var cron: Process
 var gateway: Process
+var gatewayws: Process
 var wss: Process
 var www: Process
 var xiaomiList: Process
@@ -36,6 +38,7 @@ proc handler() {.noconv.} =
   runInLoop = false
   kill(cron)
   kill(gateway)
+  kill(gatewayws)
   kill(wss)
   kill(www)
   kill(xiaomiList)
@@ -95,6 +98,7 @@ proc createDbTables() =
   mailDatabase(db)
   owntracksDatabase(db)
   pushbulletDatabase(db)
+  rssDatabase(db)
   xiaomiDatabase(db)
   cronDatabase(db)
 
@@ -106,17 +110,22 @@ proc launcherActivated() =
   if "newuser" in commandLineParams():
     createAdminUser(commandLineParams())
 
-  echo "Nim Home Assistant: Starting launcher"
+  echo "\nNim Home Assistant: Starting launcher"
+  echo " .. please wait\n"
 
   wss     = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_websocket", options = {poParentStreams})
   # Gateway may first be started after wss
-  sleep(200)
+  sleep(2000)
   gateway = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway", options = {poParentStreams})
+  gatewayws = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway_ws", options = {poParentStreams})
   www     = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_webinterface", options = {poParentStreams})
   cron    = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_cron", options = {poParentStreams})
+  sleep(2000)
   xiaomiList  = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_xiaomilistener", options = {poParentStreams})
+  sleep(1000)
 
-  echo "Nim Home Assistant: Launcher initialized"
+  echo "\n .. waiting time over"
+  echo "Nim Home Assistant: Launcher initialized\n"
 
   while runInLoop:
 
@@ -128,8 +137,12 @@ proc launcherActivated() =
 
     # Gateway may first be started, when wss is running.
     # Otherwise it will miss the connection
-    if not running(gateway) and running(wss):
-      echo "main exited. Starting again.."
+    if not running(gatewayws) and running(wss):
+      echo "gateway_ws exited. Starting again.."
+      gateway = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway_ws", options = {poParentStreams})
+
+    if not running(gateway):
+      echo "gateway exited. Starting again.."
       gateway = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway", options = {poParentStreams})
 
     if not running(www):
@@ -149,7 +162,7 @@ proc launcherActivated() =
 
 
 proc compileIt() =
-  echo "Check if runners need compiling"
+  echo "Checking if runners need compiling"
   echo " .. please wait\n"
 
   when defined(dev):
@@ -180,7 +193,7 @@ proc compileIt() =
 
   # Webinterface
   if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_webinterface") or defined(rc) or defined(rcwebinterface):
-    let outputWww = execCmd("nim c -d:ssl -d:sqlsafe " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_webinterface.nim")
+    let outputWww = execCmd("nim c -d:ssl " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_webinterface.nim")
     if outputWww == 1:
       echo "\nAn error occured nimha_webinterface\n\n"
       quit()
@@ -188,9 +201,19 @@ proc compileIt() =
       echo "nimha_webinterface compiling done\n\n"
 
 
+  # Gateway websocket
+  if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway_ws") or defined(rc) or defined(rcgateway):
+    let outputGateway = execCmd("nim c -d:ssl " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_gateway_ws.nim")
+    if outputGateway == 1:
+      echo "\nAn error occured nimha_gateway_ws\n\n"
+      quit()
+    else:
+      echo "nimha_gateway_ws compiling done\n\n"
+
+
   # Gateway
   if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway") or defined(rc) or defined(rcgateway):
-    let outputGateway = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_gateway.nim")
+    let outputGateway = execCmd("nim c -d:ssl " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_gateway.nim")
     if outputGateway == 1:
       echo "\nAn error occured nimha_gateway\n\n"
       quit()
@@ -200,7 +223,7 @@ proc compileIt() =
 
   # Xiaomi listener
   if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_xiaomilistener") or defined(rc) or defined(rcxlistener):
-    let outputXiaomiListener = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_xiaomilistener.nim")
+    let outputXiaomiListener = execCmd("nim c " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_xiaomilistener.nim")
     if outputXiaomiListener == 1:
       echo "\nAn error occured nimha_xiaomi\n\n"
       quit()
