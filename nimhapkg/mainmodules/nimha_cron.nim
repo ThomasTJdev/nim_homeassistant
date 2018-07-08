@@ -158,6 +158,5 @@ proc cronJob() =
 
 
 when isMainModule:
-  sleep(5000)
   cronJob()
   runForever()

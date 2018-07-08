@@ -247,6 +247,7 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
               if myClient.userStatus notin ["Admin", "Moderator", "Normal"]:
                 echo "WSS: Client messed up in sid and userid"
                 myClient.connected = false
+                asyncCheck updateClientsNow()
                 break
             
             # Respond

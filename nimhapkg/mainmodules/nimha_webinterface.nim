@@ -23,6 +23,7 @@ import ../resources/database/database
 import ../resources/database/sql_safe
 import ../resources/mail/mail
 import ../resources/pushbullet/pushbullet
+import ../resources/rss/rss_reader
 import ../resources/users/password
 import ../resources/users/user_add
 import ../resources/users/user_check
@@ -208,6 +209,7 @@ include "../tmpl/mail.tmpl"
 include "../tmpl/certificates.tmpl"
 include "../tmpl/owntracks.tmpl"
 include "../tmpl/pushbullet.tmpl"
+include "../tmpl/rss.tmpl"
 include "../tmpl/xiaomi.tmpl"
 
 
@@ -453,6 +455,34 @@ routes:
       exec(db, sql"DELETE FROM pushbullet_templates WHERE id = ?", @"pushid")
 
     redirect("/pushbullet")
+
+
+  get "/rss":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    resp genRss(c, @"testfeed")
+
+
+  get "/rss/do":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    if @"action" == "addfeed":
+      let skip = if @"skip" == "" or not isDigit(@"skip"): "0" else: @"skip"
+      exec(db, sql"INSERT INTO rss_feeds (url, skip, fields, name) VALUES (?, ?, ?, ?)", @"url", skip, @"fields", @"name")
+
+    elif @"action" == "deletefeed":
+      exec(db, sql"DELETE FROM rss_feeds WHERE id = ?", @"feedid")
+
+    elif @"action" == "testfeed":
+      let skip = if @"skip" == "" or not isDigit(@"skip"): 0 else: parseInt(@"skip")
+      resp genRss(c, rssReadUrl("Test", @"url", [@"fields"], skip))
+
+
+    redirect("/rss")
 
 
   get "/cron":
