@@ -223,8 +223,9 @@ proc xiaomiDiscover*(db: DbConn, refreshDB = false) =
 proc xiaomiCheckAlarmStatus(sid, value, xdata, alarmStatus: string) {.async.} =
   ## Check if the triggered device should trigger the alarm
 
-  if alarmStatus notin ["armAway", "armHome"]:
-    return
+  # Check is done before calling the proc
+  #if alarmStatus notin ["armAway", "armHome"]:
+  #  return
 
   let statusToTrigger = getValueSafe(db, sql"SELECT value_data FROM xiaomi_devices_data WHERE sid = ? AND triggerAlarm = ?", sid, alarmStatus)
 
@@ -316,7 +317,7 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
       elif "illumination" in xdata:
         value = "illumination"
       
-      if value in ["status", "motion"] and value != "no_motion":
+      if value in ["status", "motion"] and value != "no_motion" and alarmStatus in ["armAway", "armHome"]:
         asyncCheck xiaomiCheckAlarmStatus(sid, "status", xdata, alarmStatus)
 
       # Add message
