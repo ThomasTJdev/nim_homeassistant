@@ -12,8 +12,6 @@ import strutils
 import times
 import uri
 
-#import cookies as libcookies
-
 from osproc import execProcess
 
 import recaptcha
@@ -31,7 +29,7 @@ import ../resources/utils/parsers
 import ../resources/utils/dates
 
 
-
+setCurrentDir(replace(getAppDir(), "/nimhapkg/mainmodules", ""))
 
 
 #[ 
