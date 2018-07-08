@@ -125,6 +125,11 @@ function websocketHandler(obj) {
       alarm(obj)          
     }
 
+    // RSS
+    else if (obj.element == "rss") {
+      rssUpdateFeed(obj)          
+    }
+
     // Xiaomi
     else if (obj.element == "xiaomi") {
       if (obj.data['status']) {
@@ -238,6 +243,34 @@ $(function() {
     location.href = "/pushbullet/do?action=deletepush&pushid=" + pushid;
   });
 });
+
+
+
+/*
+    RSS
+________________________________*/
+$(function() {
+  $( ".rssFeedsAdd" ).click(function() {
+    var name     = $(".rssFeedsEdit .name").val();
+    var url      = $(".rssFeedsEdit .url").val();
+    var skip     = $(".rssFeedsEdit .skip").val();
+    var fields   = $(".rssFeedsEdit .fields").val();
+    location.href = "/rss/do?action=addfeed&name=" + name + "&url=" + url + "&skip=" + skip + "&fields=" + fields;
+  });
+
+  $( ".rssFeedDelete" ).click(function() {
+    var feedid    = $(this).attr("data-feedid");
+    location.href = "/rss/do?action=deletefeed&feedid=" + feedid;
+  });
+
+  $( ".rssRefresh" ).click(function() {
+    var feedid = $(this).attr("data-feedid");
+    ws.send('{' + cookieSidJson() + '"element": "rss", "action": "refresh", "feedid": "' + feedid + '"}');  
+  });
+});
+function rssUpdateFeed(obj) {
+  $("div#rss-" + obj.feedid).html(obj.data);
+}
 
 
 
@@ -513,7 +546,7 @@ function xiaomiRefreshStatus(obj, value) {
   }
   else if (value == "voltage") {
     console.log("Xiaomi - Sid: " + obj.sid + " - Value: " + obj.data.voltage);
-    $("." + obj.sid + ".device.voltage .value").text(obj.data.voltage + " volt");
+    $("." + obj.sid + ".device.voltage .value").text(obj.data.voltage + " mV");
   }
   else if (value == "lux") {
     console.log("Xiaomi - Sid: " + obj.sid + " - Value: " + obj.data.lux);

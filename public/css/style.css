@@ -259,6 +259,24 @@ nav#sidebar .sidebar-header {
 }
 
 
+/*
+    Scrollbar
+______________________________*/
+.scrollbar::-webkit-scrollbar{
+  width: 5px;
+}
+.scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+.scrollbar::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+.scrollbar::-webkit-scrollbar-thumb {
+  outline: 1px solid slategrey;
+  background-color: #555;
+}
+
+
 
 /*
     Global utils
@@ -375,6 +393,46 @@ _____________________________*/
   margin-top: 2px;
 } 
 .item .inner .pushbulletInner .badge {
+  cursor: pointer;
+}
+
+
+/*
+  RSS
+*/
+.item .inner .rss .heading {
+  font-weight: 700;
+  padding-bottom: 10px;
+  margin-right: 15px;
+}
+.item .inner .rssInner {
+  max-height: 400px;
+  overflow: auto;
+}
+.item .inner .rssInner .rss-container>div {
+  border-bottom: 1px solid grey;
+  padding: 5px;
+  font-size: 12px;
+}
+.item .inner .rssInner div .title {
+  display: inline;
+}
+.item .inner .rssInner div .pubDate,
+.item .inner .rssInner div .updated,
+.item .inner .rssInner div .modified,
+.item .inner .rssInner div .created,
+.item .inner .rssInner div .creation,
+.item .inner .rssInner div .date,
+.item .inner .rssInner div .name {
+  display: block;
+  border: 0.5px solid grey;
+  padding: 0px 2px;
+  border-radius: 3px;
+  background: #d9d7d74f;
+  width: 200px;
+  text-align: center;
+}
+.item .inner .rssInner .badge {
   cursor: pointer;
 }
 
@@ -655,6 +713,35 @@ div#pushbullet div.pushbulletApi input.api.key {
 }
 div#pushbullet table.pushbulletTemplates {
   max-width: 1200px;
+}
+
+
+/*
+  RSS
+*/
+div#rss {
+  padding: 20px;
+}
+div#rss div.rssApi button.rssApiUpdate {
+  display: block;
+  width: 90px;
+}
+div#rss div.rssTestFeed {
+  width: 350px;
+}
+div#rss div.rssTestFeed label {
+  margin-bottom: 0rem;
+  margin-top: 0.5rem;
+}
+div#rss div.rssTestFeed button#rssTestFeed {
+  margin-top: 10px;
+}
+div#rss table.rssFeeds {
+  max-width: 1200px;
+}
+div#rss table.rssFeeds .rssFeedsAdd,
+div#rss table.rssFeeds .rssFeedDelete {
+  width: 100%;
 }
 
 
