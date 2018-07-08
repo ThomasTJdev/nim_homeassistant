@@ -1,0 +1,157 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#
+#proc genRss(c: var TData, testFeed = ""): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="rss" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="rss">
+         
+          <h1>RSS</h1>
+
+          <hr>
+
+          <div class="rssTestFeed">
+
+            <h3>Test a feed</h3>
+
+            <div>
+              <form action="/rss/do" method="GET">
+                <input style="display: none" name="action" value="testfeed" />
+                <div>
+                  <label>URL:</label>
+                  <input name="url" class="form-control" required />
+                </div>
+                <div>
+                  <label>Skip x lines:</label>
+                  <input name="skip" class="form-control" value="0" required />
+                </div>
+                <div>
+                  <label>Fields (comma separated):</label>
+                  <input name="fields" class="form-control" required />
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="rssTestFeed">Test feed</button>
+              </form>
+
+              <br>
+
+              # if testFeed != "":
+              <div class="rssTestOutputRaw" style="display: none;">
+                $testFeed
+              </div>
+              <div class="rssTestOutput">
+                
+              </div>
+              # end if
+
+            </div>
+
+          </div>
+
+          <hr>
+
+          <div class="rssFeeds">
+            # let rssFeeds = getAllRows(db, sql"SELECT id, url, skip, fields, name FROM rss_feeds")
+
+            <h3>RSS feeds</h3>
+
+            <p>Fields needs to comma separated and listed in chronological order, as they appear in the RSS feed.</p>
+            <p>The skip x lines will skip the first x hits according to your fields.</p>
+            
+            <br>
+
+            <p>Examples</p>
+            <ul>
+              <li>URL: https://forum.nim-lang.org/threadActivity.xml</li>
+              <li>Skip: 2</li>
+              <li>Fields: title,updated</li>
+            </ul>
+            <ul>
+              <li>URL: https://www.archlinux.org/feeds/packages/</li>
+              <li>Skip: 0</li>
+              <li>Fields: title,pubDate</li>
+            </ul>
+
+            <table class="rssFeeds table">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Name</th>
+                  <th>URL</th>
+                  <th style="max-width: 120px;">Skip x lines</th>
+                  <th>Fields</th>
+                  <th></th>
+                </tr>
+                <tr class="rssFeedsEdit">
+                  <td>
+                    <input class="form-control form-control-sm name" />
+                  </td>
+                  <td>
+                    <input class="form-control form-control-sm url" />
+                  </td>
+                  <td style="width: 120px;">
+                    <input class="form-control form-control-sm skip" value="0" style="text-align: center;" />
+                  </td>
+                  <td>
+                    <input class="form-control form-control-sm fields" />
+                  </td>
+                  <td class="btn btn-success rssFeedsAdd">
+                    Add
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
+                # for feed in rssFeeds:
+                <tr class="rss">
+                  <td>
+                    ${feed[4]}
+                  </td>
+                  <td>
+                    ${feed[1]}
+                  </td>
+                  <td style="text-align: center;">
+                    ${feed[2]}
+                  </td>
+                  <td>
+                    ${feed[3]}
+                  </td>
+                  <td data-feedid="${feed[0]}" class="btn btn-danger rssFeedDelete">
+                    Del
+                  </td>
+                </tr>
+                # end for
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+
+
+#end proc
