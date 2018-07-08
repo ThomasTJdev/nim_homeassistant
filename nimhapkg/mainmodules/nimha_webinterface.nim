@@ -12,7 +12,7 @@ import strutils
 import times
 import uri
 
-import cookies as libcookies
+#import cookies as libcookies
 
 from osproc import execProcess
 
@@ -186,6 +186,37 @@ proc daysForward*(days: int): DateTime =
   return getTime().utc + initInterval(days = days)
 
 
+proc makeCookie(key, value, expires: string, domain = "", path = "",
+                 secure = false, httpOnly = false,
+                 sameSite = Lax): string =
+  result = ""
+  result.add key & "=" & value
+  if domain != "": result.add("; Domain=" & domain)
+  if path != "": result.add("; Path=" & path)
+  if expires != "": result.add("; Expires=" & expires)
+  if secure: result.add("; Secure")
+  if httpOnly: result.add("; HttpOnly")
+  if sameSite != None:
+    result.add("; SameSite=" & $sameSite)
+
+
+template setCookie(name, value: string, expires="",
+                    sameSite: SameSite=Lax): typed =
+  ## Creates a cookie which stores ``value`` under ``name``.
+  ##
+  ## The SameSite argument determines the level of CSRF protection that
+  ## you wish to adopt for this cookie. It's set to Lax by default which
+  ## should protect you from most vulnerabilities. Note that this is only
+  ## supported by some browsers:
+  ## https://caniuse.com/#feat=same-site-cookie-attribute
+  let newCookie = makeCookie(name, value, expires, path="/")
+  if result[2].hasKey("Set-Cookie"):
+    # A wee bit of a hack here. Multiple Set-Cookie headers are allowed.
+    var setCookieVal: string = result[2]["Set-Cookie"]
+    setCookieVal.add("\c\LSet-Cookie:" & newCookie)
+    result[2]["Set-Cookie"] = setCookieVal
+  else:
+    result[2]["Set-Cookie"] = newCookie
 
 
 
@@ -253,7 +284,7 @@ routes:
     let (loginB, loginS) = login(c, @"email", replace(@"password", " ", ""))
     if loginB:
       
-      response.data[2]["Set-Cookie"] = libcookies.setCookie(key = "sid", value = loginS, path = "/", expires = daysForward(7), noName = true)
+      setCookie("sid", loginS)
 
       redirect("/")
     else:
