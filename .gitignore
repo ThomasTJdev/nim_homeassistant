@@ -23,6 +23,7 @@ config/secret.cfg
 # Main modules
 nimhapkg/mainmodules/nimha_cron
 nimhapkg/mainmodules/nimha_gateway
+nimhapkg/mainmodules/nimha_gateway_ws
 nimhapkg/mainmodules/nimha_webinterface
 nimhapkg/mainmodules/nimha_websocket
 nimhapkg/mainmodules/nimha_xiaomilistener
