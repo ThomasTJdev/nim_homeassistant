@@ -179,7 +179,7 @@ template createTFD() =
 #[ 
       Cookie utils
 __________________________________________________]#
-proc daysForward*(days: int): DateTime =
+proc daysForward(days: int): DateTime =
   ## Returns a DateTime object referring to the current time plus ``days``.
   return getTime().utc + initInterval(days = days)
 

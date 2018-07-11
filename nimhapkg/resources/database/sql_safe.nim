@@ -38,7 +38,7 @@ proc getValueSafeRetry*(db: DbConn, query: SqlQuery, args: varargs[string, `$`])
 
 
 proc getAllRowsSafe*(db: DbConn, query: SqlQuery, args: varargs[string, `$`]): seq[Row] =
-  when not defined(dev) or defined(sqlsafe):
+  when not defined(dev):
     try:
       return getAllRows(db, query, args)
     except DbError:
@@ -50,7 +50,7 @@ proc getAllRowsSafe*(db: DbConn, query: SqlQuery, args: varargs[string, `$`]): s
 
 
 proc getRowSafe*(db: DbConn, query: SqlQuery, args: varargs[string, `$`]): Row =
-  when not defined(dev) or defined(sqlsafe):
+  when not defined(dev):
     try:
       return getRow(db, query, args)
     except DbError:
@@ -62,7 +62,7 @@ proc getRowSafe*(db: DbConn, query: SqlQuery, args: varargs[string, `$`]): Row =
 
 
 proc execSafe*(db: DbConn; query: SqlQuery; args: varargs[string, `$`]) =
-  when not defined(dev) or defined(sqlsafe):
+  when not defined(dev):
     try:
       exec(db, query, args)
     except DbError:
@@ -74,7 +74,7 @@ proc execSafe*(db: DbConn; query: SqlQuery; args: varargs[string, `$`]) =
 
 
 proc tryExecSafe*(db: DbConn; query: SqlQuery; args: varargs[string, `$`]): bool =
-  when not defined(dev) or defined(sqlsafe):
+  when not defined(dev):
     try:
       return tryExec(db, query, args)
     except DbError:
@@ -86,7 +86,7 @@ proc tryExecSafe*(db: DbConn; query: SqlQuery; args: varargs[string, `$`]): bool
 
 
 proc tryInsertIDSafe*(db: DbConn; query: SqlQuery; args: varargs[string, `$`]): int64 =
-  when not defined(dev) or defined(sqlsafe):
+  when not defined(dev):
     try:
       return tryInsertID(db, query, args)
     except DbError:

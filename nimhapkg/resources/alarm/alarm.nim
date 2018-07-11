@@ -12,6 +12,7 @@
 import parsecfg, db_sqlite, strutils, asyncdispatch, json, times
 
 import ../database/database
+import ../database/sql_safe
 import ../mail/mail
 import ../mqtt/mqtt_func
 import ../pushbullet/pushbullet
@@ -38,7 +39,7 @@ template jn(json: JsonNode, data: string): string =
 proc alarmAction(db: DbConn, state: string) {.async.} =
   ## Run the action based on the alarm state
 
-  let alarmActions = getAllRows(db, sql"SELECT action, action_ref FROM alarm_actions WHERE alarmstate = ?", state)
+  let alarmActions = getAllRowsSafe(db, sql"SELECT action, action_ref FROM alarm_actions WHERE alarmstate = ?", state)
 
   if alarmActions.len() == 0:
     return
@@ -64,9 +65,9 @@ proc alarmSetStatus(db: DbConn, newStatus, trigger, device: string) =
 
   asyncCheck alarmAction(db, newStatus)
 
-  discard tryExec(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", newStatus, trigger, device)
+  discard tryExecSafe(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", newStatus, trigger, device)
 
-  discard tryExec(db, sql"UPDATE alarm SET status = ? WHERE id = ?", newStatus, "1")
+  discard tryExecSafe(db, sql"UPDATE alarm SET status = ? WHERE id = ?", newStatus, "1")
 
   alarmStatus = newStatus
 
@@ -82,28 +83,8 @@ proc alarmRinging*(db: DbConn, trigger, device: string) {.async.} =
 
   mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"ringing\"}")
 
-#[ Currently not working
-proc alarmTriggerTimer(cd: string, db: DbConn, trigger, device: string) {.async.}  = 
-  ## The alarm countdown timer
-  ## Currently used for not blocking to much..
-  ## 
-  ## To be changed
-
-  var counter = 0
-  while true:
-    waitFor sleepAsync(1000)
-    inc(counter)
-    
-    when defined(dev):
-      echo "Alarm countdown: " & $counter & "/" & cd
-
-    if counter == parseInt(cd) or alarmStatus != "triggered":
-      break
-]#
 
 
-
-#proc alarmTriggered*(db: DbConn, trigger, device: string): bool =
 proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
   ## The alarm has been triggereds
   # Missing user_id
@@ -129,13 +110,13 @@ proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
   alarmSetStatus(db, "triggered", trigger, device)
 
   # Add to history
-  exec(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", "triggered", trigger, device)
+  execSafe(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", "triggered", trigger, device)
 
   # Send info about the alarm is triggered
   mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"triggered\"}")
 
   # Start the countdown
-  var countDown = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
+  var countDown = getValueSafeRetry(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
   asyncCheck alarmRinging(db, trigger, device)
   #[
   var counter = 0
@@ -159,7 +140,7 @@ proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
 proc alarmGetStatus*(db: DbConn): string =
   ## Get alarm status
 
-  return getValue(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
+  return getValueSafeRetry(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
 
 
 

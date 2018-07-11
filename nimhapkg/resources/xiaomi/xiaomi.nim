@@ -105,7 +105,7 @@ proc xiaomiGatewayLight*(db: DbConn, color = "0") =
 proc xiaomiWriteTemplate*(db: DbConn, id: string) {.async.} =
   ## Write a template to the gateway
 
-  let data = getRow(db, sql"SELECT sid, value_name, value_data FROM xiaomi_templates WHERE id = ?", id)
+  let data = getRowSafe(db, sql"SELECT sid, value_name, value_data FROM xiaomi_templates WHERE id = ?", id)
 
   if data[0] == "" or data[1] == "":
     return
@@ -269,7 +269,7 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
         var gwExists = ""
 
         if xiaomiGatewaySid == "":
-          xiaomiGatewaySid = getValue(db, sql"SELECT sid FROM xiaomi_api WHERE sid = ?", sid)
+          xiaomiGatewaySid = getValueSafe(db, sql"SELECT sid FROM xiaomi_api WHERE sid = ?", sid)
 
         if xiaomiGatewaySid == "":
           discard tryExecSafe(db, sql"INSERT INTO xiaomi_devices (sid, name, model) VALUES (?, ?, ?)", sid, "Gateway", "gateway")
