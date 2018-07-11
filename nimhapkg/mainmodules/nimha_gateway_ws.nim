@@ -67,7 +67,7 @@ proc mosquittoSub() =
 
   echo "Mosquitto WS started"
 
-  mqttProcess = startProcess("/usr/bin/mosquitto_sub -v -t \"#\" -u " & s_MqttUsername & " -P " & s_mqttPassword & " -h " & s_mqttIp & " -p " & s_mqttPort, options = {poEvalCommand})
+  mqttProcess = startProcess(s_mqttPathSub & " -v -t \"#\" -u nimhagate -P " & s_mqttPassword & " -h " & s_mqttIp & " -p " & s_mqttPort, options = {poEvalCommand})
 
   while running(mqttProcess):
     asyncCheck mosquittoParse(readLine(outputStream(mqttProcess)))

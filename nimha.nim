@@ -78,8 +78,8 @@ proc checkMosquittoBroker() =
   ## Check is the path to Mosquitto broker exists else quit
 
   var mosquitto: File
-  if not mosquitto.open(dict.getSectionValue("MQTT", "mqttPath")):
-    echo "\n\nMosquitto broker: Error in path. No file found at " & dict.getSectionValue("MQTT","mqttPath") & "\n"
+  if not mosquitto.open(dict.getSectionValue("MQTT", "mqttPathSub")):
+    echo "\n\nMosquitto broker: Error in path. No file found at " & dict.getSectionValue("MQTT","mqttPathSub") & "\n"
     quit()
 
   if dict.getSectionValue("MQTT", "mqttIp") == "":
