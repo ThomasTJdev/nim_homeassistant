@@ -132,11 +132,13 @@ proc launcherActivated() =
     sleep(3000)
 
     if not running(wss):
-      echo "nimha_websocket exited. Starting again.."
+      echo "nimha_websocket exited. Killing gatewayWS and starting again.."
+      kill(gatewayws)
       wss = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_websocket", options = {poParentStreams})
+      sleep(1500)
 
     # Gateway may first be started, when wss is running.
-    # Otherwise it will miss the connection
+    # Otherwise it will miss the connection and the local key exchange
     if not running(gatewayws) and running(wss):
       echo "gateway_ws exited. Starting again.."
       gateway = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway_ws", options = {poParentStreams})
