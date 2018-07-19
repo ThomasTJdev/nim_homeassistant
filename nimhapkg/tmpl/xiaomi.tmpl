@@ -230,6 +230,37 @@
               # end for
               </tbody>
             </table>
+
+            <div class="help">
+              <div class="read">
+                <h4>Read a value from a sendor</h4>
+                <div>
+                  <p>To continuously read a value each time et changes, you have to set the action to <kbd>Read</kbd>. This will ensure, that the value will be displayed on your dashboard.</p>
+                  <p>When reading a value, the "Value data" needs to be empty.</p>
+                </div>
+              </div>
+              <div class="report">
+                <h4>Report</h4>
+                <div>
+                  <p>The report is primary used in conjuction with the alarm. When using the report, you need to specify the "Value data" and the "Trigger alarm".</p>
+                  <p>For PIR sensors the "Value data" would be <kbd>status</kbd> and the "Value name" would bed <kbd>motion</kbd></p>
+                  <p>For magnet sensors the "Value data" would be <kbd>status</kbd> and the "Value name" would bed <kbd>open</kbd> or <kbd>close</kbd></p>
+                </div>
+              </div>
+              <div class="valuedata">
+                <h4>Value data</h4>
+                <div>
+                  <p>Examples of possible values for "Value data":</p>
+                  <ul>
+                    <li>Read: PIR sensors will respond with <kbd>motion</kbd></li>
+                    <li>Read: Magnet sensors will respond with <kbd>voltage</kbd></li>
+                    <li>Read: Magnet sensors will respond with <kbd>status</kbd> for the switch</li>
+                    <li>Report: PIR sensors will respond with <kbd>status</kbd></li>
+                    <li>Report: Magnet sensors will respond with <kbd>status</kbd> for the switch</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
 
           <hr>
@@ -330,8 +361,20 @@
           </div>
 
           <div class="help">
+            <div class="ringtone">
+              <h4>Ringtone</h4>
+              <div>
+                <p>Insert <kbd>ringtone</kbd> in the "Value name". Insert the ringtone number in "Value data": <kbd>8</kbd></p>
+                <p>To adjust the volume, append a comma and the volume number. Using ringtone 8 and volumne level 4: <kbd>8,4</kbd></p>
+              </div>
+              <div>
+                <p>To create a action to stop the sound (good idea!), insert <kbd>10000</kbd> in the "Value data".</p>
+              </div>
+            </div>
+            
             <div class="color">
-              <p>Only ringtone and rgb are available in action value name.</p>
+              <h4>Color</h4>
+              <p>Insert <kbd>rgb</kbd> in the "Value name". Insert the prefered color code in "Value data". For a red light insert: <kbd>4294914304</kbd></p>
               <p>To assign a RGB color, you have to use the Android() color format.</p>
               <p>You can convert HEX to Android() at this <a href="https://convertingcolors.com/android-color-4294914304.html">website</a></p>
               <ul>

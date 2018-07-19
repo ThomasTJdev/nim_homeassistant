@@ -73,7 +73,15 @@ template jn(json: JsonNode, data: string): string =
 
 
 
-proc xiaomiSoundPlay*(db: DbConn, ringtone = "8", volume = "4") =
+proc xiaomiSoundPlay*(db: DbConn, defaultRingtone = "8") =
+  ## Send Xiaomi command to start sound
+
+  var volume = "4"
+  var ringtone = defaultRingtone
+  if "," in defaultRingtone:
+    ringtone = split(defaultRingtone, ",")[0]
+    volume   = split(defaultRingtone, ",")[1]
+
   let gwData = getRow(db, sql"SELECT sid, token, key FROM xiaomi_api")
 
   if gwData[0] != "" and gwData[1] != "":
@@ -83,6 +91,8 @@ proc xiaomiSoundPlay*(db: DbConn, ringtone = "8", volume = "4") =
 
 
 proc xiaomiSoundStop*(db: DbConn) =
+  ## Send Xiaomi command to stop sound
+
   let gwData = getRow(db, sql"SELECT sid, token, key FROM xiaomi_api")
 
   if gwData[0] != "" and gwData[1] != "":
@@ -92,6 +102,8 @@ proc xiaomiSoundStop*(db: DbConn) =
     
 
 proc xiaomiGatewayLight*(db: DbConn, color = "0") =
+  ## Send Xiaomi command to enable gateway light
+
   let gwData = getRow(db, sql"SELECT sid, token, key FROM xiaomi_api")
 
   if gwData[0] != "" and gwData[1] != "":
@@ -223,10 +235,6 @@ proc xiaomiDiscover*(db: DbConn, refreshDB = false) =
 proc xiaomiCheckAlarmStatus(sid, value, xdata, alarmStatus: string) {.async.} =
   ## Check if the triggered device should trigger the alarm
 
-  # Check is done before calling the proc
-  #if alarmStatus notin ["armAway", "armHome"]:
-  #  return
-
   let statusToTrigger = getValueSafe(db, sql"SELECT value_data FROM xiaomi_devices_data WHERE sid = ? AND triggerAlarm = ?", sid, alarmStatus)
 
   if statusToTrigger == "":
@@ -316,9 +324,10 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
 
       elif "illumination" in xdata:
         value = "illumination"
+
       
-      if value in ["status", "motion"] and value != "no_motion" and alarmStatus in ["armAway", "armHome"]:
-        asyncCheck xiaomiCheckAlarmStatus(sid, "status", xdata, alarmStatus)
+      if alarmStatus in ["armAway", "armHome"]:
+        asyncCheck xiaomiCheckAlarmStatus(sid, "status", xdata, alarmStatus)     
 
       # Add message
       mqttSend("xiaomi", "wss/to", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"read\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
