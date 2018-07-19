@@ -14,7 +14,9 @@ import logging
 import os
 import osproc
 import parsecfg
+import random
 import re
+import sequtils
 import strutils
 import streams
 import times
@@ -51,10 +53,20 @@ var server = Server(
 
 
 # Set key for communication without verification on 127.0.0.1
-# When using setSectionKey formatting and comments are deleted..
-let localhostKey = replace(makeSalt(), "\"", "")
+const rlAscii  = toSeq('a'..'z')
+const rhAscii  = toSeq('A'..'Z')
+const rDigit  = toSeq('0'..'9')
+randomize()
+var localhostKey = ""
+for i in countUp(1, 62):
+  case rand(2)
+  of 0: localhostKey.add(rand(rlAscii))
+  of 1: localhostKey.add(rand(rhAscii))
+  of 2: localhostKey.add(rand(rDigit))
+  else: discard
 let localhostKeyLen = localhostKey.len()
 for fn in [replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg"]:
+  # When using setSectionKey formatting and comments are deleted..
   fn.writeFile fn.readFile.replace(re("wsLocalKey = \".*\""), "wsLocalKey = \"" & localhostKey & "\"")
 
 
