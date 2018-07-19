@@ -37,27 +37,16 @@ proc mosquittoParse(payload: string) {.async.} =
   let topicName = payload.split(" ")[0]
   let message   = payload.replace(topicName & " ", "")
   
-  if topicName == "wss/to":
-    when defined(dev):
-      echo "MosWS: " & message & "\n"
-  
-    if isNil(ws):
-      setupWs()
+  when defined(dev):
+    echo "MosWS: " & message & "\n"
 
-    if not isNil(ws):
-      waitFor ws.sendText(localhostKey & message, false)
-    else:
-      echo "Mosquitto WS: Error, client websocket not connected"
+  if isNil(ws):
+    setupWs()
 
-  elif topicName == "history":
-    # Add history to var and every nth update database with it.
-    # SQLite can not cope with all the data, which results in
-    # database is locked, and history elements are discarded
-    discard
-
+  if not isNil(ws):
+    waitFor ws.sendText(localhostKey & message, false)
   else:
-    discard
-
+    echo "Mosquitto WS: Error, client websocket not connected"
 
 
 var mqttProcess: Process
@@ -67,7 +56,7 @@ proc mosquittoSub() =
 
   echo "Mosquitto WS started"
 
-  mqttProcess = startProcess(s_mqttPathSub & " -v -t \"#\" -u nimhagate -P " & s_mqttPassword & " -h " & s_mqttIp & " -p " & s_mqttPort, options = {poEvalCommand})
+  mqttProcess = startProcess(s_mqttPathSub & " -v -t \"wss/to\" -u nimhagate -P " & s_mqttPassword & " -h " & s_mqttIp & " -p " & s_mqttPort, options = {poEvalCommand})
 
   while running(mqttProcess):
     asyncCheck mosquittoParse(readLine(outputStream(mqttProcess)))
