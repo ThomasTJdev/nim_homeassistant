@@ -174,7 +174,7 @@ function cookieSid() {
   return Cookies.get("sid");
 }
 function cookieSidJson() {
-  return '"key": "' + Cookies.get("sid") + '", "userid": "' + userID + '",';
+  return '"key": "' + Cookies.get("sidnimha") + '", "userid": "' + userID + '",';
 }
 
 

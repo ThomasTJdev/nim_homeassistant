@@ -86,8 +86,8 @@ __________________________________________________]#
 proc checkLoggedIn(c: var TData) =
   ## Check if user is logged in
 
-  if not c.req.cookies.hasKey("sid"): return
-  let sid = c.req.cookies["sid"]
+  if not c.req.cookies.hasKey("sidnimha"): return
+  let sid = c.req.cookies["sidnimha"]
   if execAffectedRows(db, sql("UPDATE session SET lastModified = ? WHERE ip = ? AND key = ?"), $toInt(epochTime()), c.req.ip, sid) > 0:
 
     c.userid = getValue(db, sql"SELECT userid FROM session WHERE ip = ? AND key = ?", c.req.ip, sid)
@@ -155,7 +155,7 @@ proc logout(c: var TData) =
   const query = sql"DELETE FROM session WHERE ip = ? AND key = ?"
   c.username = ""
   c.userpass = ""
-  exec(db, query, c.req.ip, c.req.cookies["sid"])
+  exec(db, query, c.req.ip, c.req.cookies["sidnimha"])
 
 
 
@@ -174,52 +174,6 @@ template createTFD() =
     checkLoggedIn(c)
   c.loggedIn = loggedIn(c)
 
-
-
-#[ 
-      Cookie utils
-__________________________________________________]#
-proc daysForward(days: int): DateTime =
-  ## Returns a DateTime object referring to the current time plus ``days``.
-  return getTime().utc + initInterval(days = days)
-
-
-proc makeCookie(key, value, expires: string, domain = "", path = "",
-                 secure = false, httpOnly = false,
-                 sameSite = Lax): string =
-  result = ""
-  result.add key & "=" & value
-  if domain != "": result.add("; Domain=" & domain)
-  if path != "": result.add("; Path=" & path)
-  if expires != "": result.add("; Expires=" & expires)
-  if secure: result.add("; Secure")
-  if httpOnly: result.add("; HttpOnly")
-  if sameSite != None:
-    result.add("; SameSite=" & $sameSite)
-
-
-template setCookie(name, value: string, expires="",
-                    sameSite: SameSite=Lax): typed =
-  ## Creates a cookie which stores ``value`` under ``name``.
-  ##
-  ## The SameSite argument determines the level of CSRF protection that
-  ## you wish to adopt for this cookie. It's set to Lax by default which
-  ## should protect you from most vulnerabilities. Note that this is only
-  ## supported by some browsers:
-  ## https://caniuse.com/#feat=same-site-cookie-attribute
-  let newCookie = makeCookie(name, value, expires, path="/")
-  if result[2].hasKey("Set-Cookie"):
-    # A wee bit of a hack here. Multiple Set-Cookie headers are allowed.
-    var setCookieVal: string = result[2]["Set-Cookie"]
-    setCookieVal.add("\c\LSet-Cookie:" & newCookie)
-    result[2]["Set-Cookie"] = setCookieVal
-  else:
-    result[2]["Set-Cookie"] = newCookie
-
-
-
-
-  
 
 
 
@@ -266,13 +220,13 @@ routes:
 
   get "/login":
     createTFD()
-    if c.loggedIn:
+    if c.loggedIn and @"errormsg" == "":
       redirect("/login?errormsg=" & encodeUrl("You are already logged in"))
 
     resp genLogin(c, @"errormsg")
 
 
-  post "/login/do":
+  post "/dologin":
     createTFD()
     when not defined(dev):
       if useCaptcha:
@@ -281,9 +235,7 @@ routes:
     
     let (loginB, loginS) = login(c, @"email", replace(@"password", " ", ""))
     if loginB:
-      
-      setCookie("sid", loginS)
-
+      setCookie("sidnimha", loginS, daysForward(7))
       redirect("/")
     else:
       redirect("/login?errormsg=" & encodeUrl(loginS))
