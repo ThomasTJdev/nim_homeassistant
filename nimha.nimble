@@ -1,5 +1,5 @@
 # Package
-version       = "0.1.1"
+version       = "0.1.2"
 author        = "Thomas T. Jarløv (https://github.com/ThomasTJdev)"
 description   = "Nim Home Assistant"
 license       = "GPLv3"
@@ -10,7 +10,7 @@ skipDirs      = @["private"]
 
 # Dependencies
 requires "nim >= 0.18.1"
-requires "jester >= 0.3.0"
+requires "jester >= 0.4.0"
 requires "recaptcha >= 1.0.2"
 requires "bcrypt >= 0.2.1"
 requires "multicast >= 0.1.1"
