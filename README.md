@@ -57,7 +57,7 @@ ln -sf /the/path/to/nim/git/Nim/bin/nimble /usr/bin/nimble
 
 
 ## Setup
-**There can be some trouble with the websocket when accessing NimHA locally. To avoid this, install NimHA on a another device, e.g. Raspberry Pi, and access this.**
+**There can be some trouble with the websocket when accessing NimHA locally. To avoid this, install NimHA on a another device, e.g. Raspberry Pi, and access this. Else just restart NimHA and try again and access it from your local IP.**
 
 ### Clone the git or use Nimble
 **Clone:**
@@ -351,7 +351,7 @@ Wants=mosquitto.service # Mosquitto MQTT broker needs to be up an running
 User=user # MODIFY - Insert your username
 Type=simple
 WorkingDirectory=/home/<user>/.nimble/pkgs/nimha-0.1.0/ # MODIFY
-ExecStart=/home/<user>/.nimble/pkgs/nimha-0.1.0/nimha # MODIFY
+ExecStart=/home/<user>/.nimble/bin/nimha # MODIFY
 Restart=always
 RestartSec=15
 
