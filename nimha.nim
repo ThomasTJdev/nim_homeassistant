@@ -204,7 +204,7 @@ proc compileIt() =
 
 
   # Gateway websocket
-  if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway_ws") or defined(rc) or defined(rcgateway):
+  if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway_ws") or defined(rc) or defined(rcgatewayws):
     let outputGateway = execCmd("nim c -d:ssl " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_gateway_ws.nim")
     if outputGateway == 1:
       echo "\nAn error occured nimha_gateway_ws\n\n"
