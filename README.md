@@ -57,7 +57,7 @@ ln -sf /the/path/to/nim/git/Nim/bin/nimble /usr/bin/nimble
 
 
 ## Setup
-**To access NimHA you need to use your local ip (run ifconfig or hostname -i to find it, e.g. 192.168.1.20) - it is not possible to access at 127.0.0.1.**
+**There can be some trouble with the websocket when accessing NimHA locally. To avoid this, install NimHA on a another device, e.g. Raspberry Pi, and access this.**
 
 ### Clone the git or use Nimble
 **Clone:**
@@ -211,7 +211,7 @@ server {
     root   /home/pi/nim_homeassistant/public;
 
     if ($request_uri ~* ".(ico|css|js|gif|jpe?g|png|svg)$") {
-      expires max;
+      expires 10d;
       access_log off;
       add_header Pragma public;
       add_header Cache-Control "public";
@@ -288,7 +288,7 @@ server {
 
 
 
-# SSl certificate
+# SSL certificate
 
 How to obtain a SSL certificate on a Raspberry Pi or on a PC (e.g. Arch Linux).
 
