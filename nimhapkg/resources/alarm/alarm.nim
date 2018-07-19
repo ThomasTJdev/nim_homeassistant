@@ -62,12 +62,12 @@ proc alarmAction(db: DbConn, state: string) {.async.} =
 proc alarmSetStatus(db: DbConn, newStatus, trigger, device: string) =
   # Check that doors, windows, etc are ready
   # Missing user_id
+  
+  discard tryExecSafe(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", newStatus, trigger, device)
+  
+  discard tryExecSafe(db, sql"UPDATE alarm SET status = ? WHERE id = ?", newStatus, "1")
 
   asyncCheck alarmAction(db, newStatus)
-
-  discard tryExecSafe(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", newStatus, trigger, device)
-
-  discard tryExecSafe(db, sql"UPDATE alarm SET status = ? WHERE id = ?", newStatus, "1")
 
   alarmStatus = newStatus
 
@@ -98,11 +98,11 @@ proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
 
   if armTime > toInt(epochTime()):
     when defined(dev):
-      echo "Alarm: Triggered alarm cancelled to due to armtime"
+      echo "alarmTriggered(): Triggered alarm cancelled to due to armtime"
   
   else:
     when defined(dev):
-      echo "Alarm: Triggered alarm true - armtime done"
+      echo "alarmTriggered(): Triggered alarm true - armtime done"
 
   # Due to non-working async trigger countdown, skip it at the moment
 
