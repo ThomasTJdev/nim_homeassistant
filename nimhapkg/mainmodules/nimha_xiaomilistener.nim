@@ -8,6 +8,7 @@ import os
 import multicast
 
 import ../resources/mqtt/mqtt_func
+import ../resources/utils/logging
 
 
 # Multicast parameters
@@ -42,7 +43,7 @@ proc xiaomiListen() =
   xsocket.bindAddr(xbindport)
 
   if not xsocket.joinGroup(xgroup):
-    echo "Xiaomi: Could not join multicast group"
+    logit("xiaomi", "ERROR", "Xiaomi: Could not join multicast group")
     quit()
 
   # Send connection confirmation
@@ -53,11 +54,12 @@ proc xiaomiListen() =
 
       # Send data over MQTT
       mqttSend("xiaomilisten", "xiaomi", xdata)
+      logit("xiaomi", "DEBUG", xdata)
 
   # Close group
   discard xsocket.leaveGroup(xgroup) == true
 
 
 when isMainModule:
-  echo "Xiaomi multicast listener is started"
+  logit("xiaomi", "INFO", "Xiaomi multicast listener is started")
   xiaomiListen()

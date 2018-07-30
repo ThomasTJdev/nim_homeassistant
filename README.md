@@ -65,7 +65,7 @@ ln -sf /the/path/to/nim/git/Nim/bin/nimble /usr/bin/nimble
 git clone https://github.com/ThomasTJdev/nim_homeassistant.git
 cd nim_homeassistant
 
-# Use -d:dev to get all output
+# Use -d:logoutput to get all output
 nim c nimha.nim
 ```
 **Nimble:**
@@ -146,6 +146,11 @@ sudo apt install mosquitto mosquitto-clients
 sudo pacman -S mosquitto
 ```
 ### Add password
+You have to add 3 users with the same password. Usernames:
+- nimha
+- nimhagate
+- nimhawss
+
 ```
 cd /etc/mosquitto
 sudo nano passwd
@@ -158,7 +163,7 @@ sudo mosquitto_passwd -U passwd
 
 ### Config
 ```
-sudo nano /etcc/mosquitto/mosquitto.conf
+sudo nano /etc/mosquitto/mosquitto.conf
 # and add
 port 1883 localhost
 listener 8883

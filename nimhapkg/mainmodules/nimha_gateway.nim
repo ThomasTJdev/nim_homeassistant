@@ -16,7 +16,7 @@ import ../resources/pushbullet/pushbullet
 import ../resources/rss/rss_reader
 import ../resources/web/web_utils
 import ../resources/xiaomi/xiaomi
-
+import ../resources/utils/logging
 
 
 proc mosquittoParse(payload: string) {.async.} =
@@ -24,7 +24,9 @@ proc mosquittoParse(payload: string) {.async.} =
 
   let topicName = payload.split(" ")[0]
   let message   = payload.replace(topicName & " ", "")
-  #case topicName
+  
+  logit("gateway", "DEBUG", "Topic: " & topicName & " - Payload: " & message)
+  
   if topicName == "alarm":
     asyncCheck alarmParseMqtt(message)
 
@@ -62,18 +64,12 @@ var mqttProcess: Process
 proc mosquittoSub() =
   ## Start Mosquitto sub listening on #
 
-  echo "Mosquitto GATEWAY started"
+  logit("gateway", "INFO", "Mosquitto GATEWAY started")
 
   mqttProcess = startProcess(s_mqttPathSub & " -v -t \"#\" -u nimhawss -P " & s_mqttPassword & " -h " & s_mqttIp & " -p " & s_mqttPort, options = {poEvalCommand})
 
   while running(mqttProcess):
-    when defined(dev):
-      let line = readLine(outputStream(mqttProcess))
-      echo "MosSub: " & line & "\n"
-      asyncCheck mosquittoParse(line)
-
-    when not defined(dev):
-      asyncCheck mosquittoParse(readLine(outputStream(mqttProcess)))
+    asyncCheck mosquittoParse(readLine(outputStream(mqttProcess)))
 
 
 mosquittoSub()

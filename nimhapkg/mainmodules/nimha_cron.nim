@@ -9,6 +9,7 @@ import ../resources/database/sql_safe
 import ../resources/mail/mail
 import ../resources/pushbullet/pushbullet
 import ../resources/xiaomi/xiaomi
+import ../resources/utils/logging
 
 
 var db = conn()
@@ -111,6 +112,8 @@ proc cronJobRun(time: string) =
 
   if cronActions.len() == 0:
     return
+  
+  logit("cron", "DEBUG", "Executing cron activities. Total number: " & $cronActions.len())
 
   for row in cronActions:
 
@@ -139,7 +142,7 @@ proc cronJob() =
   ## and moved inside another main module? SleepAsync
   ## messes up the RPi CPU
 
-  echo "Cron main started"
+  logit("cron", "INFO", "Cron main started")
 
 
   while true:

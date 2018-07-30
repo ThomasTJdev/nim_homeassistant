@@ -10,7 +10,6 @@ import asynchttpserver
 import asyncnet
 import db_sqlite
 import json
-import logging
 import os
 import osproc
 import parsecfg
@@ -27,6 +26,7 @@ import ../resources/database/sql_safe
 import ../resources/mqtt/mqtt_func
 import ../resources/users/password
 import ../resources/utils/dates
+import ../resources/utils/logging
 
 
 type
@@ -207,7 +207,7 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
   let (ws, error) = await verifyWebsocketRequest(req, "nimha")
 
   if ws.isNil:
-    error("WS negotiation failed: ")
+    logit("websocket", "ERROR", "WS negotiation failed")
     await req.respond(Http400, "WebSocket negotiation failed: " & error)
     
     req.client.close()
@@ -216,15 +216,15 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
     var hostname = req.hostname
     if req.headers.hasKey("x-forwarded-for"):
       hostname = req.headers["x-forwarded-for"]
-    echo "Connection from: " & hostname
+    logit("websocket", "INFO", "Connection from: " & hostname)
 
     server.clients.add(newClient(ws, req.client, hostname))
     var myClient = server.clients[^1]
     asyncCheck wsSendConnectedUsers()
     
     when defined(dev):
-      info("Client connected from ", hostname, " ")
-      info("Active users: " & $server.clients.len())
+      logit("websocket", "INFO", "Client connected from: " & hostname)
+      logit("websocket", "INFO", "Active users: " & $server.clients.len())
     
     while true:
       
@@ -233,6 +233,7 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
         #let (opcode, data) = await readData(myClient.socket, true)
 
         if myClient.hostname == "127.0.0.1" and data.substr(0, localhostKeyLen-1) == localhostKey:
+          logit("websocket", "DEBUG", "127.0.0.1 message: " & data.substr(localhostKeyLen, data.len()))
           msgHi.add(data.substr(localhostKeyLen, data.len()))
           
         else:
@@ -245,7 +246,7 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
 
             # To be removed
             if js == parseJson("{}"):
-              echo "WSS: Parsing JSON failed"
+              logit("websocket", "ERROR", "Parsing JSON failed")
               return
 
             # Check user access. Current check is set to every 5 minutes (300s) - if user account is deleted, connection will be terminated
@@ -257,7 +258,7 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
               myClient.key = key
 
               if myClient.userStatus notin ["Admin", "Moderator", "Normal"]:
-                echo "WSS: Client messed up in sid and userid"
+                logit("websocket", "ERROR", "Client messed up in sid and userid")
                 myClient.connected = false
                 asyncCheck updateClientsNow()
                 break
@@ -268,23 +269,24 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
             if data == "ping":
               discard
             else:
+              logit("websocket", "DEBUG", "Client message: " & data)
               asyncCheck mqttSendAsync("wss", jn(parseJson(data), "element"), data)
 
           of Opcode.Close:
             let (closeCode, reason) = extractCloseData(data)
-            echo("socket went away, close code: ", closeCode, ", reason: ", reason)
+            logit("websocket", "INFO", "Socket went away, close code: " & $closeCode & ", reason: " & $reason)
             myClient.connected = false
             asyncCheck updateClientsNow()
             break
           else: 
             let (closeCode, reason) = extractCloseData(data)
-            echo("case else, close code: ", closeCode, ", reason: ", reason)
+            logit("websocket", "INFO", "Case else, close code: " & $closeCode & ", reason: " & $reason)
             myClient.connected = false
             asyncCheck updateClientsNow()
 
         
       except:
-        echo("encountered exception: ", getCurrentExceptionMsg())
+        logit("websocket", "ERROR", "Encountered exception: " & getCurrentExceptionMsg())
         myClient.connected = false
         asyncCheck updateClientsNow()
         break
@@ -294,13 +296,13 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
     myClient.key = ""
     myClient.userStatus = ""
     await myClient.ws.close()
-    info(".. socket went away.")
+    logit("websocket", "INFO", ".. socket went away.")
   
     
 
 
 when isMainModule:
-  echo "Websocket main started"
+  logit("websocket", "INFO", "Websocket main started")
 
   asyncCheck pong(server)
 
@@ -314,7 +316,7 @@ when isMainModule:
     runForever()
 
   except IOError:
-    echo "IOError.. damn"
+    logit("websocket", "ERROR", "IOError.. damn")
     
 
   close(httpServer)

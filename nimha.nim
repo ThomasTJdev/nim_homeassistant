@@ -167,10 +167,11 @@ proc compileIt() =
   echo "Checking if runners need compiling"
   echo " .. please wait\n"
 
+  var devC = ""
   when defined(dev):
-    let devC = " -d:dev "  
-  when not defined(dev):
-    let devC = " "  
+    devC.add(" -d:dev ")
+  when defined(logoutput):
+    devC.add(" -d:logoutput "  )
 
     
   # Websocket

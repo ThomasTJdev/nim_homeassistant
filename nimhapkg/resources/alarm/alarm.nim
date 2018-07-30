@@ -17,7 +17,9 @@ import ../mail/mail
 import ../mqtt/mqtt_func
 import ../pushbullet/pushbullet
 import ../users/password
+import ../utils/logging
 import ../xiaomi/xiaomi
+
 
 var alarmStatus* = ""
 var alarmArmedTime = toInt(epochTime())
@@ -45,8 +47,7 @@ proc alarmAction(db: DbConn, state: string) {.async.} =
     return
 
   for row in alarmActions:
-    when defined(dev):
-      echo "Alarm action: " & row[0] & " - id: " & row[1]
+    logit("alarm", "DEBUG", "alarmAction(): " & row[0] & " - id: " & row[1])
 
     if row[0] == "pushbullet":
       asyncCheck pushbulletSendDb(db, row[1])
@@ -76,8 +77,7 @@ proc alarmSetStatus(db: DbConn, newStatus, trigger, device: string) =
 proc alarmRinging*(db: DbConn, trigger, device: string) {.async.} =
   ## The alarm is ringing
 
-  when defined(dev):
-    echo "Alarm: Status = ringing"
+  logit("alarm", "INFO", "alarmRinging(): Status = ringing")
 
   alarmSetStatus(db, "ringing", trigger, device)
 
@@ -89,20 +89,17 @@ proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
   ## The alarm has been triggereds
   # Missing user_id
 
-  when defined(dev):
-    echo "Alarm: Status = triggered"
+  logit("alarm", "INFO", "alarmTriggered(): Status = triggered")
 
   # Check if the armtime is done and
   # activate the alarm
   let armTime = parseInt(getValue(db, sql"SELECT value FROM  alarm_settings WHERE element = ?", "armtime")) + alarmArmedTime
 
   if armTime > toInt(epochTime()):
-    when defined(dev):
-      echo "alarmTriggered(): Triggered alarm cancelled to due to armtime"
+    logit("alarm", "INFO", "alarmTriggered(): Triggered alarm cancelled to due to armtime")
   
   else:
-    when defined(dev):
-      echo "alarmTriggered(): Triggered alarm true - armtime done"
+    logit("alarm", "INFO", "alarmTriggered(): Triggered alarm true - armtime done")
 
   # Due to non-working async trigger countdown, skip it at the moment
 

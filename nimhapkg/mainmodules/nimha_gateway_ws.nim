@@ -11,7 +11,7 @@ import websocket
 from os import sleep, getAppDir
 
 import ../resources/mqtt/mqtt_func
-
+import ../resources/utils/logging
 
 
 var ws: AsyncWebSocket
@@ -22,7 +22,7 @@ var localhostKey = ""
 proc setupWs() =
   ## Setup connection to WS
 
-  echo "Mosquitto Client Websocket connection started"
+  logit("WSgateway", "INFO", "Mosquitto Client Websocket connection started")
 
   ws = waitFor newAsyncWebsocketClient("127.0.0.1", Port(25437), path = "/", protocols = @["nimha"])
 
@@ -37,8 +37,7 @@ proc mosquittoParse(payload: string) {.async.} =
   let topicName = payload.split(" ")[0]
   let message   = payload.replace(topicName & " ", "")
   
-  when defined(dev):
-    echo "MosWS: " & message & "\n"
+  logit("WSgateway", "DEBUG", "Payload: " & message)
 
   if isNil(ws):
     setupWs()
@@ -46,7 +45,7 @@ proc mosquittoParse(payload: string) {.async.} =
   if not isNil(ws):
     waitFor ws.sendText(localhostKey & message, false)
   else:
-    echo "Mosquitto WS: Error, client websocket not connected"
+    logit("WSgateway", "ERROR", "127.0.0.1 client websocket not connected")
 
 
 var mqttProcess: Process
@@ -54,7 +53,7 @@ var mqttProcess: Process
 proc mosquittoSub() =
   ## Start Mosquitto sub listening on #
 
-  echo "Mosquitto WS started"
+  logit("WSgateway", "INFO", "Mosquitto WS started")
 
   mqttProcess = startProcess(s_mqttPathSub & " -v -t \"wss/to\" -u nimhagate -P " & s_mqttPassword & " -h " & s_mqttIp & " -p " & s_mqttPort, options = {poEvalCommand})
 

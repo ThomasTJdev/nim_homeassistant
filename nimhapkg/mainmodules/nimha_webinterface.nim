@@ -199,6 +199,37 @@ include "../tmpl/xiaomi.tmpl"
 
 
 
+
+#[ 
+      Cleanup
+__________________________________________________]#
+
+proc handler() {.noconv.} =
+  quit(1)
+
+
+
+
+
+#[ 
+      Init
+__________________________________________________]#
+
+when isMainModule:
+  setControlCHook(handler)
+  
+  let hostIp = execProcess("ifconfig | grep -Eo 'inet (addr:)?([0-9]*\\.){3}[0-9]*' | grep -Eo '([0-9]*\\.){3}[0-9]*' | grep -v '127.0.0.1'")
+  echo "\nAccess the webinterface on " & replace(hostIp, "\n", "") & ":5000\n"
+    
+  #[
+  # Save startup time
+  exec(db, sql"INSERT INTO mainevents (event, value) VALUES (?, ?)", "start", "main", toInt(epochTime()))
+
+  ]#
+  
+
+
+
 #[ 
       Webserver
 __________________________________________________]#
@@ -489,33 +520,3 @@ routes:
       exec(db, sql"DELETE FROM cron_actions WHERE id = ?", @"cronid")
 
     redirect("/cron")
-
-
-
-#[ 
-      Cleanup
-__________________________________________________]#
-
-proc handler() {.noconv.} =
-  quit(1)
-
-
-
-
-
-#[ 
-      Init
-__________________________________________________]#
-
-when isMainModule:
-  setControlCHook(handler)
-  
-  let hostIp = execProcess("ifconfig | grep -Eo 'inet (addr:)?([0-9]*\\.){3}[0-9]*' | grep -Eo '([0-9]*\\.){3}[0-9]*' | grep -v '127.0.0.1'")
-  echo "\nAccess the webinterface on " & replace(hostIp, "\n", "") & ":5000\n"
-    
-  #[
-  # Save startup time
-  exec(db, sql"INSERT INTO mainevents (event, value) VALUES (?, ?)", "start", "main", toInt(epochTime()))
-
-  ]#
-  runForever()
