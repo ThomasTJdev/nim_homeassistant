@@ -187,7 +187,7 @@ $(function() {
     $('#sidebar').toggleClass('active');
   });
   if ($(window).width() < 900) {
-    $('#sidebar').removeClass('active');
+    $('#sidebar').toggleClass('active');
   }
 });
 
