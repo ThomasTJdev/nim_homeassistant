@@ -664,6 +664,11 @@ div#alarmModel button.alarmpad {
 div#alarmModel div.modal-footer button {
   width: 50%;
 }
+@media only screen and (max-width: 900px) {
+  div#alarmModel button.alarmpad {
+    margin-top: 20px;
+  }
+}
 
 
 
