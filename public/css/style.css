@@ -425,12 +425,10 @@ _____________________________*/
 .item .inner .rssInner div .date,
 .item .inner .rssInner div .name {
   display: block;
-  border: 0.5px solid grey;
   padding: 0px 2px;
   border-radius: 3px;
-  background: #d9d7d74f;
   width: 200px;
-  text-align: center;
+  font-weight: 300;
 }
 .item .inner .rssInner .badge {
   cursor: pointer;
