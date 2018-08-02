@@ -374,6 +374,14 @@ _____________________________*/
 .item .inner .alarmInner span.badge-warning {
   cursor: pointer;
 }
+div.alarmInner span.status.badge {
+  cursor: default;
+}
+div.alarmInner span.status.badge:hover {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
 
 
 /*
