@@ -50,13 +50,13 @@ proc alarmAction(db: DbConn, state: string) {.async.} =
     logit("alarm", "DEBUG", "alarmAction(): " & row[0] & " - id: " & row[1])
 
     if row[0] == "pushbullet":
-      asyncCheck pushbulletSendDb(db, row[1])
+      await pushbulletSendDb(db, row[1])
 
     elif row[0] == "mail":
-      asyncCheck sendMailDb(db, row[1])
+      await sendMailDb(db, row[1])
 
     elif row[0] == "xiaomi":
-      asyncCheck xiaomiWriteTemplate(db, row[1])
+      await xiaomiWriteTemplate(db, row[1])
 
 
 
@@ -113,7 +113,7 @@ proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
   mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"triggered\"}")
 
   # Start the countdown
-  var countDown = getValueSafeRetry(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
+  #var countDown = getValueSafeRetry(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
   asyncCheck alarmRinging(db, trigger, device)
   #[
   var counter = 0
