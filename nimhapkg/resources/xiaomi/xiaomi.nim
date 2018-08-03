@@ -7,6 +7,7 @@ from os import getappdir
 
 import ../database/database
 import ../database/sql_safe
+import ../utils/logging
 import ../utils/parsers
 
 import ../mqtt/mqtt_func
@@ -285,11 +286,14 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
 
           xiaomiGatewaySid = sid
 
+          logit("xiaomi", "DEBUG", "Token updated from heartbeat")
+
         else:
           discard tryExecSafe(db, sql"UPDATE xiaomi_api SET token = ? WHERE sid = ?", token, sid)
 
       return
 
+    logit("xiaomi", "DEBUG", payload)
 
     # Skip data is empty
     let xdata = jn(js, "data")
@@ -332,10 +336,10 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
       # Add message
       mqttSend("xiaomi", "wss/to", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"read\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
 
-    when defined(dev):
-      echo "XiaomiMqtt report: " & payload & "\n"
 
   else:
+
+    logit("xiaomi", "DEBUG", payload)
 
     if js["action"].getStr() == "discover":
       let db = conn()
@@ -350,9 +354,6 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
       let value = js["value"].getStr()
 
       asyncCheck xiaomiWriteTemplate(db, value)
-
-    when defined(dev):
-      echo "XiaomiMqtt wss: " & payload & "\n"
 
   
 proc xiaomiClose*() =

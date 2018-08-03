@@ -25,7 +25,8 @@ proc mosquittoParse(payload: string) {.async.} =
   let topicName = payload.split(" ")[0]
   let message   = payload.replace(topicName & " ", "")
   
-  logit("gateway", "DEBUG", "Topic: " & topicName & " - Payload: " & message)
+  if topicName notin ["xiaomi"]:
+    logit("gateway", "DEBUG", "Topic: " & topicName & " - Payload: " & message)
   
   if topicName == "alarm":
     asyncCheck alarmParseMqtt(message)

@@ -54,7 +54,7 @@ proc xiaomiListen() =
 
       # Send data over MQTT
       mqttSend("xiaomilisten", "xiaomi", xdata)
-      logit("xiaomi", "DEBUG", xdata)
+      #logit("xiaomi", "DEBUG", xdata)
 
   # Close group
   discard xsocket.leaveGroup(xgroup) == true
