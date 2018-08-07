@@ -20,6 +20,7 @@ import ../resources/www/google_recaptcha
 import ../resources/database/database
 import ../resources/database/sql_safe
 import ../resources/mail/mail
+import ../resources/mqtt/mqtt_func
 import ../resources/pushbullet/pushbullet
 import ../resources/rss/rss_reader
 import ../resources/users/password
@@ -562,5 +563,8 @@ routes:
 
     elif @"action" == "deletemqtt":
       exec(db, sql"DELETE FROM mqtt_templates WHERE id = ?", @"actionid")
+
+    elif @"action" == "sendtest":
+      asyncCheck mqttSendAsync("mqttaction", @"topic", @"message")
 
     redirect("/mqtt")
