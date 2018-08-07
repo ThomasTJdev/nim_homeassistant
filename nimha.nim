@@ -14,6 +14,7 @@ import nimhapkg/resources/database/database
 import nimhapkg/resources/database/modules/alarm_database
 import nimhapkg/resources/database/modules/cron_database
 import nimhapkg/resources/database/modules/mail_database
+import nimhapkg/resources/database/modules/mjpegstream_database
 import nimhapkg/resources/database/modules/owntracks_database
 import nimhapkg/resources/database/modules/pushbullet_database
 import nimhapkg/resources/database/modules/rss_database
@@ -101,6 +102,7 @@ proc createDbTables() =
   rssDatabase(db)
   xiaomiDatabase(db)
   cronDatabase(db)
+  mjpegstreamDatabase(db)
 
 
 proc launcherActivated() =
@@ -170,6 +172,8 @@ proc compileIt() =
   var devC = ""
   when defined(dev):
     devC.add(" -d:dev ")
+  when defined(devmailon):
+    devC.add(" -d:devmailon ")
   when defined(logoutput):
     devC.add(" -d:logoutput "  )
 

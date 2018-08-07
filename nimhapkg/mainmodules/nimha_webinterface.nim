@@ -114,10 +114,6 @@ __________________________________________________]#
 proc login(c: var TData, email, pass: string): tuple[b: bool, s: string] =
   ## User login
 
-  when not defined(demo):
-    if email == "test@test.com":
-      return (false, "Email may not be test@test.com")
-
   const query = sql"SELECT id, name, password, email, salt, status, secretUrl FROM person WHERE email = ? AND status <> 'Deactivated'"
   if email.len == 0 or pass.len == 0:
     return (false, "Missing password or username")
@@ -189,6 +185,7 @@ include "../tmpl/alarm.tmpl"
 include "../tmpl/cron.tmpl"
 include "../tmpl/users.tmpl"
 include "../tmpl/mail.tmpl"
+include "../tmpl/mjpegstream.tmpl"
 include "../tmpl/certificates.tmpl"
 include "../tmpl/owntracks.tmpl"
 include "../tmpl/pushbullet.tmpl"
@@ -520,3 +517,26 @@ routes:
       exec(db, sql"DELETE FROM cron_actions WHERE id = ?", @"cronid")
 
     redirect("/cron")
+
+
+
+  get "/mjpegstream":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    resp genMjpegstream(c)
+
+
+  get "/mjpegstream/do":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    if @"action" == "addstream":
+      exec(db, sql"INSERT INTO mjpegstream (name, url) VALUES (?, ?)", @"streamname", @"streamurl")
+
+    elif @"action" == "deletestream":
+      exec(db, sql"DELETE FROM mjpegstream WHERE id = ?", @"streamid")
+
+    redirect("/mjpegstream")

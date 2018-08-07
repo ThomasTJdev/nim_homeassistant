@@ -406,6 +406,26 @@ div.alarmInner span.status.badge:hover {
 
 
 /*
+  MJPEG stream
+*/
+.item .inner .mjpegstream .heading {
+  padding-bottom: 10px;
+}
+.item .inner .mjpegstream .heading .badge {
+  cursor: pointer;
+}
+.item .inner .mjpegstream .heading span.heading {
+  font-weight: 700;
+  padding-right: 15px;
+}
+.item .inner .mjpegstream img {
+  width: 100%;
+  height: auto;
+}
+
+
+
+/*
   RSS
 */
 .item .inner .rss .heading {
@@ -777,4 +797,19 @@ div#cron table.cronActions thead td.time input.crontime {
 }
 div#cron table.cronActions tbody td.time {
   text-align: center;
+}
+
+
+/*
+  MJPEG stream
+*/
+div#mjpegstream {
+  padding: 20px;
+}
+div#mjpegstream table.mjpegstreams {
+  max-width: 600px;
+}
+div#mjpegstream table.mjpegstreams .streamDelete,
+div#mjpegstream table.mjpegstreams .mjpegstreamAdd {
+  width: 100%;
 }

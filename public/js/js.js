@@ -296,6 +296,38 @@ $(function() {
 
 
 /*
+    MJPEG stream
+________________________________*/
+$(function() {
+  $( ".mjpegstreamAdd" ).click(function() {
+    var streamname = $(".streamname").val();
+    var streamurl = $(".streamurl").val();
+
+    location.href = "/mjpegstream/do?action=addstream&streamname=" + streamname + "&streamurl=" + streamurl;
+  });
+
+  $( ".streamDelete" ).click(function() {
+    var streamid = $(this).attr("data-streamid");
+
+    location.href = "/mjpegstream/do?action=deletestream&streamid=" + streamid;
+  });
+
+  $( ".mjpegstreamToggle" ).click(function() {
+    var streamid = $(this).attr("data-streamid");
+
+    if ($("#mjpegstream-" + streamid).attr("data-toggle") == "play") {
+      $("#mjpegstream-" + streamid).attr("data-toggle", "paused");
+      $("#mjpegstream-1").attr("src", "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAJYCAMAAACJuGjuAAAAZlBMVEX////+/v7+//88PD4SEhQSEhIREhQRExIfHyElJSUTExMmJiYuLjAAAAIAAAAODhAVFRUNDQ8WFhYvLzEBAQEuLTIAAAQODRI0NDYJCQsICAgICAoHBwkWFhgdHR0JCQkcHBz+/v9g96XcAAAE9ElEQVR42uzBAQEAAACAkP6v7ggCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDZq3McBmEggKLjxIZsELLc/6yREIko0mEXSO9JU7ib4msMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf6X4ORxWM9v2jiYa7ktNx1wWXZdz33+n67a+S8mnOd2KziXnskztfS/XoJ7bMDYz3KOyaWxoikgp2EFYj12F9QzqeblYq4sVLlYNKe3pK0ztw2IPX+G79sUSlrBmwhKWsIQlLGEJS1jCEpawhCUsYQlLWMJCWMISlrCEJSyEJSxhCUtYwkJYwhKWsIQlLIQlLGEJS1jCQljCEpawhCUshCUsYQlLWMJCWMISlrCEJSyEJSxhCUtYwkJYwhKWsIQlLIQlLGEJS1jCQljCEpawhCUshCUsYQlLWMJCWMISlrCEJSyEJSxhCUtYwkJYwhKWsIQlLD7s0oEAAAAAw6D5Ux/kxZBYYoklllhiIZZYYokllliIJZZYYoklFmKJJZZYYomFWGKJJZZYYiGWWGKJJZZYiCWWWGKJJRZiiSWWWGKJhVhiiSWWWGIhllhiiSWWWO/EEkssscQSK7HEEkssscQSSyyxxBJLLLHEEkusEEssscQSSyzEEkssscQSC7HEEkssscRCLLHEEksssRBLLLHEEkssxBJLLLHEEguxxBJLLLHEQiyxxBJLLLEQSyyxxBJLLMQSSyyxxBILscQSSyyxxEIsscQSSyyxEEssscQSSyzEEkssscQSC7HEEkssscRCLLHEEksssRBLLLHEEkssxBJLLLHEEguxxBJLLLHEQiyxxBJLLLEQSyyxxBJr7NKBAAAAAMOg+VMf5MWQWIglllhiiSUWYoklllhiiYVYYoklllhiIZZYYoklllj3xBJLLLHEEiuxxBJLLLHEEkssscQSSyyxxBJLrBBLLLHEEkssxBJLLLHEEguxxBJLLLHEQiyxxBJLLLEQSyyxxBJLLMQSSyyxxBILscQSSyyxxEIsscQSSyyxEEssscQSSyzEEkssscQSC7HEEkssscRCLLHEEksssRBLLLHEEkssxBJLLLHEEguxxBJLLLHEQiyxxBJLLLEQSyyxxBJLLMQSSyyxxBILscQSSyyxxEIsscQSSyyxEEssscQSSyzEEkssscQSC7HEEkssscRCLLHEEksssRBLLLHEEkuse2KJJZZYYomVWGKJJdbYrXcUhmEggIK7N0jhOInyc+5/SbsIGFwGLTF4BlSoUqHHSsISlrCEJSxhCUtYwhKWsIQVCEtYwhKWsISFsIQlLGEJS1gIS1jCEpawhIWwhCUsYQlLWAhLWMISlrCEhbCEJSxhCUtYCEtYwhKWsISFsIQlLGEJS1gIS1jCEpawhIWwhCUsYQlLWAhLWMISlrCEhbCE9V/nseyihvEiLGEV6B1WxmmoDiuD3YdlYh1Sego3YZlXPu8m1r6lsIRV43prX/dFa+v6db+uxzM6e23P67h/T8FBfaJU+mQBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHN7cCAAAAAAIMjfeoERKgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAV8qN52+ih3lwAAAAASUVORK5CYII=")
+    } else {
+      $("#mjpegstream-" + streamid).attr("data-toggle", "play");
+      $("#mjpegstream-" + streamid).attr("src", $("#mjpegstream-" + streamid).attr("data-url"));
+    }
+  });
+});
+
+
+
+/*
     OS stats
 ________________________________*/
 $(function() {

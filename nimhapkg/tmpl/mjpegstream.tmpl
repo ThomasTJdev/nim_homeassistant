@@ -1,0 +1,76 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#proc genMjpegstream(c: var TData): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="mjpegstream" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="mjpegstream">
+         
+          <h1>MJPEG streams</h1>
+
+          <div class="mjpegstreams">
+
+            <table class="mjpegstreams table table-bordered table-hover">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Name</th>
+                  <th>URL</th>
+                  <th></th>
+                </tr>
+                <tr class="cronItemAdd">
+                  <td>
+                    <input name="streamname" class="streamname form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <input name="streamurl" class="streamurl form-control form-control-sm" />
+                  </td>
+                  <td class="btn btn-success mjpegstreamAdd">
+                    Add
+                  </td>
+                </tr>
+              </thead>
+
+              <tbody>
+
+              # let mjpegStreams = getAllRows(db, sql"SELECT id, name, url FROM mjpegstream")
+              # for stream in mjpegStreams:
+              <tr>
+                <td>${stream[1]}</td>
+                <td>${stream[2]}</td>
+                <td data-streamid="${stream[0]}" class="btn btn-danger streamDelete">Del</td>
+              </tr>
+              # end for
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+
+#end proc
