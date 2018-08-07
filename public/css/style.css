@@ -804,10 +804,25 @@ div#cron table.cronActions tbody td.time {
 div#mjpegstream {
   padding: 20px;
 }
-div#mjpegstream table.mjpegstreams {
+div#mjpegstream table.mjpegstream {
   max-width: 600px;
 }
-div#mjpegstream table.mjpegstreams .streamDelete,
-div#mjpegstream table.mjpegstreams .mjpegstreamAdd {
+div#mjpegstream table.mjpegstream .streamDelete,
+div#mjpegstream table.mjpegstream .mjpegstreamAdd {
+  width: 100%;
+}
+
+
+/*
+  MQTT
+*/
+div#mqtt {
+  padding: 20px;
+}
+div#mqtt table.mqtt {
+  max-width: 800px;
+}
+div#mqtt table.mqtt .mqttActionDelete,
+div#mqtt table.mjpegmqttstream .mqttActionAdd {
   width: 100%;
 }

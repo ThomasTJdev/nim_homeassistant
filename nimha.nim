@@ -15,6 +15,7 @@ import nimhapkg/resources/database/modules/alarm_database
 import nimhapkg/resources/database/modules/cron_database
 import nimhapkg/resources/database/modules/mail_database
 import nimhapkg/resources/database/modules/mjpegstream_database
+import nimhapkg/resources/database/modules/mqtt_database
 import nimhapkg/resources/database/modules/owntracks_database
 import nimhapkg/resources/database/modules/pushbullet_database
 import nimhapkg/resources/database/modules/rss_database
@@ -103,6 +104,7 @@ proc createDbTables() =
   xiaomiDatabase(db)
   cronDatabase(db)
   mjpegstreamDatabase(db)
+  mqttDatabase(db)
 
 
 proc launcherActivated() =

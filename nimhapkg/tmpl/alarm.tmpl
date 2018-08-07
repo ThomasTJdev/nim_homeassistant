@@ -104,6 +104,8 @@
             #
             # let mailAlarm = getAllRows(db, sql"SELECT id, name FROM mail_templates")
             #
+            # let mqttActions = getAllRows(db, sql"SELECT id, name FROM mqtt_templates")
+            #
             # let xiaomiAlarm = getAllRows(db, sql"SELECT xda.id, xda.name, xd.name FROM xiaomi_templates AS xda LEFT JOIN xiaomi_devices AS xd ON xd.sid = xda.sid ORDER BY xda.name")
             #
             # var select = ""
@@ -114,6 +116,10 @@
             #
             # for mail in mailAlarm:
             #   select.add("<option value='" & mail[0] & "' data-element='mail'>Mail: " & mail[1] & "</option>")
+            # end for
+            #
+            # for mqtt in mqttActions:
+            #   select.add("<option value='" & mqtt[0] & "' data-element='mqtt'>MQTT: " & mqtt[1] & "</option>")
             # end for
             #
             # for xiaomi in xiaomiAlarm:

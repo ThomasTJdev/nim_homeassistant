@@ -381,8 +381,8 @@ $(function() {
 ________________________________*/
 $(function() {
   $( ".mjpegstreamAdd" ).click(function() {
-    var streamname = $(".streamname").val();
-    var streamurl = $(".streamurl").val();
+    var streamname  = $(".streamname").val();
+    var streamurl   = $(".streamurl").val();
 
     location.href = "/mjpegstream/do?action=addstream&streamname=" + streamname + "&streamurl=" + streamurl;
   });
@@ -403,6 +403,28 @@ $(function() {
       $("#mjpegstream-" + streamid).attr("data-toggle", "play");
       $("#mjpegstream-" + streamid).attr("src", $("#mjpegstream-" + streamid).attr("data-url"));
     }
+  });
+});
+
+
+
+
+/*
+    MQTT
+________________________________*/
+$(function() {
+  $( ".mqttActionAdd" ).click(function() {
+    var mqttname    = $(".mqttname").val();
+    var mqtttopic   = $(".mqtttopic").val();
+    var mqttmessage = $(".mqttmessage").val();
+
+    location.href = "/mqtt/do?action=addmqtt&mqttname=" + mqttname + "&mqtttopic=" + mqtttopic + "&mqttmessage=" + mqttmessage;
+  });
+
+  $( ".mqttActionDelete" ).click(function() {
+    var actionid = $(this).attr("data-actionid");
+
+    location.href = "/mqtt/do?action=deletemqtt&actionid=" + actionid;
   });
 });
 

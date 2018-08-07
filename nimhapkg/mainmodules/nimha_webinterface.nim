@@ -47,7 +47,7 @@ settings:
 
 
 let dict = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
-let gMapsApi = "?key=" & dict.getSectionValue("Google","mapsAPI")
+let gMapsApi = dict.getSectionValue("Google","mapsAPI")
 
 
 
@@ -187,6 +187,7 @@ include "../tmpl/cron.tmpl"
 include "../tmpl/users.tmpl"
 include "../tmpl/mail.tmpl"
 include "../tmpl/mjpegstream.tmpl"
+include "../tmpl/mqtt.tmpl"
 include "../tmpl/certificates.tmpl"
 include "../tmpl/owntracks.tmpl"
 include "../tmpl/pushbullet.tmpl"
@@ -541,3 +542,25 @@ routes:
       exec(db, sql"DELETE FROM mjpegstream WHERE id = ?", @"streamid")
 
     redirect("/mjpegstream")
+
+
+  get "/mqtt":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    resp genMqtt(c)
+
+
+  get "/mqtt/do":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    if @"action" == "addmqtt":
+      exec(db, sql"INSERT INTO mqtt_templates (name, topic, message) VALUES (?, ?, ?)", @"mqttname", @"mqtttopic", @"mqttmessage")
+
+    elif @"action" == "deletemqtt":
+      exec(db, sql"DELETE FROM mqtt_templates WHERE id = ?", @"actionid")
+
+    redirect("/mqtt")

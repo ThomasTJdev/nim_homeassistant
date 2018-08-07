@@ -14,6 +14,7 @@ import parsecfg, db_sqlite, strutils, asyncdispatch, json, times
 import ../database/database
 import ../database/sql_safe
 import ../mail/mail
+import ../mqtt/mqtt_templates
 import ../mqtt/mqtt_func
 import ../pushbullet/pushbullet
 import ../users/password
@@ -54,6 +55,9 @@ proc alarmAction(db: DbConn, state: string) {.async.} =
 
     elif row[0] == "mail":
       await sendMailDb(db, row[1])
+
+    elif row[0] == "mqtt":
+      await mqttActionSendDb(db, row[1])
 
     elif row[0] == "xiaomi":
       await xiaomiWriteTemplate(db, row[1])
