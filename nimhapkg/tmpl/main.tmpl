@@ -106,14 +106,83 @@
 #
 #
 #proc genMain(c: var TData): string = 
-# result = "" 
+# result = ""
+#
+#
+# let cardOrderRaw = "cardAlarm,cardPushbullet,cardCertificates,cardXiaomiDevice,cardOwntracks,cardMjpegstream,cardWebsocketUsers,cardOsStats"
+# var cardOrder = ""
+#
+# if not c.req.cookies.hasKey("dashboardCardOrder"):
+#   cardOrder = cardOrderRaw
+# else:
+#   ## Uses "%2C" since comma can not be saved in cookie
+#   cardOrder = replace(c.req.cookies["dashboardCardOrder"], "%2C", ",")
+# end if
+#
 <head>
-  ${genMainHead(c)}
+  <meta name="description" content="Nim Website Creator">
+  <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/style.css">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous" defer></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous" defer></script>
+  
+  # if c.loggedIn:
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.0/src/js.cookie.min.js" defer></script>
+    
+    # if gMapsApi == "":
+      <script src="http://maps.google.com/maps/api/js" type="text/javascript" defer></script>
+    # else:
+      <script src="https://maps.google.com/maps/api/js$gMapsApi" type="text/javascript" defer></script>
+    # end if
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js" defer></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.6.0/Sortable.min.js" defer></script>
+
+    <script src="/js/js.js" defer></script>
+  # end if
 </head>
 
 <body>
   <header>
-    ${genMainHeader()}
+    <nav id="navbar" class="navbar navbar-expand-md navbar-dark">
+      <a id="sidebarToggle" class="navbar-brand" href="#!">Nim Home Assistant</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link disabled" href="#">Card order:</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Options
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item orderReset" href="#">Reset order</a>
+              <div class="dropdown-divider"></div>
+
+              # for card in split(cardOrderRaw, ","):
+              #   let cardName = replace(card, "card", "")
+              #   if card in split(cardOrder, ","):
+                    <a class="dropdown-item cardToggle" data-card="$card" data-visible="true" href="#!"><span style="color: green; font-weight: 700; margin-right: 10px;">ON</span>$cardName</a>
+              #   else:
+                    <a class="dropdown-item cardToggle" data-card="$card" data-visible="false" href="#!"><span style="color: red; font-weight: 700; margin-right: 10px;">OFF</span>$cardName</a>
+              #   end if
+              # end for
+            
+            </div>
+          </li>
+          <li class="nav-item">
+            <a id="orderTrash" class="nav-link trash" href="#"><img src="/images/icon_trash.png"></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
   </header>
 
   <main>
@@ -121,33 +190,50 @@
     <div class="wrapper">
       ${genMainSidebar()}
 
-
-
       <!--
           Main area
       -->
-
       <div id="pagewrapper">
         <div class="container-fluid">
-          <div class="row">
+          <div id="sortableCards" class="row">
 
-            ${cardAlarm(c)}
+            # for position in split(cardOrder, ","):
+            #   case position
+            #
+            #   of "cardAlarm":
+                  ${cardAlarm(c)}
+            #
+            #   of "cardCertificates":
+                  ${cardCertificates(c)}
+            #
+            #   of "cardPushbullet":
+                  ${cardPushbullet(c)}
+            #
+            #   of "cardXiaomiDevice":
+                  ${cardXiaomiDevice(c)}
+            #
+            #   of "cardOwntracks":
+                  ${cardOwntracks(c)}
+            #
+            #   of "cardMjpegstream":
+                  ${cardMjpegstream(c)}
+            #
+            #   of "cardRss":
+                  ${cardRss(c)}
+            #
+            #   of "cardWebsocketUsers":
+                  ${cardWebsocketUsers(c)}
+            #
+            #   of "cardOsStats":
+                  ${cardOsStats(c)}
+            #
+            #   else:
+            #     discard
+            #
+            #   end case
+            # end for
+
             
-            ${cardCertificates(c)}
-
-            ${cardPushbullet(c)}
-
-            ${cardXiaomiDevice(c)}
-            
-            ${cardOwntracks(c)}
-
-            ${cardMjpegstream(c)}
-
-            ${cardRss(c)}
-            
-            ${cardWebsocketUsers(c)}
-
-            ${cardOsStats(c)}
 
           </div>
         </div>

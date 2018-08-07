@@ -214,6 +214,86 @@ function notify(obj) {
 
 
 /*
+    Dashboard
+________________________________*/
+$(function() {
+  // Dashboard cards
+  if ($("#sortableCards").length) {
+    var theElement = $("#sortableCards")[0];
+
+    var handle = "";
+    /*if ($( window ).width() < 768) {
+      handle = ".todo-item-handle"
+    }*/
+
+    Sortable.create(theElement, {
+      animation: 100,
+      handle: handle,
+      group: {
+        name: "shared",
+      },
+      store: {
+        set: function (sortable) {
+            var order = sortable.toArray();
+            console.log(order);
+            Cookies.set('dashboardCardOrder', order.join(','));
+        }, 
+        get: function(){return [];}
+      }
+    });
+  }
+
+  // Trash icon
+  if ($("#orderTrash").length) {
+    var theElement = $("#orderTrash")[0];
+    Sortable.create(theElement, {
+      group: {
+        name: "shared",
+      },
+      onAdd: function (evt) {
+        var el = evt.item;
+        el.parentNode.removeChild(el);
+      }
+    });
+  }
+
+  $( ".orderReset" ).click(function() {
+    Cookies.remove('dashboardCardOrder');
+    location.reload();
+  });
+
+  $( ".cardToggle" ).click(function() {
+    var card        = $(this).attr("data-card");
+    var cardVisible = $(this).attr("data-visible");
+    var cookie      = Cookies.get('dashboardCardOrder');
+
+    if (cardVisible == "true") {
+      var removeValue = function(list, value, separator) {
+        separator = separator || ",";
+        var values = list.split(separator);
+        for(var i = 0 ; i < values.length ; i++) {
+          if(values[i] == value) {
+            values.splice(i, 1);
+            return values.join(separator);
+          }
+        }
+        return list;
+      }
+      Cookies.set('dashboardCardOrder', removeValue(cookie, card, ","))
+      $("." + card).hide(400);
+      $(this).children("span").text("OFF");
+      $(this).children("span").css("color", "red");
+    } else {
+      Cookies.set('dashboardCardOrder', cookie + "," + card)
+      location.reload();
+    }
+  });
+
+});
+
+
+
+/*
     Pushbullet
 ________________________________*/
 $(function() {

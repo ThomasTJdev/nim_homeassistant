@@ -30,7 +30,6 @@ ______________________________*/
 }
 #pagewrapper {
   width: 100%;
-  margin-top: 57px;
   padding-bottom: 10px;
 }
 
@@ -81,16 +80,8 @@ header {
     Navbar
 ______________________________*/
 nav#navbar{
-  background-color: transparent;
-  border-bottom: 1px solid #dee2e6;
-  display: block;
-  z-index: 999;
   background: rgba(28, 121, 221, 0.98);
-  position: fixed;
   width: 100%;
-  overflow: hidden;
-  top: 0;
-  height: 57px;
 }
 nav#navbar #sidebarToggle {
   cursor: pointer;
@@ -111,11 +102,6 @@ nav#navbar .navbar-toggler {
 nav#navbar .navbar-toggler-icon {
   border: 1px solid white;
 }
-@media only screen and (min-width: 768px) {
-  nav#navbar {
-    display: block;
-  }
-}
 
 /*
   Navbar settings
@@ -131,6 +117,19 @@ div#navbarSettings a {
 div#navbarSettings .dropdown-menu a {
   color: black;
 }
+
+/*
+  Navbar card order
+*/
+nav#navbar a.nav-link.trash > * {
+  display: none;
+}
+nav#navbar a.nav-link.trash img {
+  width: 20px;
+  height: auto;
+  display: block;
+}
+
 
 
 
@@ -218,7 +217,6 @@ nav#sidebar {
   max-width: 250px;
   min-height: 100vh;
   padding: 20px;
-  padding-top: 57px;
 }
 nav#sidebar a,
 nav#sidebar a:hover,
