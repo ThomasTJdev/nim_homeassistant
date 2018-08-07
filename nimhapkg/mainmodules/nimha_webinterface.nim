@@ -179,6 +179,7 @@ template createTFD() =
       HTML pages
 __________________________________________________]#
 
+include "../tmpl/dashboard.tmpl"
 include "../tmpl/alarm_numpad.tmpl"
 include "../tmpl/main.tmpl"
 include "../tmpl/alarm.tmpl"
