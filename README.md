@@ -30,7 +30,7 @@ ____
 
 ### [Alarm system](https://github.com/ThomasTJdev/nim_homeassistant/wiki/Alarm-system)
 * Alarm system integrated with Xiaomi IOT devices
-* Custom actions when the alarm status changes, e.g. from armed to ringing
+* Custom actions when the alarm status changes, e.g. from armed to ringing send mail
 * Custom alarm codes for each user
 * User defined arm time
 
@@ -51,6 +51,11 @@ ____
 * View where each of your Owntrack devices are located
 * Add custom waypoints to the map
 * Use [Google maps](https://github.com/ThomasTJdev/nim_homeassistant/wiki/Google-Maps)
+
+### [MQTT](https://github.com/ThomasTJdev/nim_homeassistant/wiki/MQTT)
+* Define custom MQTT templates (topic and message)
+* Send MQTT message when the alarm changes status or with cronjobs
+* Send test messages via MQTT
 
 ### OS stats
 * Monitor the health of your system
