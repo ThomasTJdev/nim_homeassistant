@@ -19,7 +19,7 @@ import ../mqtt/mqtt_func
 import ../pushbullet/pushbullet
 import ../users/password
 import ../utils/logging
-import ../xiaomi/xiaomi
+import ../xiaomi/xiaomi_utils
 
 
 var alarmStatus* = ""
@@ -28,15 +28,9 @@ var alarmArmedTime = toInt(epochTime())
 var db = conn()
 
 
-
 template jn(json: JsonNode, data: string): string =
   ## Avoid error in parsing JSON
-
-  try:
-    json[data].getStr()
-  except:
-    ""
-
+  try: json[data].getStr() except: ""
 
 
 proc alarmAction(db: DbConn, state: string) {.async.} =
@@ -63,7 +57,6 @@ proc alarmAction(db: DbConn, state: string) {.async.} =
       await xiaomiWriteTemplate(db, row[1])
 
 
-
 proc alarmSetStatus(db: DbConn, newStatus, trigger, device: string) =
   # Check that doors, windows, etc are ready
   # Missing user_id
@@ -77,7 +70,6 @@ proc alarmSetStatus(db: DbConn, newStatus, trigger, device: string) =
   alarmStatus = newStatus
 
 
-
 proc alarmRinging*(db: DbConn, trigger, device: string) {.async.} =
   ## The alarm is ringing
 
@@ -86,7 +78,6 @@ proc alarmRinging*(db: DbConn, trigger, device: string) {.async.} =
   alarmSetStatus(db, "ringing", trigger, device)
 
   mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"ringing\"}")
-
 
 
 proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
@@ -144,7 +135,6 @@ proc alarmGetStatus*(db: DbConn): string =
   return getValueSafeRetry(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
 
 
-
 proc alarmParseMqtt*(payload: string) {.async.} =
   ## Parse MQTT
 
@@ -192,7 +182,6 @@ proc alarmInit*(db: DbConn) =
   ## Set alarm status
   
   alarmStatus = getValue(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
-
 
 
 alarmInit(db)

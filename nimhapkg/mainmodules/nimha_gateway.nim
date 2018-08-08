@@ -15,7 +15,7 @@ import ../resources/owntracks/owntracks
 import ../resources/pushbullet/pushbullet
 import ../resources/rss/rss_reader
 import ../resources/web/web_utils
-import ../resources/xiaomi/xiaomi
+import ../resources/xiaomi/xiaomi_utils
 import ../resources/utils/logging
 
 

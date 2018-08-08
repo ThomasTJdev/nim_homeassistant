@@ -29,6 +29,8 @@ import ../resources/users/user_check
 import ../resources/utils/parsers
 import ../resources/utils/dates
 
+from ../resources/xiaomi/xiaomi_utils import xiaomiUpdateGatewayPassword
+
 
 setCurrentDir(replace(getAppDir(), "/nimhapkg/mainmodules", ""))
 
@@ -271,14 +273,6 @@ routes:
     else:
       redirect("/login?errormsg=" & encodeUrl(loginS))
 
-  
-  get "/xiaomi/devices":
-    createTFD()
-    if not c.loggedIn:
-      redirect("/login")
-
-    resp genXiaomiDevices(c)
-
 
   get "/certificates":
     createTFD()
@@ -300,6 +294,14 @@ routes:
       exec(db, sql"DELETE FROM certificates WHERE id = ?", @"id")
 
     redirect("/certificates")
+
+  
+  get "/xiaomi/devices":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    resp genXiaomiDevices(c)
 
 
   get "/xiaomi/devices/do":
@@ -328,6 +330,7 @@ routes:
 
     elif @"action" == "updatekey":
       exec(db, sql"UPDATE xiaomi_api SET key = ? WHERE sid = ?", @"key", @"sid")
+      xiaomiUpdateGatewayPassword()
 
     redirect("/xiaomi/devices")
 
