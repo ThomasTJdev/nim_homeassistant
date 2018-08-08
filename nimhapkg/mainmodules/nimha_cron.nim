@@ -9,20 +9,12 @@ import ../resources/database/sql_safe
 import ../resources/mail/mail
 import ../resources/mqtt/mqtt_templates
 import ../resources/pushbullet/pushbullet
-import ../resources/xiaomi/xiaomi
+import ../resources/xiaomi/xiaomi_utils
 import ../resources/utils/logging
 
 
 var db = conn()
 
-
-template jn(json: JsonNode, data: string): string =
-  ## Avoid error in parsing JSON
-
-  try:
-    json[data].getStr()
-  except:
-    ""
 
 
 #[
@@ -120,17 +112,16 @@ proc cronJobRun(time: string) =
 
     case row[0]
     of "pushbullet":
-      echo "push"
-      asyncCheck pushbulletSendDb(db, row[1])
+      waitFor pushbulletSendDb(db, row[1])
 
     of "mail":
-      asyncCheck sendMailDb(db, row[1])
+      waitFor sendMailDb(db, row[1])
 
     of "mqtt":
-      asyncCheck mqttActionSendDb(db, row[1])
+      waitFor mqttActionSendDb(db, row[1])
 
     of "xiaomi":
-      asyncCheck xiaomiWriteTemplate(db, row[1])
+      waitFor xiaomiWriteTemplate(db, row[1])
 
     else:
       discard
