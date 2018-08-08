@@ -241,6 +241,7 @@ proc compileIt() =
 
 
 proc requirements() =
+  discard existsOrCreateDir("tmp")
   secretCfg()
   updateJsFile()
   checkMosquittoBroker()
