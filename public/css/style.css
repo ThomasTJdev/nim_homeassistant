@@ -406,17 +406,17 @@ div.alarmInner span.status.badge:hover {
 /*
   MJPEG stream
 */
-.item .inner .mjpegstream .heading {
+.item .inner .filestream .heading {
   padding-bottom: 10px;
 }
-.item .inner .mjpegstream .heading .badge {
+.item .inner .filestream .heading .badge {
   cursor: pointer;
 }
-.item .inner .mjpegstream .heading span.heading {
+.item .inner .filestream .heading span.heading {
   font-weight: 700;
   padding-right: 15px;
 }
-.item .inner .mjpegstream img {
+.item .inner .filestream img {
   width: 100%;
   height: auto;
   max-height: 400px;
@@ -802,14 +802,14 @@ div#cron table.cronActions tbody td.time {
 /*
   MJPEG stream
 */
-div#mjpegstream {
+div#filestream {
   padding: 20px;
 }
-div#mjpegstream table.mjpegstream {
+div#filestream table.filestream {
   max-width: 600px;
 }
-div#mjpegstream table.mjpegstream .streamDelete,
-div#mjpegstream table.mjpegstream .mjpegstreamAdd {
+div#filestream table.filestream .streamDelete,
+div#filestream table.filestream .filestreamAdd {
   width: 100%;
 }
 

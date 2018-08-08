@@ -175,18 +175,28 @@
 #
 #
 #
-#proc cardMjpegstream(c: var TData): string =
+#proc cardfilestream(c: var TData): string =
 # result = ""
-# let mjpegStreams = getAllRows(db, sql"SELECT id, name, url FROM mjpegstream")
-# for stream in mjpegStreams:
-<div data-id="cardMjpegstream" class="cardMjpegstream item col-12 col-sm-6 col-md-6 col-lg-3">
+# let filestreams = getAllRows(db, sql"SELECT id, name, url, download, html FROM filestream")
+# for stream in filestreams:
+<div data-id="cardFilestream" class="cardFilestream item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
-    <div class="mjpegstream">
+    <div class="filestream">
       <div class="heading">
         <span class="heading">${stream[1]}</span>
-        <span data-streamid="${stream[0]}" class="mjpegstreamToggle badge badge-primary">Start/Pause</span>
+        <span data-streamid="${stream[0]}" class="filestreamToggle badge badge-primary">Toggle</span>
+        <span data-streamid="${stream[0]}" class="filestreamUpdate badge badge-primary">Update</span>
+        <span data-streamid="${stream[0]}" class="filestreamAutoUpdate badge badge-primary">2sec update</span>
       </div>
-      <img id="mjpegstream-${stream[0]}" data-url="${stream[2]}" data-toggle="play" src="${stream[2]}">
+      # var htmlType = "img"
+      # if stream[4] != "" or stream[4] != "img":
+      #   htmlType = stream[4]
+      # end if
+      # if stream[3] == "true":
+      <$htmlType id="filestream-${stream[0]}" data-url="/filestream/download?url=${stream[2]}" data-toggle="play" src="/filestream/download?url=${stream[2]}">
+      # else:
+      <$htmlType id="filestream-${stream[0]}" data-url="${stream[2]}" data-toggle="play" src="${stream[2]}">
+      # end if
     </div>
   </div>
 </div>

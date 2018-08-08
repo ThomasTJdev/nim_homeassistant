@@ -1,6 +1,7 @@
 # Copyright 2018 - Thomas T. Jarløv
 
 import asyncdispatch
+from httpclient import newHttpClient, downloadFile
 import db_sqlite
 import jester
 import json
@@ -189,7 +190,7 @@ include "../tmpl/alarm.tmpl"
 include "../tmpl/cron.tmpl"
 include "../tmpl/users.tmpl"
 include "../tmpl/mail.tmpl"
-include "../tmpl/mjpegstream.tmpl"
+include "../tmpl/filestream.tmpl"
 include "../tmpl/mqtt.tmpl"
 include "../tmpl/certificates.tmpl"
 include "../tmpl/owntracks.tmpl"
@@ -526,26 +527,46 @@ routes:
 
 
 
-  get "/mjpegstream":
+  get "/filestream":
     createTFD()
     if not c.loggedIn:
       redirect("/login")
 
-    resp genMjpegstream(c)
+    resp genFilestream(c)
 
 
-  get "/mjpegstream/do":
+  get "/filestream/do":
     createTFD()
     if not c.loggedIn:
       redirect("/login")
 
     if @"action" == "addstream":
-      exec(db, sql"INSERT INTO mjpegstream (name, url) VALUES (?, ?)", @"streamname", @"streamurl")
+      let download = if @"streamdownload" notin ["true", "false"]: "false" else: @"streamdownload"
+      let html = if @"streamhtml" notin ["img", "video"]: "img" else: @"streamhtml"
+      exec(db, sql"INSERT INTO filestream (name, url, download, html) VALUES (?, ?, ?, ?)", @"streamname", @"streamurl", download, html)
 
     elif @"action" == "deletestream":
-      exec(db, sql"DELETE FROM mjpegstream WHERE id = ?", @"streamid")
+      exec(db, sql"DELETE FROM filestream WHERE id = ?", @"streamid")
 
-    redirect("/mjpegstream")
+    redirect("/filestream")
+
+  get "/filestream/download":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    if @"url".len() == 0:
+      resp("")
+
+    let filename = split(@"url", "/")[split(@"url", "/").len()-1]
+    var aa = newHttpClient()
+    downloadFile(aa, @"url", "tmp/" & filename)
+    sendFile("tmp/" & filename)
+    
+
+  after "/filestream/download":
+    let filename = split(@"url", "/")[split(@"url", "/").len()-1]
+    discard tryRemoveFile("tmp/" & filename)
 
 
   get "/mqtt":

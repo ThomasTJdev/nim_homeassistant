@@ -1,0 +1,92 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#proc genFilestream(c: var TData): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="filestream" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="filestream">
+         
+          <h1>Filestreams</h1>
+
+          <p>This enables a stream of a file to your dashboard. This could be a image or video.</p>
+
+          <p>If you are serving a image from a camera at home - which should not be exposed to the internet, you can set the <kbd>Download</kbd> to <kbd>true</kbd>. Then the NimHA will download the image and serve it.</p>
+
+          <p>As a standard, the HTML type will be <kbd>img</kbd>.</p>
+
+          <div class="filestream">
+
+            <table class="filestream table table-bordered table-hover">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Name</th>
+                  <th>URL</th>
+                  <th>Download</th>
+                  <th>HTML type</th>
+                  <th></th>
+                </tr>
+                <tr class="filestreamItemAdd">
+                  <td>
+                    <input name="streamname" class="streamname form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <input name="streamurl" class="streamurl form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <input name="streamdownload" class="streamdownload form-control form-control-sm" />
+                  </td>
+                  <td>
+                    <input name="streamhtml" class="streamhtml form-control form-control-sm" />
+                  </td>
+                  <td class="btn btn-success filestreamAdd">
+                    Add
+                  </td>
+                </tr>
+              </thead>
+
+              <tbody>
+
+              # let filestreams = getAllRows(db, sql"SELECT id, name, url, download, html FROM filestream")
+              # for stream in filestreams:
+              <tr>
+                <td>${stream[1]}</td>
+                <td>${stream[2]}</td>
+                <td>${stream[3]}</td>
+                <td>${stream[4]}</td>
+                <td data-streamid="${stream[0]}" class="btn btn-danger streamDelete">Del</td>
+              </tr>
+              # end for
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+
+#end proc

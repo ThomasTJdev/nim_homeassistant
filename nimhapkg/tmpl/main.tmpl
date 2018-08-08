@@ -59,7 +59,7 @@
         <li><a href="/certificates">Certificates</a></li>
         <li><a href="/cron">Cron jobs</a></li>
         <li><a href="/mail">Mail</a></li>
-        <li><a href="/mjpegstream">MJPEG stream</a></li>
+        <li><a href="/filestream">Filestream</a></li>
         <li><a href="/mqtt">MQTT</a></li>
         <li><a href="/owntracks">Owntracks</a></li>
         <li><a href="/pushbullet">Pushbullet</a></li>
@@ -111,7 +111,7 @@
 # result = ""
 #
 #
-# let cardOrderRaw = "cardAlarm,cardPushbullet,cardCertificates,cardXiaomiDevice,cardOwntracks,cardMjpegstream,cardWebsocketUsers,cardOsStats"
+# let cardOrderRaw = "cardAlarm,cardPushbullet,cardCertificates,cardXiaomiDevice,cardOwntracks,cardFilestream,cardWebsocketUsers,cardOsStats"
 # var cardOrder = ""
 #
 # if not c.req.cookies.hasKey("dashboardCardOrder"):
@@ -217,8 +217,8 @@
             #   of "cardOwntracks":
                   ${cardOwntracks(c)}
             #
-            #   of "cardMjpegstream":
-                  ${cardMjpegstream(c)}
+            #   of "cardFilestream":
+                  ${cardFilestream(c)}
             #
             #   of "cardRss":
                   ${cardRss(c)}

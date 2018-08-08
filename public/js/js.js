@@ -377,32 +377,48 @@ $(function() {
 
 
 /*
-    MJPEG stream
+    Filestream
 ________________________________*/
 $(function() {
-  $( ".mjpegstreamAdd" ).click(function() {
+  $( ".filestreamAdd" ).click(function() {
     var streamname  = $(".streamname").val();
     var streamurl   = $(".streamurl").val();
+    var streamdownload   = $(".streamdownload").val();
+    var streamhtml   = $(".streamhtml").val();
 
-    location.href = "/mjpegstream/do?action=addstream&streamname=" + streamname + "&streamurl=" + streamurl;
+    location.href = "/filestream/do?action=addstream&streamname=" + streamname + "&streamurl=" + streamurl + "&streamdownload=" + streamdownload + "&streamhtml=" + streamhtml;
   });
 
   $( ".streamDelete" ).click(function() {
     var streamid = $(this).attr("data-streamid");
 
-    location.href = "/mjpegstream/do?action=deletestream&streamid=" + streamid;
+    location.href = "/filestream/do?action=deletestream&streamid=" + streamid;
   });
 
-  $( ".mjpegstreamToggle" ).click(function() {
+  $( ".filestreamToggle" ).click(function() {
     var streamid = $(this).attr("data-streamid");
 
-    if ($("#mjpegstream-" + streamid).attr("data-toggle") == "play") {
-      $("#mjpegstream-" + streamid).attr("data-toggle", "paused");
-      $("#mjpegstream-" + streamid).attr("src", "/images/icon_pause.png")
+    if ($("#filestream-" + streamid).attr("data-toggle") == "play") {
+      $("#filestream-" + streamid).attr("data-toggle", "paused");
+      $("#filestream-" + streamid).attr("src", "/images/icon_pause.png")
     } else {
-      $("#mjpegstream-" + streamid).attr("data-toggle", "play");
-      $("#mjpegstream-" + streamid).attr("src", $("#mjpegstream-" + streamid).attr("data-url"));
+      $("#filestream-" + streamid).attr("data-toggle", "play");
+      $("#filestream-" + streamid).attr("src", $("#filestream-" + streamid).attr("data-url"));
     }
+  });
+
+  $( ".filestreamUpdate" ).click(function() {
+    var streamid = $(this).attr("data-streamid");
+    var d = new Date();
+    $("#filestream-" + streamid).attr("src", $("#filestream-" + streamid).attr("data-url") + "?v=" + d.getTime());
+  });
+
+  $( ".filestreamAutoUpdate" ).click(function() {
+    var streamid = $(this).attr("data-streamid");
+    window.setInterval(function() {
+      var d = new Date();
+      $("#filestream-" + streamid).attr("src", $("#filestream-" + streamid).attr("data-url") + "?v=" + d.getTime());
+    }, 1000);
   });
 });
 
