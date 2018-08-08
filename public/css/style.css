@@ -419,6 +419,7 @@ div.alarmInner span.status.badge:hover {
 .item .inner .mjpegstream img {
   width: 100%;
   height: auto;
+  max-height: 400px;
 }
 
 
