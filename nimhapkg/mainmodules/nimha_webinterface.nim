@@ -13,6 +13,7 @@ import strutils
 import times
 import uri
 
+from sequtils import deduplicate, foldl
 from osproc import execProcess
 
 import recaptcha
@@ -560,13 +561,13 @@ routes:
 
     let filename = split(@"url", "/")[split(@"url", "/").len()-1]
     var aa = newHttpClient()
-    downloadFile(aa, @"url", "tmp/" & filename)
-    sendFile("tmp/" & filename)
+    downloadFile(aa, @"url", "tmp/" & "filename.jpg")
+    sendFile("tmp/" & "filename.jpg")
     
 
   after "/filestream/download":
     let filename = split(@"url", "/")[split(@"url", "/").len()-1]
-    discard tryRemoveFile("tmp/" & filename)
+    discard tryRemoveFile("tmp/" & "filename.jpg")
 
 
   get "/mqtt":

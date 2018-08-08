@@ -118,7 +118,8 @@
 #   cardOrder = cardOrderRaw
 # else:
 #   ## Uses "%2C" since comma can not be saved in cookie
-#   cardOrder = replace(c.req.cookies["dashboardCardOrder"], "%2C", ",")
+#   var cardOrdertmp = replace(c.req.cookies["dashboardCardOrder"], "%2C", ",")
+#   cardOrder = foldl(deduplicate(split(cardOrdertmp,",")), a & (b & ","), "")
 # end if
 #
 <head>
@@ -200,39 +201,38 @@
           <div id="sortableCards" class="row">
 
             # for position in split(cardOrder, ","):
-            #   case position
             #
-            #   of "cardAlarm":
+            #   if position == "cardAlarm":
                   ${cardAlarm(c)}
             #
-            #   of "cardCertificates":
+            #   elif position == "cardCertificates":
                   ${cardCertificates(c)}
             #
-            #   of "cardPushbullet":
+            #   elif position == "cardPushbullet":
                   ${cardPushbullet(c)}
             #
-            #   of "cardXiaomiDevice":
+            #   elif position == "cardXiaomiDevice":
                   ${cardXiaomiDevice(c)}
             #
-            #   of "cardOwntracks":
+            #   elif position == "cardOwntracks":
                   ${cardOwntracks(c)}
             #
-            #   of "cardFilestream":
+            #   elif position == "cardFilestream":
                   ${cardFilestream(c)}
             #
-            #   of "cardRss":
+            #   elif position == "cardRss":
                   ${cardRss(c)}
             #
-            #   of "cardWebsocketUsers":
+            #   elif position == "cardWebsocketUsers":
                   ${cardWebsocketUsers(c)}
             #
-            #   of "cardOsStats":
+            #   elif position == "cardOsStats":
                   ${cardOsStats(c)}
             #
             #   else:
             #     discard
             #
-            #   end case
+            #   end if
             # end for
 
             

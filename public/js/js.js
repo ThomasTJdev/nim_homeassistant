@@ -418,7 +418,7 @@ $(function() {
     window.setInterval(function() {
       var d = new Date();
       $("#filestream-" + streamid).attr("src", $("#filestream-" + streamid).attr("data-url") + "?v=" + d.getTime());
-    }, 1000);
+    }, 6000);
   });
 });
 
