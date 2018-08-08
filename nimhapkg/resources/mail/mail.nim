@@ -51,7 +51,7 @@ proc sendMailNow*(subject, message, recipient: string) {.async.} =
     echo "Email send"
 
 
-proc sendMailDb*(db: DbConn, mailID: string) {.async.} =
+proc sendMailDb*(db: DbConn, mailID: string) =
   ## Get data from mail template and send
   ## Uses Sync Socket
 

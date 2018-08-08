@@ -46,7 +46,7 @@ proc pushbulletHistory(db: DbConn, resp, title, body: string): string =
     
 
 
-proc pushbulletSendDb*(db: DbConn, pushID: string) {.async.} =
+proc pushbulletSendDb*(db: DbConn, pushID: string) =
   ## Sends a push from database
 
   let push = getRow(db, sql"SELECT title, body FROM pushbullet_templates WHERE id = ?", pushID)
@@ -56,7 +56,7 @@ proc pushbulletSendDb*(db: DbConn, pushID: string) {.async.} =
    
 
 
-proc pushbulletSendTest*(db: DbConn) {.async.} =
+proc pushbulletSendTest*(db: DbConn) =
   ## Sends a test pushmessage
 
   let resp = pushbulletSendCurl("note", "Test title", "Test body")
@@ -69,16 +69,16 @@ proc pushbulletSendTest*(db: DbConn) {.async.} =
 
 
 
-proc pushbulletParseMqtt*(payload: string) {.async.} =
+proc pushbulletParseMqtt*(payload: string) =
   ## Receive raw JSON from MQTT and parse it
 
   let js = parseJson(payload)
 
   if js["pushid"].getStr() == "test":
-    asyncCheck pushbulletSendTest(db)
+    pushbulletSendTest(db)
 
   else:
-    asyncCheck pushbulletSendDb(db, js["pushid"].getStr())
+    pushbulletSendDb(db, js["pushid"].getStr())
 
 
 #[

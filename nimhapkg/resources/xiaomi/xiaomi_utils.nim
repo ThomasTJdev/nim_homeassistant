@@ -19,7 +19,6 @@ var db = conn()
 
 ## Xiaomi
 var xiaomiGatewaySid = ""
-xiaomiGatewayPassword = getValueSafe(db, sql"SELECT key FROM xiaomi_api")
 
 
 template jn(json: JsonNode, data: string): string =
@@ -69,7 +68,7 @@ proc xiaomiGatewayLight*(db: DbConn, sid: string, color = "0") =
   xiaomiWrite(sid, "\"rgb\": " & color, true)
 
 
-proc xiaomiWriteTemplate*(db: DbConn, id: string) {.async.} =
+proc xiaomiWriteTemplate*(db: DbConn, id: string) =
   ## Write a template to the gateway
 
   let data = getRowSafe(db, sql"SELECT sid, value_name, value_data FROM xiaomi_templates WHERE id = ?", id)
@@ -227,7 +226,8 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
     elif js["action"].getStr() == "template":
       let value = js["value"].getStr()
 
-      asyncCheck xiaomiWriteTemplate(db, value)
+      xiaomiWriteTemplate(db, value)
 
 
 xiaomiConnect()
+xiaomiUpdateGatewayPassword()

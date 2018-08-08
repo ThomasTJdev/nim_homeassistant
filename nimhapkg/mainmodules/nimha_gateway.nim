@@ -2,11 +2,8 @@
 
 import asyncdispatch
 import osproc
-import parsecfg
 import strutils
 import streams
-
-from os import sleep, getAppDir
 
 import ../resources/alarm/alarm
 import ../resources/mqtt/mqtt_func
@@ -38,7 +35,7 @@ proc mosquittoParse(payload: string) {.async.} =
     asyncCheck rssParseMqtt(message)
 
   elif topicName == "pushbullet":
-    asyncCheck pushbulletParseMqtt(message)
+    pushbulletParseMqtt(message)
 
   elif topicName == "webutils":
     asyncCheck webParseMqtt(message)

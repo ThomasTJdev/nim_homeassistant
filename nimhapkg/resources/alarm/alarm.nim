@@ -33,7 +33,7 @@ template jn(json: JsonNode, data: string): string =
   try: json[data].getStr() except: ""
 
 
-proc alarmAction(db: DbConn, state: string) {.async.} =
+proc alarmAction(db: DbConn, state: string) =
   ## Run the action based on the alarm state
 
   let alarmActions = getAllRowsSafe(db, sql"SELECT action, action_ref FROM alarm_actions WHERE alarmstate = ?", state)
@@ -45,16 +45,16 @@ proc alarmAction(db: DbConn, state: string) {.async.} =
     logit("alarm", "DEBUG", "alarmAction(): " & row[0] & " - id: " & row[1])
 
     if row[0] == "pushbullet":
-      await pushbulletSendDb(db, row[1])
+      pushbulletSendDb(db, row[1])
 
     elif row[0] == "mail":
-      await sendMailDb(db, row[1])
+      sendMailDb(db, row[1])
 
     elif row[0] == "mqtt":
-      await mqttActionSendDb(db, row[1])
+      mqttActionSendDb(db, row[1])
 
     elif row[0] == "xiaomi":
-      await xiaomiWriteTemplate(db, row[1])
+      xiaomiWriteTemplate(db, row[1])
 
 
 proc alarmSetStatus(db: DbConn, newStatus, trigger, device: string) =
@@ -65,12 +65,12 @@ proc alarmSetStatus(db: DbConn, newStatus, trigger, device: string) =
   
   discard tryExecSafe(db, sql"UPDATE alarm SET status = ? WHERE id = ?", newStatus, "1")
 
-  asyncCheck alarmAction(db, newStatus)
+  alarmAction(db, newStatus)
 
   alarmStatus = newStatus
 
 
-proc alarmRinging*(db: DbConn, trigger, device: string) {.async.} =
+proc alarmRinging*(db: DbConn, trigger, device: string) =
   ## The alarm is ringing
 
   logit("alarm", "INFO", "alarmRinging(): Status = ringing")
@@ -80,7 +80,7 @@ proc alarmRinging*(db: DbConn, trigger, device: string) {.async.} =
   mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"ringing\"}")
 
 
-proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
+proc alarmTriggered*(db: DbConn, trigger, device: string) =
   ## The alarm has been triggereds
   # Missing user_id
 
@@ -109,7 +109,7 @@ proc alarmTriggered*(db: DbConn, trigger, device: string) {.async.} =
 
   # Start the countdown
   #var countDown = getValueSafeRetry(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
-  asyncCheck alarmRinging(db, trigger, device)
+  alarmRinging(db, trigger, device)
   #[
   var counter = 0
   while true:
@@ -145,7 +145,7 @@ proc alarmParseMqtt*(payload: string) {.async.} =
   if action == "triggered" and alarmStatus in ["armAway", "armHome"]:
     #if alarmTriggered(db, jn(js, "value"), jn(js, "sid")):
     #  asyncCheck alarmRinging(db, jn(js, "value"), jn(js, "sid"))
-    asyncCheck alarmTriggered(db, jn(js, "value"), jn(js, "sid"))
+    alarmTriggered(db, jn(js, "value"), jn(js, "sid"))
 
   elif action == "activate":
     var passOk = false

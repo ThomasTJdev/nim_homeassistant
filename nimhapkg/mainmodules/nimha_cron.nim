@@ -82,10 +82,10 @@ proc cronJobRun() {.async.} =
       case cronitem.element
       of "pushbullet":
         echo "push"
-        asyncCheck pushbulletSendDb(db, cronitem.jobid)
+        pushbulletSendDb(db, cronitem.jobid)
 
       of "mail":
-        asyncCheck sendMailDb(db, cronitem.jobid)
+        sendMailDb(db, cronitem.jobid)
 
       of "xiaomi":
         asyncCheck xiaomiWriteTemplate(db, cronitem.jobid)
@@ -112,16 +112,16 @@ proc cronJobRun(time: string) =
 
     case row[0]
     of "pushbullet":
-      waitFor pushbulletSendDb(db, row[1])
+      pushbulletSendDb(db, row[1])
 
     of "mail":
-      waitFor sendMailDb(db, row[1])
+      sendMailDb(db, row[1])
 
     of "mqtt":
-      waitFor mqttActionSendDb(db, row[1])
+      mqttActionSendDb(db, row[1])
 
     of "xiaomi":
-      waitFor xiaomiWriteTemplate(db, row[1])
+      xiaomiWriteTemplate(db, row[1])
 
     else:
       discard

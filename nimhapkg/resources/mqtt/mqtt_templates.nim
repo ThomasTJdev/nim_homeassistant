@@ -12,7 +12,7 @@ import ../mqtt/mqtt_func
 var db = conn()
 
 
-proc mqttActionSendDb*(db: DbConn, mqttActionID: string) {.async.} =
+proc mqttActionSendDb*(db: DbConn, mqttActionID: string) =
   ## Sends a MQTT message from database
 
   let action = getRow(db, sql"SELECT topic, message FROM mqtt_templates WHERE id = ?", mqttActionID)
