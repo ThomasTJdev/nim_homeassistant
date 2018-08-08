@@ -398,7 +398,7 @@ $(function() {
 
     if ($("#mjpegstream-" + streamid).attr("data-toggle") == "play") {
       $("#mjpegstream-" + streamid).attr("data-toggle", "paused");
-      $("#mjpegstream-1").attr("src", "/images/icon_pause.png")
+      $("#mjpegstream-" + streamid).attr("src", "/images/icon_pause.png")
     } else {
       $("#mjpegstream-" + streamid).attr("data-toggle", "play");
       $("#mjpegstream-" + streamid).attr("src", $("#mjpegstream-" + streamid).attr("data-url"));
