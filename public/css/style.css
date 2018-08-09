@@ -30,7 +30,7 @@ ______________________________*/
 }
 #pagewrapper {
   width: 100%;
-  padding-bottom: 10px;
+  padding: 20px;
 }
 
 
@@ -529,7 +529,6 @@ div.alarmInner span.status.badge:hover {
   Xiaomi devices
 */
 #xiaomiDevices {
-  padding: 20px;
   max-width: 1400px;
 }
 div.deviceList table.devicelist td,
@@ -608,9 +607,6 @@ div#certificates table.certList tr>td>input.port {
 /*
   Owntracks
 */
-div#owntracksDevices {
-  padding: 20px;
-}
 div#owntracksDevices table.deviceList,
 div#owntracksDevices table.waypoints {
   width: auto;
@@ -630,9 +626,6 @@ div#owntracksDevices table.waypoints td {
 /*
   Alarm
 */
-div#alarm {
-  padding: 20px;
-}
 div#alarm div.alarmDetails button {
   display: block;
   width: 90px;
@@ -700,9 +693,6 @@ div#alarmModel div.modal-footer button {
 /*
   Mail
 */
-div#mail {
-  padding: 20px;
-}
 div#mail div.mailSettings button {
   display: block;
   width: 90px;
@@ -728,9 +718,6 @@ div#mail table.alarmActions {
 /*
   Pushbullet
 */
-div#pushbullet {
-  padding: 20px;
-}
 div#pushbullet div.pushbulletApi button.pushbulletApiUpdate {
   display: block;
   width: 90px;
@@ -749,9 +736,6 @@ div#pushbullet table.pushbulletTemplates {
 /*
   RSS
 */
-div#rss {
-  padding: 20px;
-}
 div#rss div.rssApi button.rssApiUpdate {
   display: block;
   width: 90px;
@@ -778,9 +762,6 @@ div#rss table.rssFeeds .rssFeedDelete {
 /*
   Cron
 */
-div#cron {
-  padding: 20px;
-}
 div#cron table.cronActions {
   max-width: 800px;
 }
@@ -800,11 +781,8 @@ div#cron table.cronActions tbody td.time {
 
 
 /*
-  MJPEG stream
+  Filestream
 */
-div#filestream {
-  padding: 20px;
-}
 div#filestream table.filestream {
   max-width: 600px;
 }
@@ -817,13 +795,18 @@ div#filestream table.filestream .filestreamAdd {
 /*
   MQTT
 */
-div#mqtt {
-  padding: 20px;
-}
 div#mqtt table.mqtt {
   max-width: 800px;
 }
 div#mqtt table.mqtt .mqttActionDelete,
 div#mqtt table.mjpegmqttstream .mqttActionAdd {
   width: 100%;
+}
+
+
+/*
+  Settings
+*/
+div#settings div.settings.restart a {
+  margin-bottom: 20px;
 }

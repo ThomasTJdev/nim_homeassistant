@@ -14,7 +14,7 @@ import times
 import uri
 
 from sequtils import deduplicate, foldl
-from osproc import execProcess
+from osproc import execProcess, execCmd
 
 import recaptcha
 import ../resources/www/google_recaptcha
@@ -197,6 +197,7 @@ include "../tmpl/certificates.tmpl"
 include "../tmpl/owntracks.tmpl"
 include "../tmpl/pushbullet.tmpl"
 include "../tmpl/rss.tmpl"
+include "../tmpl/settings.tmpl"
 include "../tmpl/xiaomi.tmpl"
 
 
@@ -593,3 +594,38 @@ routes:
       asyncCheck mqttSendAsync("mqttaction", @"topic", @"message")
 
     redirect("/mqtt")
+
+
+
+  get "/settings":
+    createTFD()
+    if not c.loggedIn or c.rank != Admin:
+      redirect("/login")
+
+    resp(genSettings(c))
+
+
+  get "/settings/restart":
+    createTFD()
+    if not c.loggedIn or c.rank != Admin:
+      redirect("/login")
+
+    if @"module" == "cron":
+      discard execCmd("pkill nimha_cron")
+      
+    elif @"module" == "gateway":
+      discard execCmd("pkill nimha_gateway")
+
+    elif @"module" == "gatewayws":
+      discard execCmd("pkill nimha_gateway_ws")
+
+    elif @"module" == "webinterface":
+      discard execCmd("pkill nimha_webinterface")
+
+    elif @"module" == "websocket":
+      discard execCmd("pkill nimha_websocket")
+
+    elif @"module" == "xiaomi":
+      discard execCmd("pkill nimha_xiaomi")
+
+    redirect("/settings")

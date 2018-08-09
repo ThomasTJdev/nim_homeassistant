@@ -1,0 +1,57 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#proc genSettings(c: var TData): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="settings" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="settings">
+         
+          <h1>Settings</h1>
+
+          <p>Main settings for NimHA. Only the <kbd>admin</kbd> user can use the tools.</p>
+
+          <div class="settings restart">
+            <h3>Restart main modules</h3>
+
+            <p>You can restart the different modules if necessary.</p>
+
+            <div class="btn-group-vertical">
+              <a href="/settings/restart?module=cron" class="btn btn-danger">Cron</a>
+              <a href="/settings/restart?module=gateway" class="btn btn-danger">Gateway</a>
+              <a href="/settings/restart?module=gatewayws" class="btn btn-danger">Gateway websocket</a>
+              <a href="/settings/restart?module=webinterface" class="btn btn-danger">Webserver</a>
+              <a href="/settings/restart?module=websocket" class="btn btn-danger">Websocket</a>
+              <a href="/settings/restart?module=xiaomi" class="btn btn-danger">Xiaomi</a>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+
+#end proc
