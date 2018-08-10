@@ -61,6 +61,8 @@ proc xiaomiLoadDevicesTemplates() =
 proc xiaomiLoadDevicesAlarm() =
   ## Load all devices which trigger the alarm into seq
 
+  devicesAlarm = @[]
+
   let allDevices = getAllRows(db, sql"SELECT xd.sid, xd.name, xd.model, xdd.value_data FROM xiaomi_devices AS xd LEFT JOIN xiaomi_devices_data AS xdd ON xdd.sid = xd.sid WHERE xdd.triggerAlarm != '' AND xdd.triggerAlarm != 'false' AND xdd.triggerAlarm IS NOT NULL")
 
   for row in allDevices:
@@ -144,7 +146,7 @@ proc xiaomiWriteTemplate*(db: DbConn, id: string) =
       break
 
 
-proc xiaomiCheckAlarmStatus(sid, value, xdata, alarmStatus: string) {.async.} =
+proc xiaomiCheckAlarmStatus(sid, value, xdata: string) {.async.} =
   ## Check if the triggered device should trigger the alarm
 
   let alarmtrigger = jn(parseJson(xdata), value)
@@ -251,7 +253,7 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
 
       # Check if the alarms needs to ring
       if alarmStatus in ["armAway", "armHome"]:
-        asyncCheck xiaomiCheckAlarmStatus(sid, "status", xdata, alarmStatus)     
+        asyncCheck xiaomiCheckAlarmStatus(sid, "status", xdata)     
 
       # Add message
       mqttSend("xiaomi", "wss/to", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"read\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")

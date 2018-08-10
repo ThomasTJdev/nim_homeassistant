@@ -397,15 +397,19 @@ routes:
       let name = getValue(db, sql(query), @"alarmid")
 
       exec(db, sql"INSERT INTO alarm_actions (alarmstate, action, action_ref, action_name) VALUES (?, ?, ?, ?)", @"alarmstate", @"alarmelement", @"alarmid", name)
+      mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"adddevice\"}")
 
     elif @"action" == "deleteaction":
       exec(db, sql"DELETE FROM alarm_actions WHERE id = ?", @"actionid")
+      mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"deletedevice\"}")
 
     elif @"action" == "updatecountdown":
       exec(db, sql"UPDATE alarm_settings SET value = ? WHERE element = ?", @"countdown", "countdown")
+      mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updatealarm\"}")
 
     elif @"action" == "updatecarmtime":
       exec(db, sql"UPDATE alarm_settings SET value = ? WHERE element = ?", @"armtime", "armtime")
+      mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updatealarm\"}")
 
     elif @"action" == "adduser":
       # Check if user exists
@@ -417,9 +421,12 @@ routes:
 
         discard insertID(db, sql"INSERT INTO alarm_password (userid, password, salt) VALUES (?, ?, ?)", @"userid", password, salt)
 
+        mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updateuser\"}")
+
     elif @"action" == "deleteuser":
       execSafe(db, sql"DELETE FROM alarm_password WHERE userid = ?", @"userid")
-
+      mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updateuser\"}")
+      
     redirect("/alarm")
 
 

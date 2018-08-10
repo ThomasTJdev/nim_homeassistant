@@ -22,10 +22,48 @@ import ../utils/logging
 import ../xiaomi/xiaomi_utils
 
 
-var alarmStatus* = ""
-var alarmArmedTime = toInt(epochTime())
+
+type
+  Alarm = tuple[status: string, armtime: string, countdown: string, armedtime: string]
+  AlarmPasswords = tuple[userid: string, password: string, salt: string]
+  AlarmActions = tuple[id: string, action: string, action_ref: string, alarmstate: string]
+
+var alarm*: Alarm
+var alarmPasswords: seq[AlarmPasswords] = @[]
+var alarmActions: seq[AlarmActions] = @[]
+
 
 var db = conn()
+
+
+proc alarmLoadStatus() =
+  ## Load alarm status
+
+  let aStatus = getValue(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
+  let aArmtime = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "armtime")
+  let aCountdown = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
+
+  alarm = (status: aStatus, armtime: aArmtime, countdown: aCountdown, armedtime: $toInt(epochTime()))
+
+
+proc alarmLoadPasswords() =
+  ## Load the alarm passwords
+
+  alarmPasswords = @[]
+
+  let allPasswords = getAllRows(db, sql"SELECT userid, password, salt FROM alarm_password ")
+  for row in allPasswords:
+    alarmPasswords.add((userid: row[0], password: row[1], salt: row[2]))
+
+
+proc alarmLoadActions() =
+  ## Load the alarm passwords
+
+  alarmActions = @[]
+
+  let allActions = getAllRows(db, sql"SELECT id, action, action_ref, alarmstate FROM alarm_actions")
+  for row in allActions:
+    alarmActions.add((id: row[0], action: row[1], action_ref: row[2], alarmstate: row[3]))
 
 
 template jn(json: JsonNode, data: string): string =
@@ -33,14 +71,25 @@ template jn(json: JsonNode, data: string): string =
   try: json[data].getStr() except: ""
 
 
-proc alarmAction(db: DbConn, state: string) =
+proc alarmAction() =
   ## Run the action based on the alarm state
 
-  let alarmActions = getAllRowsSafe(db, sql"SELECT action, action_ref FROM alarm_actions WHERE alarmstate = ?", state)
+  for action in alarmActions:
+    if action[3] == alarm[0]:
+      logit("alarm", "DEBUG", "alarmAction(): " & action[1] & " - id: " & action[2])
 
-  if alarmActions.len() == 0:
-    return
+      case action[1]
+      of "pushbullet":
+        pushbulletSendDb(db, action[2])
+      of "mail":
+        sendMailDb(db, action[2])
+      of "mqtt":
+        mqttActionSendDb(db, action[2])
+      of "xiaomi":
+        xiaomiWriteTemplate(db, action[2])
 
+
+  #[
   for row in alarmActions:
     logit("alarm", "DEBUG", "alarmAction(): " & row[0] & " - id: " & row[1])
 
@@ -55,19 +104,22 @@ proc alarmAction(db: DbConn, state: string) =
 
     elif row[0] == "xiaomi":
       xiaomiWriteTemplate(db, row[1])
+  ]#
 
 
-proc alarmSetStatus(db: DbConn, newStatus, trigger, device: string) =
+proc alarmSetStatus(newStatus, trigger, device: string, userID = "") =
   # Check that doors, windows, etc are ready
-  # Missing user_id
-  
-  discard tryExecSafe(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", newStatus, trigger, device)
-  
-  discard tryExecSafe(db, sql"UPDATE alarm SET status = ? WHERE id = ?", newStatus, "1")
 
-  alarmAction(db, newStatus)
+  alarm[0] = newStatus
+  
+  if userID != "":
+    discard tryExec(db, sql"INSERT INTO alarm_history (status, trigger, device, userid) VALUES (?, ?, ?, ?)", newStatus, trigger, device, userID)
+  else:
+    discard tryExec(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", newStatus, trigger, device)
+  
+  discard tryExec(db, sql"UPDATE alarm SET status = ? WHERE id = ?", newStatus, "1")
 
-  alarmStatus = newStatus
+  alarmAction()
 
 
 proc alarmRinging*(db: DbConn, trigger, device: string) =
@@ -75,90 +127,75 @@ proc alarmRinging*(db: DbConn, trigger, device: string) =
 
   logit("alarm", "INFO", "alarmRinging(): Status = ringing")
 
-  alarmSetStatus(db, "ringing", trigger, device)
+  alarmSetStatus("ringing", trigger, device)
 
   mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"ringing\"}")
 
 
 proc alarmTriggered*(db: DbConn, trigger, device: string) =
   ## The alarm has been triggereds
-  # Missing user_id
 
   logit("alarm", "INFO", "alarmTriggered(): Status = triggered")
 
-  # Check if the armtime is done and
-  # activate the alarm
-  let armTime = parseInt(getValue(db, sql"SELECT value FROM  alarm_settings WHERE element = ?", "armtime")) + alarmArmedTime
-
-  if armTime > toInt(epochTime()):
+  # Check if the armtime is over
+  let armTimeOver = parseInt(alarm[1]) + parseInt(alarm[3])
+  if armTimeOver > toInt(epochTime()):
     logit("alarm", "INFO", "alarmTriggered(): Triggered alarm cancelled to due to armtime")
+    return
   
   else:
     logit("alarm", "INFO", "alarmTriggered(): Triggered alarm true - armtime done")
 
-  # Due to non-working async trigger countdown, skip it at the moment
-
   # Change the alarm status
-  alarmSetStatus(db, "triggered", trigger, device)
-
-  # Add to history
-  execSafe(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", "triggered", trigger, device)
+  alarmSetStatus("triggered", trigger, device)
 
   # Send info about the alarm is triggered
   mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"triggered\"}")
 
-  # Start the countdown
-  #var countDown = getValueSafeRetry(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
+  ############
+  # Due to non-working async trigger countdown (sleepAsync), it's skipped at the moment
+  ############
+
   alarmRinging(db, trigger, device)
-  #[
-  var counter = 0
-  while true:
-    await sleepAsync(1000)
-    inc(counter)
-    
-    when defined(dev):
-      echo "Alarm countdown: " & $counter & "/" & countDown
-
-    if counter == parseInt(countDown):
-      asyncCheck alarmRinging(db, trigger, device)
-      break
-
-    if alarmStatus != "triggered":
-      break
-  ]#
-
-
-
-proc alarmGetStatus*(db: DbConn): string =
-  ## Get alarm status
-
-  return getValueSafeRetry(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
 
 
 proc alarmParseMqtt*(payload: string) {.async.} =
-  ## Parse MQTT
+  ## Parse MQTT message
 
   var js = parseJson(payload)
-
   let action = jn(js, "action")
 
-  if action == "triggered" and alarmStatus in ["armAway", "armHome"]:
-    #if alarmTriggered(db, jn(js, "value"), jn(js, "sid")):
-    #  asyncCheck alarmRinging(db, jn(js, "value"), jn(js, "sid"))
+
+  if action == "adddevice":
+    alarmLoadActions()
+
+  elif action == "deletedevice":
+    alarmLoadActions()
+    
+  elif action == "updatealarm":
+    alarmLoadStatus()
+
+  elif action == "updateuser":
+    alarmLoadPasswords()
+
+  elif action == "triggered" and alarm[0] in ["armAway", "armHome"]:
     alarmTriggered(db, jn(js, "value"), jn(js, "sid"))
 
   elif action == "activate":
+    let userID = jn(js, "userid")
     var passOk = false
-    let passwordEnabled = getAllRows(db, sql"SELECT id FROM alarm_password")
 
-    if passwordEnabled.len() > 0:
-      let password = jn(js, "password")
-
-      for row in fastRows(db, sql"SELECT password, salt FROM alarm_password WHERE userid = ?", jn(js, "userid")):
-        if row[0] == makePassword(password, row[1], row[0]):
-          passOk = true
+    # Check passwords
+    if alarmPasswords.len() > 0:
+      let passwordUser = jn(js, "password")
+      
+      for password in alarmPasswords:
+        if userID == password[0]:
+          if password[1] == makePassword(passwordUser, password[2], password[1]):
+            passOk = true
 
     else:
+      # If there's no password protection - accept
       passOk = true
 
     if not passOk:
@@ -168,20 +205,17 @@ proc alarmParseMqtt*(payload: string) {.async.} =
     let status = jn(js, "status")
     
     if status in ["armAway", "armHome"]:
-      alarmSetStatus(db, status, "user", "")
+      alarm[3] = $toInt(epochTime())
+      alarmSetStatus(status, "user", "", userID)
     
     elif status == "disarmed":
-      alarmArmedTime = toInt(epochTime())
-      alarmSetStatus(db, status, "user", "")
-
+      alarm[3] = $toInt(epochTime())
+      alarmSetStatus(status, "user", "", userID)
 
     mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"" & status & "\"}")
 
 
-proc alarmInit*(db: DbConn) =
-  ## Set alarm status
-  
-  alarmStatus = getValue(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
-
-
-alarmInit(db)
+## Load alarm data
+alarmLoadStatus()
+alarmLoadPasswords()
+alarmLoadActions()
