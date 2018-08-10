@@ -63,8 +63,10 @@ ____
 ### [RSS feed](https://github.com/ThomasTJdev/nim_homeassistant/wiki/RSS-feed)
 * Keep an eye on your favorite RSS feeds
 
-### [MJPEG stream](https://github.com/ThomasTJdev/nim_homeassistant/wiki/MJPEG-stream)
+### [Filestream](https://github.com/ThomasTJdev/nim_homeassistant/wiki/MJPEG-stream)
 * Watch your MJPEG stream from the dashboard
+* Show a static image from URL
+* Get a static image from a LAN url, save the image to NimHA and show it, to avoid exposing LAN url to the internet
 
 ### [Pushbullet](https://github.com/ThomasTJdev/nim_homeassistant/wiki/Pushbullet)
 * Stay notified with the Pushbullet integration on all your devices
