@@ -31,8 +31,6 @@ import ../resources/users/user_check
 import ../resources/utils/parsers
 import ../resources/utils/dates
 
-from ../resources/xiaomi/xiaomi_utils import xiaomiUpdateGatewayPassword
-
 
 setCurrentDir(replace(getAppDir(), "/nimhapkg/mainmodules", ""))
 
@@ -331,9 +329,9 @@ routes:
     elif @"action" == "updatedevice":
       exec(db, sql"UPDATE xiaomi_devices SET name = ? WHERE sid = ?", @"name", @"sid")
 
-    elif @"action" == "updatekey":
-      exec(db, sql"UPDATE xiaomi_api SET key = ? WHERE sid = ?", @"key", @"sid")
-      xiaomiUpdateGatewayPassword()
+    elif @"action" == "updatepassword":
+      exec(db, sql"UPDATE xiaomi_api SET key = ? WHERE sid = ?", @"password", @"sid")
+      mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"updatepassword\"}")
 
     redirect("/xiaomi/devices")
 

@@ -5,13 +5,23 @@ import multicast
 import nimcrypto
 import xiaomi
 
-
 import ../database/database
 import ../database/sql_safe
 import ../utils/logging
 import ../utils/parsers
-
 import ../mqtt/mqtt_func
+
+
+type 
+  Device = tuple[sid: string, name: string, model: string, alarmvalue: string]
+  DeviceTemplate = tuple[id: string, sid: string, value_name: string, value_data: string]
+  Gateway = tuple[sid: string, name: string, model: string, token: string, password: string, secret: string]
+
+
+var devices: seq[Device] = @[]
+var devicesTemplates: seq[DeviceTemplate] = @[]
+var devicesAlarm: seq[Device] = @[]
+var gateway: Gateway
 
 
 ## Db connection
@@ -26,19 +36,54 @@ template jn(json: JsonNode, data: string): string =
   try: json[data].getStr() except:""
 
 
-proc xiaomiUpdateGatewayPassword*() =
+proc xiaomiLoadDevices() =
+  ## Load all devices into seq
+
+  let allDevices = getAllRows(db, sql"SELECT sid, name, model FROM xiaomi_devices")
+
+  for row in allDevices:
+    devices.add((sid: row[0], name: row[1], model: row[2], alarmvalue: ""))
+
+
+proc xiaomiLoadDevicesTemplates() =
+  ## Load all devices into seq
+
+  let allDevices = getAllRows(db, sql"SELECT id, sid, value_name, value_data FROM xiaomi_templates")
+
+  for row in allDevices:
+    devicesTemplates.add((id: row[0], sid: row[1], value_name: row[2], value_data: row[3]))
+
+
+proc xiaomiLoadDevicesAlarm() =
+  ## Load all devices which trigger the alarm into seq
+
+  let allDevices = getAllRows(db, sql"SELECT xd.sid, xd.name, xd.model, xdd.value_data FROM xiaomi_devices AS xd LEFT JOIN xiaomi_devices_data AS xdd ON xdd.sid = xd.sid WHERE xdd.triggerAlarm != '' AND xdd.triggerAlarm != 'false' AND xdd.triggerAlarm IS NOT NULL")
+
+  for row in allDevices:
+    devicesAlarm.add((sid: row[0], name: row[1], model: row[2], alarmvalue: row[3]))
+
+
+proc xiaomiGatewayCreate(gSid, gName, gToken, gPassword, gSecret: string) =
+  ## Generates the gateway tuple
+
+  gateway = (sid: gSid, name: gName, model: "gateway", token: gToken, password: gPassword, secret: gSecret)
+
+
+proc xiaomiGatewayUpdateSecret(gToken = gateway[3]) =
+  ## Updates the gateways token and secret
+  
+  xiaomiSecretUpdate(gateway[4], gToken)
+  gateway[3] = gToken
+  gateway[5] = xiaomiGatewaySecret
+
+
+proc xiaomiGatewayUpdatePassword*() =
   ## Update the gateways password.
   ## It is not currently need to use a proc,
   ## but in the future, there will be support
   ## for multiple gateways.
 
-  xiaomiGatewayPassword = getValueSafe(db, sql"SELECT key FROM xiaomi_api")
-
-
-proc xiaomiUpdateToken() =
-  ## Updates to the newest token
-
-  xiaomiGatewayToken = getValueSafe(db, sql"SELECT token FROM xiaomi_api")
+  gateway[4] = getValueSafe(db, sql"SELECT key FROM xiaomi_api")
 
 
 proc xiaomiSoundPlay*(db: DbConn, sid: string, defaultRingtone = "8") =
@@ -50,70 +95,64 @@ proc xiaomiSoundPlay*(db: DbConn, sid: string, defaultRingtone = "8") =
     ringtone = split(defaultRingtone, ",")[0]
     volume   = split(defaultRingtone, ",")[1]
 
-  xiaomiUpdateToken()
-  xiaomiWrite(sid, "\"mid\": " & ringtone & ", \"vol\": " & volume, true)
+  xiaomiGatewaySecret = gateway[5]
+  xiaomiWrite(sid, "\"mid\": " & ringtone & ", \"vol\": " & volume)
 
 
 proc xiaomiSoundStop*(db: DbConn, sid: string) =
   ## Send Xiaomi command to stop sound
 
-  xiaomiUpdateToken()
-  xiaomiWrite(sid, "\"mid\": 10000", true)
+  xiaomiGatewaySecret = gateway[5]
+  xiaomiWrite(sid, "\"mid\": 10000")
     
 
 proc xiaomiGatewayLight*(db: DbConn, sid: string, color = "0") =
   ## Send Xiaomi command to enable gateway light
 
-  xiaomiUpdateToken()
-  xiaomiWrite(sid, "\"rgb\": " & color, true)
+  xiaomiGatewaySecret = gateway[5]
+  xiaomiWrite(sid, "\"rgb\": " & color)
 
 
 proc xiaomiWriteTemplate*(db: DbConn, id: string) =
   ## Write a template to the gateway
 
-  let data = getRowSafe(db, sql"SELECT sid, value_name, value_data FROM xiaomi_templates WHERE id = ?", id)
+  for device in devicesTemplates:
+    if device[0] == id:
 
-  if data[0] == "" or data[1] == "":
-    return
+      case device[2]
+      of "ringtone":
+        if device[3] == "10000":
+          xiaomiSoundStop(db, device[1])
+        elif device[3] != "":
+          xiaomiSoundPlay(db, device[1], device[3])
+        else:
+          xiaomiSoundPlay(db, device[1])
 
-  case data[1]
-  of "ringtone":
-    if data[2] == "10000":
-      xiaomiSoundStop(db, data[0])
-    
-    elif data[2] != "":
-      xiaomiSoundPlay(db, data[0], data[2])
+      of "rgb":
+        if device[3] != "":
+          xiaomiGatewayLight(db, device[1], device[3])
+        else:
+          xiaomiGatewayLight(db, device[1])
 
-    else:
-      xiaomiSoundPlay(db, data[0])
+      else:
+        discard
 
-  of "rgb":
-    if data[2] != "":
-      xiaomiGatewayLight(db, data[0], data[2])
-
-    else:
-      xiaomiGatewayLight(db, data[0])
-
-  else:
-    return
+      break
 
 
 proc xiaomiCheckAlarmStatus(sid, value, xdata, alarmStatus: string) {.async.} =
   ## Check if the triggered device should trigger the alarm
 
-  let statusToTrigger = getValueSafe(db, sql"SELECT value_data FROM xiaomi_devices_data WHERE sid = ? AND triggerAlarm = ?", sid, alarmStatus)
+  let alarmtrigger = jn(parseJson(xdata), value)
 
-  if statusToTrigger == "":
-    return
+  for device in devicesAlarm:
+    if device[0] == sid and device[3] == alarmtrigger:
+      mqttSend("xiaomi", "alarm", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"triggered\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
 
-  let st = parseJson(xdata)
+      logit("xiaomi", "INFO", "xiaomiCheckAlarmStatus(): ALARM = " & xdata)
 
-  if statusToTrigger == jn(st, value):
-
-    mqttSend("xiaomi", "alarm", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"triggered\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
-
-    logit("xiaomi", "INFO", "xiaomiCheckAlarmStatus(): ALARM = " & xdata)
-    
+      break
+      
 
 proc xiaomiDiscoverUpdateDB(clearDB = false) =
   # Updates the database with new devices
@@ -127,6 +166,10 @@ proc xiaomiDiscoverUpdateDB(clearDB = false) =
     let sid = device["sid"].getStr()
     if getValue(db, sql"SELECT sid FROM xiaomi_devices WHERE sid = ?", sid) == "":
       exec(db, sql"INSERT INTO xiaomi_devices (sid, name, model, short_id) VALUES (?, ?, ?, ?)", sid, sid, device["model"].getStr(), device["short_id"].getStr())
+
+  xiaomiLoadDevices()
+  xiaomiLoadDevicesTemplates()
+  xiaomiLoadDevicesAlarm()
 
 
 proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
@@ -142,28 +185,34 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
     logit("xiaomi", "ERROR", "JSON parsing error")
     return
   
+  # Get SID
+  let sid = jn(js, "sid")
+
   # Check that payload has command response
   if js.hasKey("cmd"):
     let cmd = jn(js, "cmd")
 
-    # If this is the gateway, get the token
+    # If this is the gateway, get the token and update the secret
     if jn(js, "cmd") == "heartbeat" and jn(js, "token") != "":
-      let sid = jn(js, "sid")
       let token = jn(js, "token")
 
-      if xiaomiGatewaySid == "":
-        xiaomiGatewaySid = getValueSafe(db, sql"SELECT sid FROM xiaomi_api WHERE sid = ?", sid)
+      # Create the gateway
+      if gateway[0].len() == 0:
+        xiaomiGatewayCreate(sid, "Gateway", token, getValueSafe(db, sql"SELECT key FROM xiaomi_api"), "")
+        xiaomiGatewayUpdateSecret()
 
-      if xiaomiGatewaySid == "":
-        discard tryExecSafe(db, sql"INSERT INTO xiaomi_devices (sid, name, model) VALUES (?, ?, ?)", sid, "Gateway", "gateway")
-        discard tryExecSafe(db, sql"INSERT INTO xiaomi_api (sid, token) VALUES (?, ?)", sid, token)
+        # Create gateway in DB
+        if getValueSafe(db, sql"SELECT sid FROM xiaomi_api WHERE sid = ?", sid).len() == 0:
+          discard tryExecSafe(db, sql"INSERT INTO xiaomi_devices (sid, name, model) VALUES (?, ?, ?)", sid, "Gateway", "gateway")
+          discard tryExecSafe(db, sql"INSERT INTO xiaomi_api (sid, token) VALUES (?, ?)", sid, token)
 
-        xiaomiGatewaySid = sid
-
-        logit("xiaomi", "DEBUG", "Token updated from heartbeat")
+        logit("xiaomi", "DEBUG", "Gateway created")
 
       else:
-        discard tryExecSafe(db, sql"UPDATE xiaomi_api SET token = ? WHERE sid = ?", token, sid)
+        # Update the secret
+        xiaomiGatewayUpdateSecret(token)
+        #discard tryExecSafe(db, sql"UPDATE xiaomi_api SET token = ? WHERE sid = ?", token, sid)
+        logit("xiaomi", "DEBUG", "Gateway secret updated")
 
       return
 
@@ -173,13 +222,6 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
     let xdata = jn(js, "data")
     if xdata == "":
       return
-
-    # Check for gateway <-- Should be done by the heartbeat check
-    #let model = jn(js, "model")
-    #if model == "gateway":
-    #  return
-
-    let sid = jn(js, "sid")
     
     # Check output
     if cmd == "report" or cmd == "read_ack":
@@ -203,7 +245,7 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
       elif "illumination" in xdata:
         value = "illumination"
 
-      
+      # Check if the alarms needs to ring
       if alarmStatus in ["armAway", "armHome"]:
         asyncCheck xiaomiCheckAlarmStatus(sid, "status", xdata, alarmStatus)     
 
@@ -219,15 +261,18 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
       xiaomiDiscoverUpdateDB()
     
     elif js["action"].getStr() == "read":
-      let value = js["value"].getStr()
-  
       xiaomiSendRead(js["sid"].getStr())
 
     elif js["action"].getStr() == "template":
-      let value = js["value"].getStr()
+      xiaomiWriteTemplate(db, js["value"].getStr())
 
-      xiaomiWriteTemplate(db, value)
+    elif js["action"].getStr() == "updatepassword":
+      xiaomiGatewayUpdatePassword()
+
+    
 
 
 xiaomiConnect()
-xiaomiUpdateGatewayPassword()
+xiaomiLoadDevices()
+xiaomiLoadDevicesTemplates()
+xiaomiLoadDevicesAlarm()

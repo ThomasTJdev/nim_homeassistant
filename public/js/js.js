@@ -771,7 +771,7 @@ $(function() {
   $( ".xiaomiUpdateKey" ).click(function() {
     var sid = $(this).attr("data-sid");
     var key = $(this).parent("div").children("input").val();
-    location.href = "/xiaomi/devices/do?action=updatekey&key=" + key + "&sid=" + sid;
+    location.href = "/xiaomi/devices/do?action=updatepassword&password=" + key + "&sid=" + sid;
   });
 });
 
