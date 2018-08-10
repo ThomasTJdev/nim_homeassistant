@@ -316,18 +316,23 @@ routes:
       let valuedata = if @"triggeralarm" == "false": "" else: @"valuedata"
 
       exec(db, sql"INSERT INTO xiaomi_devices_data (sid, value_name, value_data, action, triggerAlarm) VALUES (?, ?, ?, ?, ?)", @"sid", @"valuename", valuedata, @"handling", triggerAlarm)
+      mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"adddevice\"}")
 
     elif @"action" == "deletesensor":
       exec(db, sql"DELETE FROM xiaomi_devices_data WHERE id = ?", @"id")
+      mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"deletedevice\"}")
 
     elif @"action" == "addaction":
       exec(db, sql"INSERT INTO xiaomi_templates (sid, name, value_name, value_data) VALUES (?, ?, ?, ?)", @"sid", @"name", @"valuename", @"valuedata")
+      mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"addtemplate\"}")
 
     elif @"action" == "deleteaction":
       exec(db, sql"DELETE FROM xiaomi_templates WHERE id = ?", @"id")
+      mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"deletetemplate\"}")
 
     elif @"action" == "updatedevice":
       exec(db, sql"UPDATE xiaomi_devices SET name = ? WHERE sid = ?", @"name", @"sid")
+      mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"updatedevice\"}")
 
     elif @"action" == "updatepassword":
       exec(db, sql"UPDATE xiaomi_api SET key = ? WHERE sid = ?", @"password", @"sid")

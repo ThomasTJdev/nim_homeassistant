@@ -257,19 +257,37 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
 
     logit("xiaomi", "DEBUG", payload)
 
-    if js["action"].getStr() == "discover":
+    case js["action"].getStr()
+    of "discover":
       xiaomiDiscoverUpdateDB()
     
-    elif js["action"].getStr() == "read":
+    of "read":
       xiaomiSendRead(js["sid"].getStr())
 
-    elif js["action"].getStr() == "template":
+    of "template":
       xiaomiWriteTemplate(db, js["value"].getStr())
 
-    elif js["action"].getStr() == "updatepassword":
+    of "updatepassword":
       xiaomiGatewayUpdatePassword()
 
+    of "adddevice":
+      xiaomiLoadDevices()
+
+    of "updatedevice":
+      xiaomiLoadDevices()
+      xiaomiLoadDevicesTemplates()
+      xiaomiLoadDevicesAlarm()
+
+    of "deletedevice":
+      xiaomiLoadDevices()
+      xiaomiLoadDevicesTemplates()
+      xiaomiLoadDevicesAlarm()
     
+    of "addtemplate":
+      xiaomiLoadDevicesTemplates()
+
+    of "deletetemplate":
+      xiaomiLoadDevicesTemplates()
 
 
 xiaomiConnect()
