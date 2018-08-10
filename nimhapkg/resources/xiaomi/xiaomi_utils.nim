@@ -39,6 +39,8 @@ template jn(json: JsonNode, data: string): string =
 proc xiaomiLoadDevices() =
   ## Load all devices into seq
 
+  devices = @[]
+
   let allDevices = getAllRows(db, sql"SELECT sid, name, model FROM xiaomi_devices")
 
   for row in allDevices:
@@ -47,6 +49,8 @@ proc xiaomiLoadDevices() =
 
 proc xiaomiLoadDevicesTemplates() =
   ## Load all devices into seq
+
+  devicesTemplates = @[]
 
   let allDevices = getAllRows(db, sql"SELECT id, sid, value_name, value_data FROM xiaomi_templates")
 
