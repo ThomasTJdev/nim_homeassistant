@@ -24,10 +24,7 @@ task setup, "Setup started":
   if detectOs(Windows):
     echo "Cannot run on Windows"
     quit()
-
-  if not fileExists("config/secret.cfg"):
-    exec "cp config/secret_default.cfg config/secret.cfg"
-
+    
 before install:
   setupTask()
 
