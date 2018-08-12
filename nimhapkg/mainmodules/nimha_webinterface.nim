@@ -15,6 +15,7 @@ import uri
 
 from sequtils import deduplicate, foldl
 from osproc import execProcess, execCmd
+from re import match, re
 
 import recaptcha
 import ../resources/www/google_recaptcha

@@ -220,6 +220,9 @@
             #   elif position == "cardFilestream":
                   ${cardFilestream(c)}
             #
+            #   elif match(position, re"cardFilestream"):
+                  ${cardfilestream(c, replace(position, "cardFilestream-", ""))}
+            #
             #   elif position == "cardRss":
                   ${cardRss(c)}
             #

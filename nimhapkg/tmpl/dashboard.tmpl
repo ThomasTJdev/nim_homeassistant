@@ -190,11 +190,16 @@
 #
 #
 #
-#proc cardfilestream(c: var TData): string =
+#proc cardfilestream(c: var TData, cardNumber = ""): string =
 # result = ""
-# let filestreams = getAllRows(db, sql"SELECT id, name, url, download, html FROM filestream")
+# var filestreams: seq[Row]
+# if cardNumber == "":
+#   filestreams = getAllRows(db, sql"SELECT id, name, url, download, html FROM filestream")
+# else:
+#   filestreams = getAllRows(db, sql"SELECT id, name, url, download, html FROM filestream WHERE id = ?", cardNumber)
+# end if
 # for stream in filestreams:
-<div data-id="cardFilestream" class="cardFilestream item col-12 col-sm-6 col-md-6 col-lg-3">
+<div data-id="cardFilestream-${stream[0]}" class="cardFilestream item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
     <div class="filestream">
       <div class="heading">
