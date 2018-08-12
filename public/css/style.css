@@ -306,7 +306,6 @@ div#login button {
 /*
     Dashboard 
 ______________________________*/
-
 /* Card items */
 .item .inner {
   border-radius: 2px;
@@ -320,6 +319,25 @@ ______________________________*/
   padding: 15px;
   margin-top: 10px;
 }
+/* Handle to drag and drop */
+.icon-handle {
+  display: none;
+}
+@media only screen and (max-width: 810px) {
+  .item .inner .heading>div {
+    display: inline-block;
+  }
+  .icon-handle {
+    background-image: url("/images/icon_handle.png");
+    width: 20px;
+    height: 20px;
+    background-repeat: no-repeat, repeat;
+    background-size: contain;
+    vertical-align: sub;
+    margin-right: 10px;
+  }
+}
+
 
 
 /*

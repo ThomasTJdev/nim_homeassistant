@@ -222,9 +222,9 @@ $(function() {
     var theElement = $("#sortableCards")[0];
 
     var handle = "";
-    /*if ($( window ).width() < 768) {
-      handle = ".todo-item-handle"
-    }*/
+    if ($( window ).width() < 810) {
+      handle = ".icon-handle"
+    }
 
     Sortable.create(theElement, {
       animation: 100,

@@ -31,7 +31,10 @@
     # var canActivate = ""
 
     <div class="alarm">
-      <div class="heading">Alarm status</div>
+      <div class="heading">
+        <div class="icon-handle"></div>
+        <div>Alarm status</div>
+      </div>
       <div class="alarmInner">
         <div class="disarmed">
           <label>Disarmed</label>
@@ -84,7 +87,10 @@
 <div data-id="cardCertificates" class="cardCertificates item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
     <div class="certexpiry">
-      <div class="heading">Cert expiration</div>
+      <div class="heading">
+        <div class="icon-handle"></div>
+        <div>Cert expiration</div>
+      </div>
       <div class="certexpiryInner">
         # for cert in certificates:
 
@@ -112,7 +118,10 @@
 <div data-id="cardPushbullet" class="cardPushbullet item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
     <div class="pushbullet">
-      <div class="heading">Pushbullet</div>
+      <div class="heading">
+        <div class="icon-handle"></div>
+        <div>Pushbullet</div>
+      </div>
       <div class="pushbulletInner">
         # for push in pushAll:
         <div>
@@ -137,7 +146,10 @@
 <div data-id="cardXiaomiDevice" class="cardXiaomiDevice item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
     <div class="xiaomi">
-      <div class="heading">Xiaomi device status</div>
+      <div class="heading">
+        <div class="icon-handle"></div>
+        <div>Xiaomi device status</div>
+      </div>
       <div class="xiaomiInner">
         # for device in xiaomiDevices:
         <div class="${device[0]} device ${device[2]}">
@@ -162,7 +174,10 @@
 <div data-id="cardOwntracks" class="cardOwntracks item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
     <div class="owntracks">
-      <div class="heading">Owntracks map <span class="owntracksRefresh badge badge-primary">Refresh</span></div>
+      <div class="heading">
+        <div class="icon-handle"></div>
+        <div>Owntracks map <span class="owntracksRefresh badge badge-primary">Refresh</span></div>
+      </div>
       <div class="owntracksInner">
         <div id="map" style="width: 100%; height: 100%"></div>
       </div>
@@ -183,10 +198,13 @@
   <div class="inner">
     <div class="filestream">
       <div class="heading">
-        <span class="heading">${stream[1]}</span>
-        <span data-streamid="${stream[0]}" class="filestreamToggle badge badge-primary">Toggle</span>
-        <span data-streamid="${stream[0]}" class="filestreamUpdate badge badge-primary">Update</span>
-        <span data-streamid="${stream[0]}" class="filestreamAutoUpdate badge badge-primary">6sec update</span>
+        <div class="icon-handle"></div>
+        <div>
+          <span class="heading">${stream[1]}</span>
+          <span data-streamid="${stream[0]}" class="filestreamToggle badge badge-primary">Toggle</span>
+          <span data-streamid="${stream[0]}" class="filestreamUpdate badge badge-primary">Update</span>
+          <span data-streamid="${stream[0]}" class="filestreamAutoUpdate badge badge-primary">6sec update</span>
+        </div>
       </div>
       # var htmlType = "img"
       # if stream[4] != "" or stream[4] != "img":
@@ -213,7 +231,10 @@
 <div data-id="cardRss" class="cardRss item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
     <div class="rss">
-      <div class="heading">RSS - ${feed[4]} <span data-feedid="${feed[0]}" class="rssRefresh badge badge-primary">Refresh</span></div>
+      <div class="heading">
+        <div class="icon-handle"></div>
+        <div>RSS - ${feed[4]} <span data-feedid="${feed[0]}" class="rssRefresh badge badge-primary">Refresh</span></div>
+      </div>
       <div id="rss-${feed[0]}" class="rssInner scrollbar">
         ${rssReadUrl(feed[4], feed[1], feed[3].split(","), parseInt(feed[2]))}
       </div>
@@ -231,7 +252,10 @@
 <div data-id="cardWebsocketUsers" class="cardWebsocketUsers item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
     <div class="wsusers">
-      <div class="heading">Websocket users</div>
+      <div class="heading">
+        <div class="icon-handle"></div>
+        <div>Websocket users</div>
+      </div>
       <div class="wsusersInner">
       </div>
       <div class="user clone" style="display: none">
@@ -250,8 +274,11 @@
   <div class="inner">
     <div class="osstats">
       <div class="heading">
-        <span class="heading">OS stats</span>
-        <span id="osstatsRefresh" class="badge badge-primary">Refresh</span>
+        <div class="icon-handle"></div>
+        <div>
+          <span class="heading">OS stats</span>
+          <span id="osstatsRefresh" class="badge badge-primary">Refresh</span>
+        </div>
       </div>
       <div class="osstatsInner">
         <div class="stats">
