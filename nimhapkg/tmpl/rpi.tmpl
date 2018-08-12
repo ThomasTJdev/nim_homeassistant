@@ -1,0 +1,137 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#
+#proc genRpi(c: var TData): string = 
+# result = "" 
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="rpi" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="rpi">
+         
+          <h1>Raspberry Pi</h1>
+          
+          <hr>
+
+          <div class="rpiTemplates">
+            # let allRpi = getAllRows(db, sql"SELECT id, name, pin, pinMode, pinPull, digitalAction, analogAction, value FROM rpi_templates")
+
+            <h3>Raspberry Pi templates</h3>
+
+            <p>The GPIO are mapped to Broadcom. Checkout <a href="https://pinout.xyz/">https://pinout.xyz/</a> to get the pins numbers.</p>
+
+            <p>The <kbd>mode</kbd> can be set to: input, output, GPIO and PWM.</p>
+
+            <p>The <kbd>pull</kbd> can be set to off, down and up.</p>
+
+            <p>The <kbd>digital</kbd> can be set to write, pwm (write) and read. When set to read, you need to specify the pin to read on, in the <kbd>value</kbd> field.</p>
+
+            <p>The <kbd>analog</kbd> can be set to write and read. When set to read, you need to specify the pin to read on, in the <kbd>value</kbd> field.</p>
+
+            <p></p>
+
+            <table class="rpiTemplates table">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Name</th>
+                  <th>Pin</th>
+                  <th>Mode</th>
+                  <th>Pull</th>
+                  <th>Digital</th>
+                  <th>Analog</th>
+                  <th>Value</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+                <tr class="rpiTemplatesEdit">
+                  <td>
+                    <input class="form-control form-control-sm name" />
+                  </td>
+                  <td>
+                    <input class="form-control form-control-sm pin" />
+                  </td>
+                  <td>
+                    <input class="form-control form-control-sm mode" />
+                  </td>
+                  <td>
+                    <input class="form-control form-control-sm pull" />
+                  </td>
+                  <td>
+                    <input class="form-control form-control-sm digital" />
+                  </td>
+                  <td>
+                    <input class="form-control form-control-sm analog" />
+                  </td>
+                  <td>
+                    <input class="form-control form-control-sm value" />
+                  </td>
+                  <td colspan="2" class="btn btn-success rpiTemplateAdd">
+                    Add
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
+                # for rpi in allRpi:
+                <tr class="rpi">
+                  <td>
+                    ${rpi[1]}
+                  </td>
+                  <td>
+                    ${rpi[2]}
+                  </td>
+                  <td>
+                    ${rpi[3]}
+                  </td>
+                  <td>
+                    ${rpi[4]}
+                  </td>
+                  <td>
+                    ${rpi[5]}
+                  </td>
+                  <td>
+                    ${rpi[6]}
+                  </td>
+                  <td>
+                    ${rpi[7]}
+                  </td>
+                  <td data-rpi="${rpi[0]}" class="btn btn-primary rpiTemplateRun">
+                    Run
+                  </td>
+                  <td data-rpi="${rpi[0]}" class="btn btn-danger rpiTemplateDelete">
+                    Del
+                  </td>
+                </tr>
+                # end for
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()} 
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+
+
+#end proc

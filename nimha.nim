@@ -18,6 +18,7 @@ import nimhapkg/resources/database/modules/filestream_database
 import nimhapkg/resources/database/modules/mqtt_database
 import nimhapkg/resources/database/modules/owntracks_database
 import nimhapkg/resources/database/modules/pushbullet_database
+import nimhapkg/resources/database/modules/rpi_database
 import nimhapkg/resources/database/modules/rss_database
 import nimhapkg/resources/database/modules/xiaomi_database
 
@@ -105,6 +106,7 @@ proc createDbTables() =
   cronDatabase(db)
   filestreamDatabase(db)
   mqttDatabase(db)
+  rpiDatabase(db)
 
 
 proc launcherActivated() =

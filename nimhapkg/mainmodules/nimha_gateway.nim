@@ -10,6 +10,7 @@ import ../resources/mqtt/mqtt_func
 import ../resources/os/os_utils
 import ../resources/owntracks/owntracks
 import ../resources/pushbullet/pushbullet
+import ../resources/rpi/rpi_utils
 import ../resources/rss/rss_reader
 import ../resources/web/web_utils
 import ../resources/xiaomi/xiaomi_utils
@@ -33,6 +34,9 @@ proc mosquittoParse(payload: string) {.async.} =
 
   elif topicName == "rss":
     asyncCheck rssParseMqtt(message)
+
+  elif topicName == "rpi":
+    asyncCheck rpiParseMqtt(message)
 
   elif topicName == "pushbullet":
     pushbulletParseMqtt(message)

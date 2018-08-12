@@ -17,6 +17,7 @@ import ../mail/mail
 import ../mqtt/mqtt_templates
 import ../mqtt/mqtt_func
 import ../pushbullet/pushbullet
+import ../rpi/rpi_utils
 import ../users/password
 import ../utils/logging
 import ../xiaomi/xiaomi_utils
@@ -85,6 +86,8 @@ proc alarmAction() =
         sendMailDb(db, action[2])
       of "mqtt":
         mqttActionSendDb(db, action[2])
+      of "rpi":
+        discard rpiAction(action[2])
       of "xiaomi":
         xiaomiWriteTemplate(db, action[2])
 

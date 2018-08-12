@@ -33,6 +33,8 @@
             #
             # let mqttActions = getAllRows(db, sql"SELECT id, name FROM mqtt_templates")
             #
+            # let rpiActions = getAllRows(db, sql"SELECT id, name FROM rpi_templates")
+            #
             # let xiaomiAlarm = getAllRows(db, sql"SELECT xda.id, xda.name, xd.name FROM xiaomi_templates AS xda LEFT JOIN xiaomi_devices AS xd ON xd.sid = xda.sid ORDER BY xda.name")
             #
             # var select = ""
@@ -47,6 +49,10 @@
             #
             # for mqtt in mqttActions:
             #   select.add("<option value='" & mqtt[0] & "' data-element='mqtt'>MQTT: " & mqtt[1] & "</option>")
+            # end for
+            #
+            # for rpi in rpiActions:
+            #   select.add("<option value='" & rpi[0] & "' data-element='rpi'>RPi: " & rpi[1] & "</option>")
             # end for
             #
             # for xiaomi in xiaomiAlarm:

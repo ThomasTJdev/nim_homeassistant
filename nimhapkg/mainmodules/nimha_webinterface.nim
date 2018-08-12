@@ -25,6 +25,7 @@ import ../resources/database/sql_safe
 import ../resources/mail/mail
 import ../resources/mqtt/mqtt_func
 import ../resources/pushbullet/pushbullet
+import ../resources/rpi/rpi_utils
 import ../resources/rss/rss_reader
 import ../resources/users/password
 import ../resources/users/user_add
@@ -195,6 +196,7 @@ include "../tmpl/mqtt.tmpl"
 include "../tmpl/certificates.tmpl"
 include "../tmpl/owntracks.tmpl"
 include "../tmpl/pushbullet.tmpl"
+include "../tmpl/rpi.tmpl"
 include "../tmpl/rss.tmpl"
 include "../tmpl/settings.tmpl"
 include "../tmpl/xiaomi.tmpl"
@@ -606,6 +608,27 @@ routes:
 
     redirect("/mqtt")
 
+
+  get "/rpi":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    resp genRpi(c)
+
+
+  get "/rpi/do":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    if @"action" == "addrpi":
+      exec(db, sql"INSERT INTO rpi_templates (name, pin, pinMode, pinPull, digitalAction, analogAction, value) VALUES (?, ?, ?, ?, ?, ?, ?)", @"name", @"pin", @"mode", @"pull", @"digital", @"analog", @"value")
+
+    elif @"action" == "deleterpi":
+      exec(db, sql"DELETE FROM rpi_templates WHERE id = ?", @"rpiid")
+
+    redirect("/rpi")
 
 
   get "/settings":

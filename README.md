@@ -60,6 +60,11 @@ ____
 ### OS stats
 * Monitor the health of your system
 
+### [Raspberry Pi](https://github.com/ThomasTJdev/nim_homeassistant/wiki/Raspberry-Pi)
+* Automate actions using the Raspberry Pi's GPIO
+* Write to the pins
+* Read the values from the pins
+
 ### [RSS feed](https://github.com/ThomasTJdev/nim_homeassistant/wiki/RSS-feed)
 * Keep an eye on your favorite RSS feeds
 

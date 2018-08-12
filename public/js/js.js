@@ -125,6 +125,11 @@ function websocketHandler(obj) {
       alarm(obj)          
     }
 
+    // Raspberry pi
+    else if (obj.element == "rpi") {
+      rpi(obj)          
+    }
+
     // RSS
     else if (obj.element == "rss") {
       rssUpdateFeed(obj)          
@@ -532,6 +537,41 @@ $(function() {
   });
 });
 
+
+
+/*
+    Raspberry Pi
+________________________________*/
+$(function() {
+  $( ".rpiTemplateRun" ).click(function() {
+    var runid     = $(this).attr("data-rpi");
+    ws.send('{' + cookieSidJson() + '"element": "rpi", "action": "runtemplate", "rpiid": "' + runid + '"}'); 
+  });
+
+  $( ".rpiTemplateAdd" ).click(function() {
+    var name    = $(".rpiTemplatesEdit .name").val();
+    var pin     = $(".rpiTemplatesEdit .pin").val();
+    var mode    = $(".rpiTemplatesEdit .mode").val();
+    var pull    = $(".rpiTemplatesEdit .pull").val();
+    var digital = $(".rpiTemplatesEdit .digital").val();
+    var analog  = $(".rpiTemplatesEdit .analog").val();
+    var value   = $(".rpiTemplatesEdit .value").val();
+
+    if (digital != "" && analog != "") {
+      notify("You can not specify both digital and analog")
+    } else {
+      location.href = "/rpi/do?action=addrpi&name=" + name + "&pin=" + pin + "&mode=" + mode + "&pull=" + pull + "&digital=" + digital + "&analog=" + analog + "&value=" + value;
+    }
+  });
+
+  $( ".rpiTemplateDelete" ).click(function() {
+    var runid     = $(this).attr("data-rpi");
+    location.href = "/rpi/do?action=deleterpi&rpiid=" + runid;
+  });
+});
+function rpi(obj) {
+  notify(obj.output);
+}
 
 
 /*

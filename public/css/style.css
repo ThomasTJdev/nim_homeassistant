@@ -675,6 +675,18 @@ div#alarm table.alarmPasswords .alarmDeletePassword {
 
 
 /*
+  Raspberry Pi
+*/
+div#rpi table.rpiTemplates .btn {
+  display: table-cell;
+  width: 55px;
+}
+div#rpi table.rpiTemplates {
+  max-width: 1200px;
+}
+
+
+/*
   Alarm numpad
 */
 div#alarmModel div.modal-dialog {

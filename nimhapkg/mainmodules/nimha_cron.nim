@@ -9,6 +9,7 @@ import ../resources/database/sql_safe
 import ../resources/mail/mail
 import ../resources/mqtt/mqtt_templates
 import ../resources/pushbullet/pushbullet
+import ../resources/rpi/rpi_utils
 import ../resources/xiaomi/xiaomi_utils
 import ../resources/utils/logging
 
@@ -119,6 +120,9 @@ proc cronJobRun(time: string) =
 
     of "mqtt":
       mqttActionSendDb(db, row[1])
+
+    of "rpi":
+      discard rpiAction(row[1])
 
     of "xiaomi":
       xiaomiWriteTemplate(db, row[1])

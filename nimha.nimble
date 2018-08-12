@@ -15,6 +15,7 @@ requires "recaptcha >= 1.0.2"
 requires "bcrypt >= 0.2.1"
 requires "multicast >= 0.1.1"
 requires "websocket >= 0.3.1"
+requires "wiringPiNim >= 0.1.0"
 requires "xiaomi >= 0.1.0"
 
 
