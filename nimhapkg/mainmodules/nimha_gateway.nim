@@ -5,15 +5,15 @@ import osproc
 import strutils
 import streams
 
-import ../resources/alarm/alarm
+import ../modules/alarm/alarm
 import ../resources/mqtt/mqtt_func
-import ../resources/os/os_utils
-import ../resources/owntracks/owntracks
-import ../resources/pushbullet/pushbullet
-import ../resources/rpi/rpi_utils
-import ../resources/rss/rss_reader
-import ../resources/web/web_utils
-import ../resources/xiaomi/xiaomi_utils
+import ../modules/os/os_utils
+import ../modules/owntracks/owntracks
+import ../modules/pushbullet/pushbullet
+import ../modules/rpi/rpi_utils
+import ../modules/rss/rss_reader
+import ../modules/web/web_utils
+import ../modules/xiaomi/xiaomi_utils
 import ../resources/utils/logging
 
 

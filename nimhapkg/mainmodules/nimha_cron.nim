@@ -5,12 +5,11 @@ import parsecfg, db_sqlite, strutils, asyncdispatch, json, times
 from os import sleep
 
 import ../resources/database/database
-import ../resources/database/sql_safe
-import ../resources/mail/mail
+import ../modules/mail/mail
 import ../resources/mqtt/mqtt_templates
-import ../resources/pushbullet/pushbullet
-import ../resources/rpi/rpi_utils
-import ../resources/xiaomi/xiaomi_utils
+import ../modules/pushbullet/pushbullet
+import ../modules/rpi/rpi_utils
+import ../modules/xiaomi/xiaomi_utils
 import ../resources/utils/logging
 
 
@@ -102,7 +101,7 @@ proc cronJobRun() {.async.} =
 proc cronJobRun(time: string) =
   ## Run the cron jobs
 
-  let cronActions = getAllRowsSafe(db, sql"SELECT element, action_ref FROM cron_actions WHERE active = ? AND time = ?", "true", time)
+  let cronActions = getAllRows(db, sql"SELECT element, action_ref FROM cron_actions WHERE active = ? AND time = ?", "true", time)
 
   if cronActions.len() == 0:
     return

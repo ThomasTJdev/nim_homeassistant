@@ -2,7 +2,7 @@
 
 import osproc, strutils, asyncdispatch, json
 
-import ../mqtt/mqtt_func
+import ../../resources/mqtt/mqtt_func
 
 proc osFreeMem*(): string =
   return execProcess("free -m | awk 'NR==2{print $4}'")

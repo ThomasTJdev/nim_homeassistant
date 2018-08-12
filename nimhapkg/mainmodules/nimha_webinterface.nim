@@ -21,12 +21,11 @@ import recaptcha
 import ../resources/www/google_recaptcha
 
 import ../resources/database/database
-import ../resources/database/sql_safe
-import ../resources/mail/mail
+import ../modules/mail/mail
 import ../resources/mqtt/mqtt_func
-import ../resources/pushbullet/pushbullet
-import ../resources/rpi/rpi_utils
-import ../resources/rss/rss_reader
+import ../modules/pushbullet/pushbullet
+import ../modules/rpi/rpi_utils
+import ../modules/rss/rss_reader
 import ../resources/users/password
 import ../resources/users/user_add
 import ../resources/users/user_check
@@ -427,7 +426,7 @@ routes:
         mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updateuser\"}")
 
     elif @"action" == "deleteuser":
-      execSafe(db, sql"DELETE FROM alarm_password WHERE userid = ?", @"userid")
+      exec(db, sql"DELETE FROM alarm_password WHERE userid = ?", @"userid")
       mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updateuser\"}")
       
     redirect("/alarm")

@@ -1,10 +1,10 @@
 # Copyright 2018 - Thomas T. Jarløv
 
 import db_sqlite, strutils, json, asyncdispatch, parsecfg
-import ../database/database
-import ../mqtt/mqtt_func
-import ../utils/dates
-import ../utils/parsers
+import ../../resources/database/database
+import ../../resources/mqtt/mqtt_func
+import ../../resources/utils/dates
+import ../../resources/utils/parsers
 
 from os import getAppDir
 

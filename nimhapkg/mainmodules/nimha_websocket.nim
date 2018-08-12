@@ -22,7 +22,6 @@ import times
 import websocket
 
 import ../resources/database/database
-import ../resources/database/sql_safe
 import ../resources/mqtt/mqtt_func
 import ../resources/users/password
 import ../resources/utils/dates
@@ -252,8 +251,8 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
             # Check user access. Current check is set to every 5 minutes (300s) - if user account is deleted, connection will be terminated
             if myClient.wsSessionStart + 300 < toInt(epochTime()) or myClient.key == "" or myClient.userStatus == "":
               let key = jn(js, "key")
-              let userid = getValueSafeRetry(db, sql"SELECT userid FROM session WHERE ip = ? AND key = ? AND userid = ?", hostname, key, jn(js, "userid"))
-              myClient.userStatus = getValueSafeRetry(db, sql"SELECT status FROM person WHERE id = ?", userid)
+              let userid = getValue(db, sql"SELECT userid FROM session WHERE ip = ? AND key = ? AND userid = ?", hostname, key, jn(js, "userid"))
+              myClient.userStatus = getValue(db, sql"SELECT status FROM person WHERE id = ?", userid)
               myClient.wsSessionStart = toInt(epochTime())
               myClient.key = key
 

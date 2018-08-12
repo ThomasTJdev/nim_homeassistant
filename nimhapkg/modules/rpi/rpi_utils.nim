@@ -8,9 +8,9 @@ import db_sqlite
 
 from osproc import execProcess
 
-import ../database/database
-import ../mqtt/mqtt_func
-import ../utils/logging
+import ../../resources/database/database
+import ../../resources/mqtt/mqtt_func
+import ../../resources/utils/logging
 
 type 
   RpiTemplate = tuple[id: string, name: string, pin: string, pinMode: string, pinPull: string, digitalAction: string, analogAction: string, value: string]

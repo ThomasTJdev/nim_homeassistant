@@ -6,8 +6,8 @@ import parsexml
 import streams
 import strutils
 
-import ../database/database
-import ../mqtt/mqtt_func
+import ../../resources/database/database
+import ../../resources/mqtt/mqtt_func
 
 
 ## Db connection

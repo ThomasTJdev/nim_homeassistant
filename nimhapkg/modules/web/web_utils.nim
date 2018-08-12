@@ -4,8 +4,8 @@
 
 import osproc, strutils, asyncdispatch, json
 
-import ../database/database
-import ../mqtt/mqtt_func
+import ../../resources/database/database
+import ../../resources/mqtt/mqtt_func
 import ../web/web_certs
 
 var db = conn()

@@ -2,7 +2,7 @@
 
 import osproc, strutils, db_sqlite, asyncdispatch
 
-import ../mqtt/mqtt_func
+import ../../resources/mqtt/mqtt_func
 
 from times import epochTime
 

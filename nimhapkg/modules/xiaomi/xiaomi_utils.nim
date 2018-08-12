@@ -5,11 +5,10 @@ import multicast
 import nimcrypto
 import xiaomi
 
-import ../database/database
-import ../database/sql_safe
-import ../utils/logging
-import ../utils/parsers
-import ../mqtt/mqtt_func
+import ../../resources/database/database
+import ../../resources/utils/logging
+import ../../resources/utils/parsers
+import ../../resources/mqtt/mqtt_func
 
 
 type 
@@ -89,7 +88,7 @@ proc xiaomiGatewayUpdatePassword*() =
   ## but in the future, there will be support
   ## for multiple gateways.
 
-  gateway[4] = getValueSafe(db, sql"SELECT key FROM xiaomi_api")
+  gateway[4] = getValue(db, sql"SELECT key FROM xiaomi_api")
 
 
 proc xiaomiSoundPlay*(db: DbConn, sid: string, defaultRingtone = "8") =
@@ -204,20 +203,19 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
 
       # Create the gateway
       if gateway[0].len() == 0:
-        xiaomiGatewayCreate(sid, "Gateway", token, getValueSafe(db, sql"SELECT key FROM xiaomi_api"), "")
+        xiaomiGatewayCreate(sid, "Gateway", token, getValue(db, sql"SELECT key FROM xiaomi_api"), "")
         xiaomiGatewayUpdateSecret()
 
         # Create gateway in DB
-        if getValueSafe(db, sql"SELECT sid FROM xiaomi_api WHERE sid = ?", sid).len() == 0:
-          discard tryExecSafe(db, sql"INSERT INTO xiaomi_devices (sid, name, model) VALUES (?, ?, ?)", sid, "Gateway", "gateway")
-          discard tryExecSafe(db, sql"INSERT INTO xiaomi_api (sid, token) VALUES (?, ?)", sid, token)
+        if getValue(db, sql"SELECT sid FROM xiaomi_api WHERE sid = ?", sid).len() == 0:
+          discard tryExec(db, sql"INSERT INTO xiaomi_devices (sid, name, model) VALUES (?, ?, ?)", sid, "Gateway", "gateway")
+          discard tryExec(db, sql"INSERT INTO xiaomi_api (sid, token) VALUES (?, ?)", sid, token)
 
         logit("xiaomi", "DEBUG", "Gateway created")
 
       else:
         # Update the secret
         xiaomiGatewayUpdateSecret(token)
-        #discard tryExecSafe(db, sql"UPDATE xiaomi_api SET token = ? WHERE sid = ?", token, sid)
         logit("xiaomi", "DEBUG", "Gateway secret updated")
 
       return

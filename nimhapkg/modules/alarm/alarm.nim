@@ -11,15 +11,14 @@
 
 import parsecfg, db_sqlite, strutils, asyncdispatch, json, times
 
-import ../database/database
-import ../database/sql_safe
+import ../../resources/database/database
+import ../../resources/mqtt/mqtt_func
+import ../../resources/mqtt/mqtt_templates
+import ../../resources/users/password
+import ../../resources/utils/logging
 import ../mail/mail
-import ../mqtt/mqtt_templates
-import ../mqtt/mqtt_func
 import ../pushbullet/pushbullet
 import ../rpi/rpi_utils
-import ../users/password
-import ../utils/logging
 import ../xiaomi/xiaomi_utils
 
 

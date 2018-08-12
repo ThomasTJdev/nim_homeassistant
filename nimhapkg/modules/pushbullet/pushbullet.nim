@@ -5,8 +5,8 @@
 import asyncdispatch
 
 import db_sqlite, osproc, json, strutils, parsecfg
-import ../database/database
-import ../mqtt/mqtt_func
+import ../../resources/database/database
+import ../../resources/mqtt/mqtt_func
 
 
 var pushbulletAPI = ""

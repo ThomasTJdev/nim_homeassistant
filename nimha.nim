@@ -194,7 +194,7 @@ proc compileIt() =
 
   # Cron jobs
   if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_cron") or defined(rc) or defined(rccron):
-    let outputAlarm = execCmd("nim c -d:sqlsafe " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_cron.nim")
+    let outputAlarm = execCmd("nim c " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_cron.nim")
     if outputAlarm == 1:
       echo "\nAn error occured nimha_cron\n\n"
       quit()

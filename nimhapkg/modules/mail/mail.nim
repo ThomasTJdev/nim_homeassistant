@@ -5,7 +5,7 @@ import db_sqlite
 import smtp
 import strutils
 
-import ../database/database
+import ../../resources/database/database
 
 var db = conn()
 
