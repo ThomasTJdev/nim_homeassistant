@@ -44,11 +44,13 @@ type
     clients: seq[Client]
     needsUpdate: bool
 
+  #Users = tuple[userid: string, ip: string, key: string, status: string]
 
 # Contains the clients
-var server = Server(
-    clients: @[]
-  )
+var server = Server(clients: @[])
+
+# Contains the user data
+#var users: seq[Users] = @[]
 
 
 # Set key for communication without verification on 127.0.0.1
@@ -91,6 +93,30 @@ proc wsmsgMessages*(): string =
 
   return "{\"handler\": \"history\", \"data\" :[" & json & "]}"
 
+#[
+proc loadUsers() =
+  ## Load the user data
+
+  users = @[]
+
+  let allUsers = getAllRows(db, sql"SELECT session.userid, session.password, session.salt, person.status FROM session LEFT JOIN person ON person.id = session.userid")
+  for row in allUsers:
+    users.add((userid: row[0], ip: row[1], key: row[2], status: row[3]))
+
+
+template checkUserAccess(hostname, key, userID: string) =
+  ## Check if the user (requester) has access
+
+  var access = false
+
+  for user in users:
+    if user[0] == userID and hostname == user[1] and key == user[2] and status in ["Admin", "Moderator", "Normal"]:
+      access = true
+      break
+
+  if not access:
+    break
+]#
 
 
 proc newClient(ws: AsyncWebSocket, socket: AsyncSocket, hostname: string): Client =
@@ -256,11 +282,11 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
               myClient.wsSessionStart = toInt(epochTime())
               myClient.key = key
 
-              if myClient.userStatus notin ["Admin", "Moderator", "Normal"]:
-                logit("websocket", "ERROR", "Client messed up in sid and userid")
-                myClient.connected = false
-                asyncCheck updateClientsNow()
-                break
+            if myClient.userStatus notin ["Admin", "Moderator", "Normal"]:
+              logit("websocket", "ERROR", "Client messed up in sid and userid")
+              myClient.connected = false
+              asyncCheck updateClientsNow()
+              break
             
             # Respond
             await myClient.socket.sendText("{\"event\": \"received\"}", false)
