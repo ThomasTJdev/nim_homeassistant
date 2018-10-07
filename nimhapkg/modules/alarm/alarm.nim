@@ -94,6 +94,8 @@ proc alarmAction() =
 proc alarmSetStatus(newStatus, trigger, device: string, userID = "") =
   # Check that doors, windows, etc are ready
   
+  asyncCheck mqttSendAsync("alarm", "alarminfo", "{\"action\": \"iotinfo\", \"element\": \"alarm\", \"status\": \"" & newStatus & "\", \"value\": \"\"}")
+
   alarm[0] = newStatus
   exec(db, sql"UPDATE alarm SET status = ?", newStatus)
   
@@ -145,7 +147,7 @@ proc alarmTriggered*(db: DbConn, trigger, device: string) =
 proc alarmParseMqtt*(payload: string) {.async.} =
   ## Parse MQTT message
 
-  var js = parseJson(payload)
+  let js = parseJson(payload)
   let action = jn(js, "action")
 
 
