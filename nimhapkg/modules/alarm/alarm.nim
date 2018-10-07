@@ -91,36 +91,17 @@ proc alarmAction() =
         xiaomiWriteTemplate(db, action[2])
 
 
-  #[
-  for row in alarmActions:
-    logit("alarm", "DEBUG", "alarmAction(): " & row[0] & " - id: " & row[1])
-
-    if row[0] == "pushbullet":
-      pushbulletSendDb(db, row[1])
-
-    elif row[0] == "mail":
-      sendMailDb(db, row[1])
-
-    elif row[0] == "mqtt":
-      mqttActionSendDb(db, row[1])
-
-    elif row[0] == "xiaomi":
-      xiaomiWriteTemplate(db, row[1])
-  ]#
-
-
 proc alarmSetStatus(newStatus, trigger, device: string, userID = "") =
   # Check that doors, windows, etc are ready
-
+  
   alarm[0] = newStatus
+  exec(db, sql"UPDATE alarm SET status = ?", newStatus)
   
   if userID != "":
     discard tryExec(db, sql"INSERT INTO alarm_history (status, trigger, device, userid) VALUES (?, ?, ?, ?)", newStatus, trigger, device, userID)
   else:
     discard tryExec(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", newStatus, trigger, device)
   
-  discard tryExec(db, sql"UPDATE alarm SET status = ? WHERE id = ?", newStatus, "1")
-
   alarmAction()
 
 
