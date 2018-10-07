@@ -52,7 +52,9 @@ proc pushbulletSendDb*(db: DbConn, pushID: string) =
   let push = getRow(db, sql"SELECT title, body FROM pushbullet_templates WHERE id = ?", pushID)
 
   let resp = pushbulletSendCurl("note", push[0], push[1])
-  discard pushbulletHistory(db, resp, push[0], push[1])
+
+  # Why save the pushbullet history?
+  #discard pushbulletHistory(db, resp, push[0], push[1])
    
 
 
@@ -81,17 +83,6 @@ proc pushbulletParseMqtt*(payload: string) =
     pushbulletSendDb(db, js["pushid"].getStr())
 
 
-#[
-proc pushbulletSend*(pushType, title, body: string) =
-  ## Get certificate expiration date in special format
-  ##
-  ## Returns true and output if success,
-  ## Returns false and output if error
-
-  let resp = pushbulletSendCurl("note", title, body)
-
-  discard pushbulletHistory(db, resp, title, body)
-]#
 
 #[
 proc pushbulletSendWebsocketDb*(db: DbConn, pushID: string): string =
