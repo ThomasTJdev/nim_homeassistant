@@ -14,7 +14,7 @@ var pageType    = $("#pageType").attr("data-type");
 var userID      = $("#pageType").attr("data-userid");
 
 $(function() {
-  websocketInit();  
+  websocketInit();
 });
 
 function websocketInit() {
@@ -24,15 +24,15 @@ function websocketInit() {
     }
     ws = new WebSocket(wsProtocol + "://" + wsAddress + ":" + wsPort + "", ["nimha"]);
   }
-  
+
   ws.onopen = function() {
     notify(jQuery.parseJSON('{"error": "false", "value": "Websocket connected"}'));
 
     if (pageType == "dashboard" && pageInit == true) {
-      ws.send('{' + cookieSidJson() + '"element": "main", "data": "connected"}');  
-      ws.send('{' + cookieSidJson() + '"element": "owntracks", "action": "locations", "value": "init"}'); 
+      ws.send('{' + cookieSidJson() + '"element": "main", "data": "connected"}');
+      ws.send('{' + cookieSidJson() + '"element": "owntracks", "action": "locations", "value": "init"}');
       ws.send('{' + cookieSidJson() + '"element": "osstats", "value": "refresh"}');
-      ws.send('{' + cookieSidJson() + '"element": "webutils", "item": "certexpiry"}');  
+      ws.send('{' + cookieSidJson() + '"element": "webutils", "item": "certexpiry"}');
       xiaomiRefreshInit()
     }
 
@@ -44,27 +44,27 @@ function websocketInit() {
   ws.onclose = function() {
     websocketCancelKeepAlive();
     if (pageRefresh != true && wsError == false) {
-      console.log("Connection is closed... Trying to reconnecting in 10 seconds."); 
+      console.log("Connection is closed... Trying to reconnecting in 10 seconds.");
       notify(jQuery.parseJSON('{"error": "true", "value": "Websocket closed"}'));
-      setTimeout(function(){ 
+      setTimeout(function(){
         websocketInit();
       }, 10000);
     }
   };
 
-  ws.onerror = function() { 
+  ws.onerror = function() {
     websocketCancelKeepAlive();
     if (pageRefresh != true) {
       wsError = true;
-      console.log("Error in connection... Trying to reconnecting in 60 seconds."); 
+      console.log("Error in connection... Trying to reconnecting in 60 seconds.");
       notify(jQuery.parseJSON('{"error": "true", "value": "Websocket error"}'));
-      setTimeout(function(){ 
+      setTimeout(function(){
         websocketInit();
       }, 60000);
     }
   };
-    
-  ws.onmessage = function (response) { 
+
+  ws.onmessage = function (response) {
     console.log(response.data);
     var obj = jQuery.parseJSON(response.data);
 
@@ -75,7 +75,7 @@ function websocketInit() {
         websocketHandler(objnest)
       });
     }
-    else 
+    else
     {
       // Single object
       websocketHandler(obj)
@@ -87,12 +87,12 @@ function websocketInit() {
 
 /* Ping to keep alive */
 var pingRun;
-function websocketKeepAlive() { 
+function websocketKeepAlive() {
   pingRun = window.setInterval(function(){
     ws.send('{' + cookieSidJson() + '"element": "ping"}');
   }, 30000);
-}  
-function websocketCancelKeepAlive() {  
+}
+function websocketCancelKeepAlive() {
     clearInterval(pingRun)
 }
 
@@ -102,17 +102,17 @@ function websocketHandler(obj) {
   if (obj.handler == "noaction") {
     //notify(obj)
   }
-  
+
   else if (obj.handler == "response") {
     notify(obj)
 
   }
-  
+
   else if (obj.handler == "action" && pageType == "dashboard") {
 
     // Certificates
     if (obj.element == "certexpiry") {
-      certRefresh(obj)          
+      certRefresh(obj)
     }
 
     // OS stats
@@ -122,17 +122,17 @@ function websocketHandler(obj) {
 
     // Alarm
     else if (obj.element == "alarm") {
-      alarm(obj)          
+      alarm(obj)
     }
 
     // Raspberry pi
     else if (obj.element == "rpi") {
-      rpi(obj)          
+      rpi(obj)
     }
 
     // RSS
     else if (obj.element == "rss") {
-      rssUpdateFeed(obj)          
+      rssUpdateFeed(obj)
     }
 
     // Xiaomi
@@ -208,7 +208,7 @@ function notify(obj) {
   $("#notification .inner").css("top", $('#navbar').offset().top);
   $("#notification .inner").text(obj.value);
   $("#notification").show(400);
-  setTimeout(function(){ 
+  setTimeout(function(){
     $("#notification").hide(400);
     if (obj.error == "true") {
       $("#notification .inner").css("background", "rgba(39, 203, 78, 0.87)");
@@ -242,7 +242,7 @@ $(function() {
             var order = sortable.toArray();
             console.log(order);
             Cookies.set('dashboardCardOrder', order.join(','));
-        }, 
+        },
         get: function(){return [];}
       }
     });
@@ -304,12 +304,12 @@ $(function() {
 ________________________________*/
 $(function() {
   $( "#pushbulletTest" ).click(function() {
-    ws.send('{' + cookieSidJson() + '"element": "pushbullet", "action": "message", "pushid": "test"}');  
+    ws.send('{' + cookieSidJson() + '"element": "pushbullet", "action": "message", "pushid": "test"}');
   });
 
   $( ".pushbulletSend" ).click(function() {
     var pushid = $(this).attr("data-pushid");
-    ws.send('{' + cookieSidJson() + '"element": "pushbullet", "action": "message", "pushid": "' + pushid + '"}');  
+    ws.send('{' + cookieSidJson() + '"element": "pushbullet", "action": "message", "pushid": "' + pushid + '"}');
   });
 
   $( ".pushbulletApiUpdate" ).click(function() {
@@ -351,7 +351,7 @@ $(function() {
 
   $( ".rssRefresh" ).click(function() {
     var feedid = $(this).attr("data-feedid");
-    ws.send('{' + cookieSidJson() + '"element": "rss", "action": "refresh", "feedid": "' + feedid + '"}');  
+    ws.send('{' + cookieSidJson() + '"element": "rss", "action": "refresh", "feedid": "' + feedid + '"}');
   });
 });
 function rssUpdateFeed(obj) {
@@ -456,7 +456,7 @@ $(function() {
 ________________________________*/
 $(function() {
   $( "#osstatsRefresh" ).click(function() {
-    ws.send('{' + cookieSidJson() + '"element": "osstats", "value": "refresh"}');  
+    ws.send('{' + cookieSidJson() + '"element": "osstats", "value": "refresh"}');
   });
 });
 function osstatsRefresh(obj) {
@@ -480,7 +480,7 @@ $(function() {
   $( ".certRefresh" ).click(function() {
     var server = $(this).attr("data-server");
     var port = $(this).attr("data-port");
-    ws.send('{' + cookieSidJson() + '"element": "webutils", "item": "certexpiry", "server": "' + server + '", "port": "' + port + '"}');  
+    ws.send('{' + cookieSidJson() + '"element": "webutils", "item": "certexpiry", "server": "' + server + '", "port": "' + port + '"}');
   });
 
   $( ".certAddNew" ).click(function() {
@@ -545,7 +545,7 @@ ________________________________*/
 $(function() {
   $( ".rpiTemplateRun" ).click(function() {
     var runid     = $(this).attr("data-rpi");
-    ws.send('{' + cookieSidJson() + '"element": "rpi", "action": "runtemplate", "rpiid": "' + runid + '"}'); 
+    ws.send('{' + cookieSidJson() + '"element": "rpi", "action": "runtemplate", "rpiid": "' + runid + '"}');
   });
 
   $( ".rpiTemplateAdd" ).click(function() {
@@ -586,7 +586,7 @@ $(function() {
     var status = $(this).attr("data-status");
     $('#alarmModel div#alarmNumpad').attr("data-status", status);
     $('#alarmModel h5.modal-title').text("Alarm (" + status + ")");
-    $('#alarmModel').modal('toggle'); 
+    $('#alarmModel').modal('toggle');
   });
 
   // Alarm numpad
@@ -614,9 +614,9 @@ $(function() {
     if (onlyCode == "true") {
       status = $("div#alarmNumpad .onlyCode option:selected").val();
     }
-     
-    ws.send('{' + cookieSidJson() + '"element": "alarm", "action": "activate", "status": "' + status + '", "password": "' + password + '"}'); 
-    
+
+    ws.send('{' + cookieSidJson() + '"element": "alarm", "action": "activate", "status": "' + status + '", "password": "' + password + '"}');
+
     $('#alarmModel').modal('toggle');
     $("#alarmNumpad .password").val("");
 
@@ -695,12 +695,12 @@ $(function() {
     var sid = $(this).attr("data-sid");
     var action = $(this).attr("data-action");
     var value = $(this).attr("data-value");
-    ws.send('{' + cookieSidJson() + '"element": "xiaomi", "action": "' + action + '", "sid": "' + sid + '", "value": "' + value + '"}');  
+    ws.send('{' + cookieSidJson() + '"element": "xiaomi", "action": "' + action + '", "sid": "' + sid + '", "value": "' + value + '"}');
   });
 
   // Xiaomi settings page. Discover available devices
   $( ".xiaomiDiscoverDevices" ).click(function() {
-    ws.send('{' + cookieSidJson() + '"element": "xiaomi", "action": "discover"}');  
+    ws.send('{' + cookieSidJson() + '"element": "xiaomi", "action": "discover"}');
     location.reload();
   });
 });
@@ -718,7 +718,7 @@ function xiaomiRefreshInit() {
       var value = $(this).find(".xiaomiRefresh").attr("data-value");
       //ws.send('{' + cookieSidJson() + '"element": "xiaomi", "action": "' + action + '", "sid": "' + sid + '", "value": "' + value + '"}');
 
-      setTimeout( function(){ 
+      setTimeout( function(){
         ws.send('{' + cookieSidJson() + '"element": "xiaomi", "action": "' + action + '", "sid": "' + sid + '", "value": "' + value + '"}')
       }, time);
       time += 500;
@@ -726,10 +726,10 @@ function xiaomiRefreshInit() {
   });
 }
 function xiaomiRefreshStatus(obj, value) {
-  
+
   // Hide object
   $("." + obj.sid + ".device." + value + " div.value").hide();
-  
+
   // Assign new value
   if (value == "status") {
     console.log("Xiaomi - Sid: " + obj.sid + " - Value: " + obj.data.status);
@@ -822,7 +822,7 @@ $(function() {
 ________________________________*/
 function websocketConnectedUsers(obj) {
   console.log("Updating websocket users")
-  
+
   var clo = "";
   var newClo = "";
   $(".wsusersInner").empty();
@@ -848,8 +848,8 @@ function websocketConnectedUsers(obj) {
 ________________________________*/
 $(function() {
   $( ".owntracksRefresh" ).click(function() {
-    ws.send('{' + cookieSidJson() + '"element": "owntracks", "action": "refreshlocations", "value": "refresh"}');  
-  }); 
+    ws.send('{' + cookieSidJson() + '"element": "owntracks", "action": "refreshlocations", "value": "refresh"}');
+  });
 
   $( ".owntracksDeleteDevice" ).click(function() {
     var username = $(this).attr("data-username");
@@ -935,7 +935,7 @@ function owntracksGmapInit(obj) {
       fillColor: '#1c79ddfa'
     });
     circle.bindTo('center', marker, 'position');
-    
+
     // Add event listener. Click on cirle to get waypoint name.
     google.maps.event.addListener(marker, 'click', (function(marker, i) {
       return function() {
