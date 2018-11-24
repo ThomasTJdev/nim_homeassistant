@@ -10,7 +10,8 @@ import ../resources/mqtt/mqtt_func
 import ../modules/os/os_utils
 import ../modules/owntracks/owntracks
 import ../modules/pushbullet/pushbullet
-import ../modules/rpi/rpi_utils
+when defined(rpi):
+  import ../modules/rpi/rpi_utils
 import ../modules/rss/rss_reader
 import ../modules/web/web_utils
 import ../modules/xiaomi/xiaomi_utils
@@ -22,10 +23,10 @@ proc mosquittoParse(payload: string) {.async.} =
 
   let topicName = payload.split(" ")[0]
   let message   = payload.replace(topicName & " ", "")
-  
+
   if topicName notin ["xiaomi"]:
     logit("gateway", "DEBUG", "Topic: " & topicName & " - Payload: " & message)
-  
+
   if topicName == "alarm":
     asyncCheck alarmParseMqtt(message)
 
@@ -36,7 +37,8 @@ proc mosquittoParse(payload: string) {.async.} =
     asyncCheck rssParseMqtt(message)
 
   elif topicName == "rpi":
-    asyncCheck rpiParseMqtt(message)
+    when defined(rpi):
+      asyncCheck rpiParseMqtt(message)
 
   elif topicName == "pushbullet":
     pushbulletParseMqtt(message)
@@ -45,7 +47,7 @@ proc mosquittoParse(payload: string) {.async.} =
     asyncCheck webParseMqtt(message)
 
   elif topicName == "xiaomi":
-    asyncCheck xiaomiParseMqtt(message, alarm[0]) 
+    asyncCheck xiaomiParseMqtt(message, alarm[0])
 
   elif topicName.substr(0, 8) == "owntracks":
     asyncCheck owntracksParseMqtt(message, topicName)

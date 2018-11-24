@@ -8,7 +8,8 @@ import ../resources/database/database
 import ../modules/mail/mail
 import ../resources/mqtt/mqtt_templates
 import ../modules/pushbullet/pushbullet
-import ../modules/rpi/rpi_utils
+when defined(rpi):
+  import ../modules/rpi/rpi_utils
 import ../modules/xiaomi/xiaomi_utils
 import ../resources/utils/logging
 
@@ -69,14 +70,14 @@ proc cronJobRun() {.async.} =
     for cronitem in cron.cronjobs:
       if not cronitem.active:
         continue
-      
+
       # Add job to seq
       newCronjobs.add(cronitem)
 
       # Check time. If hour and minut fits (24H) then go
       if cronTime != cronitem.time:
         continue
-      
+
       cronitem.active = false
 
       case cronitem.element
@@ -92,7 +93,7 @@ proc cronJobRun() {.async.} =
 
       else:
         discard
-    
+
     # Update seq - exclude non active
     cron.cronjobs = newCronjobs
 ]#
@@ -105,7 +106,7 @@ proc cronJobRun(time: string) =
 
   if cronActions.len() == 0:
     return
-  
+
   logit("cron", "DEBUG", "Executing cron activities. Total number: " & $cronActions.len())
 
   for row in cronActions:
@@ -121,9 +122,11 @@ proc cronJobRun(time: string) =
       mqttActionSendDb(db, row[1])
 
     of "rpi":
-      discard rpiAction(row[1])
+      when defined(rpi):
+        discard rpiAction(row[1])
 
     of "xiaomi":
+      ## TODO: This leads to error sometimes
       xiaomiWriteTemplate(db, row[1])
 
     else:
@@ -133,7 +136,7 @@ proc cronJobRun(time: string) =
 
 proc cronJob() =
   ## Run the main cron job
-  ## 
+  ##
   ## Check every minute if an action is required
   ##
   ## Currently using sleep - should it be sleepAsync
@@ -151,7 +154,7 @@ proc cronJob() =
     # Get current seconds, subtract from 60 to
     # get next starting minute and sleep. This
     # will accept that we are blocking using sleep
-    
+
     let sleepTime = 60 - parseInt(format(local(now()), "ss"))
 
     sleep(sleepTime * 1000)

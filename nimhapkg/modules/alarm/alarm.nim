@@ -18,7 +18,8 @@ import ../../resources/users/password
 import ../../resources/utils/logging
 import ../mail/mail
 import ../pushbullet/pushbullet
-import ../rpi/rpi_utils
+when defined(rpi):
+  import ../rpi/rpi_utils
 import ../xiaomi/xiaomi_utils
 
 
@@ -86,24 +87,25 @@ proc alarmAction() =
       of "mqtt":
         mqttActionSendDb(db, action[2])
       of "rpi":
-        discard rpiAction(action[2])
+        when defined(rpi):
+          discard rpiAction(action[2])
       of "xiaomi":
         xiaomiWriteTemplate(db, action[2])
 
 
 proc alarmSetStatus(newStatus, trigger, device: string, userID = "") =
   # Check that doors, windows, etc are ready
-  
+
   asyncCheck mqttSendAsync("alarm", "alarminfo", "{\"action\": \"iotinfo\", \"element\": \"alarm\", \"status\": \"" & newStatus & "\", \"value\": \"\"}")
 
   alarm[0] = newStatus
-  exec(db, sql"UPDATE alarm SET status = ?", newStatus)
-  
+  discard tryExec(db, sql"UPDATE alarm SET status = ?", newStatus)
+
   if userID != "":
     discard tryExec(db, sql"INSERT INTO alarm_history (status, trigger, device, userid) VALUES (?, ?, ?, ?)", newStatus, trigger, device, userID)
   else:
     discard tryExec(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", newStatus, trigger, device)
-  
+
   alarmAction()
 
 
@@ -127,15 +129,15 @@ proc alarmTriggered*(db: DbConn, trigger, device: string) =
   if armTimeOver > toInt(epochTime()):
     logit("alarm", "INFO", "alarmTriggered(): Triggered alarm cancelled to due to armtime")
     return
-  
+
   else:
     logit("alarm", "INFO", "alarmTriggered(): Triggered alarm true - armtime done")
 
   # Change the alarm status
-  alarmSetStatus("triggered", trigger, device)
+  #alarmSetStatus("triggered", trigger, device)
 
   # Send info about the alarm is triggered
-  mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"triggered\"}")
+  #mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"triggered\"}")
 
   ############
   # Due to non-working async trigger countdown (sleepAsync), it's skipped at the moment
@@ -156,7 +158,7 @@ proc alarmParseMqtt*(payload: string) {.async.} =
 
   elif action == "deletedevice":
     alarmLoadActions()
-    
+
   elif action == "updatealarm":
     alarmLoadStatus()
 
@@ -173,7 +175,7 @@ proc alarmParseMqtt*(payload: string) {.async.} =
     # Check passwords
     if alarmPasswords.len() > 0:
       let passwordUser = jn(js, "password")
-      
+
       for password in alarmPasswords:
         if userID == password[0]:
           if password[1] == makePassword(passwordUser, password[2], password[1]):
@@ -185,14 +187,14 @@ proc alarmParseMqtt*(payload: string) {.async.} =
 
     if not passOk:
       mqttSend("alarm", "wss/to", "{\"handler\": \"response\", \"value\": \"Wrong alarm password\", \"error\": \"true\"}")
-      return      
+      return
 
     let status = jn(js, "status")
-    
+
     if status in ["armAway", "armHome"]:
       alarm[3] = $toInt(epochTime())
       alarmSetStatus(status, "user", "", userID)
-    
+
     elif status == "disarmed":
       alarm[3] = $toInt(epochTime())
       alarmSetStatus(status, "user", "", userID)

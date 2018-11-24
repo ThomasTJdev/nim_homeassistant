@@ -61,6 +61,7 @@ ____
 * Monitor the health of your system
 
 ### [Raspberry Pi](https://github.com/ThomasTJdev/nim_homeassistant/wiki/Raspberry-Pi)
+** Compile with `-d:rpi` to enable **
 * Automate actions using the Raspberry Pi's GPIO
 * Write to the pins
 * Read the values from the pins

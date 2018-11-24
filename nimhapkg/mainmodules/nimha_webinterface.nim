@@ -24,7 +24,8 @@ import ../resources/database/database
 import ../modules/mail/mail
 import ../resources/mqtt/mqtt_func
 import ../modules/pushbullet/pushbullet
-import ../modules/rpi/rpi_utils
+when defined(rpi):
+  import ../modules/rpi/rpi_utils
 import ../modules/rss/rss_reader
 import ../resources/users/password
 import ../resources/users/user_add
@@ -36,7 +37,7 @@ import ../resources/utils/dates
 setCurrentDir(replace(getAppDir(), "/nimhapkg/mainmodules", ""))
 
 
-#[ 
+#[
       Defining variables
 __________________________________________________]#
 
@@ -55,7 +56,7 @@ let gMapsApi = dict.getSectionValue("Google","mapsAPI")
 
 
 
-#[ 
+#[
       User check
 __________________________________________________]#
 
@@ -70,9 +71,9 @@ proc init(c: var TData) =
   c.loggedIn      = false
 
 
-    
 
-#[ 
+
+#[
       Validation check
 __________________________________________________]#
 proc loggedIn(c: TData): bool =
@@ -83,7 +84,7 @@ proc loggedIn(c: TData): bool =
 
 
 
-#[ 
+#[
       Check if user is signed in
 __________________________________________________]#
 
@@ -111,7 +112,7 @@ proc checkLoggedIn(c: var TData) =
 
 
 
-#[ 
+#[
       User login
 __________________________________________________]#
 
@@ -139,14 +140,14 @@ proc login(c: var TData, email, pass: string): tuple[b: bool, s: string] =
 
       let key = makeSessionKey()
       exec(db, sql"INSERT INTO session (ip, key, userid) VALUES (?, ?, ?)", c.req.ip, key, row[0])
-      
+
       return (true, key)
 
   return (false, "Login failed")
 
 
 
-#[ 
+#[
       Logout
 __________________________________________________]#
 proc logout(c: var TData) =
@@ -160,7 +161,7 @@ proc logout(c: var TData) =
 
 
 
-#[ 
+#[
       Check if logged in
 __________________________________________________]#
 template createTFD() =
@@ -179,7 +180,7 @@ template createTFD() =
 
 
 
-#[ 
+#[
       HTML pages
 __________________________________________________]#
 
@@ -205,7 +206,7 @@ include "../tmpl/xiaomi.tmpl"
 
 
 
-#[ 
+#[
       Cleanup
 __________________________________________________]#
 
@@ -216,26 +217,26 @@ proc handler() {.noconv.} =
 
 
 
-#[ 
+#[
       Init
 __________________________________________________]#
 
 when isMainModule:
   setControlCHook(handler)
-  
+
   let hostIp = execProcess("ifconfig | grep -Eo 'inet (addr:)?([0-9]*\\.){3}[0-9]*' | grep -Eo '([0-9]*\\.){3}[0-9]*' | grep -v '127.0.0.1'")
   echo "\nAccess the webinterface on " & replace(hostIp, "\n", "") & ":5000\n"
-    
+
   #[
   # Save startup time
   exec(db, sql"INSERT INTO mainevents (event, value) VALUES (?, ?)", "start", "main", toInt(epochTime()))
 
   ]#
-  
 
 
 
-#[ 
+
+#[
       Webserver
 __________________________________________________]#
 
@@ -247,7 +248,7 @@ routes:
 
     resp genMain(c)
 
-  
+
   get "/logout":
     createTFD()
     logout(c)
@@ -268,7 +269,7 @@ routes:
       if useCaptcha:
         if not await checkReCaptcha(@"g-recaptcha-response", c.req.ip):
           redirect("/login")
-    
+
     let (loginB, loginS) = login(c, @"email", replace(@"password", " ", ""))
     if loginB:
       setCookie("sidnimha", loginS, daysForward(7))
@@ -298,7 +299,7 @@ routes:
 
     redirect("/certificates")
 
-  
+
   get "/xiaomi/devices":
     createTFD()
     if not c.loggedIn:
@@ -428,7 +429,7 @@ routes:
     elif @"action" == "deleteuser":
       exec(db, sql"DELETE FROM alarm_password WHERE userid = ?", @"userid")
       mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updateuser\"}")
-      
+
     redirect("/alarm")
 
 
@@ -450,7 +451,7 @@ routes:
 
     elif @"action" == "updatesettings":
       exec(db, sql"UPDATE mail_settings SET address = ?, port = ?, fromaddress = ?, user = ?, password = ? WHERE id = ?", @"address", @"port", @"from", @"user", @"password", "1")
-      
+
       mailUpdateParameters(db)
 
     elif @"action" == "addmail":
@@ -576,7 +577,7 @@ routes:
     var aa = newHttpClient()
     downloadFile(aa, @"url", "tmp/" & "filename.jpg")
     sendFile("tmp/" & "filename.jpg")
-    
+
 
   after "/filestream/download":
     let filename = split(@"url", "/")[split(@"url", "/").len()-1]
@@ -645,7 +646,7 @@ routes:
 
     if @"module" == "cron":
       discard execCmd("pkill nimha_cron")
-      
+
     elif @"module" == "gateway":
       discard execCmd("pkill nimha_gateway")
 
