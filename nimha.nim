@@ -58,17 +58,17 @@ proc secretCfg() =
     copyFile(getAppDir() & "/config/secret_default.cfg", secretDir)
     echo "\nYour secret.cfg has been generated at " & secretDir & ". Please fill in your data\n"
 
-proc updateJsFile() = 
+proc updateJsFile() =
   ## Updates the JS file with Websocket details from secret.cfg
 
   let wsAddressTo     = "var wsAddress   = \"" & dict.getSectionValue("Websocket","wsAddress") & "\""
   let wsProtocolTo    = "var wsProtocol  = \"" & dict.getSectionValue("Websocket","wsProtocol") & "\""
   let wsPortTo        = "var wsPort      = \"" & dict.getSectionValue("Websocket","wsPort") & "\""
-  
+
   let wsAddressFrom   = "var wsAddress   = \"127.0.0.1\""
   let wsProtocolFrom  = "var wsProtocol  = \"ws\""
   let wsPortFrom      = "var wsPort      = \"25437\""
-  
+
   for fn in [getAppDir() & "/public/js/js.js"]:
     fn.writeFile fn.readFile.replace(re("var wsAddress   = \".*\""), wsAddressTo)
     fn.writeFile fn.readFile.replace(re("var wsProtocol  = \".*\""), wsProtocolTo)
@@ -181,9 +181,9 @@ proc compileIt() =
   when defined(logoutput):
     devC.add(" -d:logoutput "  )
 
-    
+
   # Websocket
-  if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_websocket") or defined(rc) or defined(rcwss):    
+  if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_websocket") or defined(rc) or defined(rcwss):
     let outputWSS = execCmd("nim c -d:ssl " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_websocket.nim")
     if outputWSS == 1:
       echo "\nAn error occured nimha_websocket\n\n"
@@ -194,7 +194,7 @@ proc compileIt() =
 
   # Cron jobs
   if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_cron") or defined(rc) or defined(rccron):
-    let outputAlarm = execCmd("nim c " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_cron.nim")
+    let outputAlarm = execCmd("nim c -d:ssl " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_cron.nim")
     if outputAlarm == 1:
       echo "\nAn error occured nimha_cron\n\n"
       quit()
@@ -234,7 +234,7 @@ proc compileIt() =
 
   # Xiaomi listener
   if not fileExists(getAppDir() & "/nimhapkg/mainmodules/nimha_xiaomilistener") or defined(rc) or defined(rcxlistener):
-    let outputXiaomiListener = execCmd("nim c " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_xiaomilistener.nim")
+    let outputXiaomiListener = execCmd("nim c -d:ssl " & devC & getAppDir() & "/nimhapkg/mainmodules/nimha_xiaomilistener.nim")
     if outputXiaomiListener == 1:
       echo "\nAn error occured nimha_xiaomi\n\n"
       quit()
