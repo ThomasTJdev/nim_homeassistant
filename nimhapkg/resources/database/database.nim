@@ -11,7 +11,7 @@ let db_host = replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & dict.get
 let db_folder = dict.getSectionValue("Database","folder")
 
 proc generateDB*(db: DbConn) =
- 
+
   const
     TPassword = "VARCHAR(32)"
 
@@ -66,7 +66,10 @@ proc generateDB*(db: DbConn) =
     creation timestamp NOT NULL default (STRFTIME('%s', 'now'))
   );""", []):
     echo " - Database: history table already exists"
-  
+
+  # Set WAL - https://www.sqlite.org/wal.html
+  exec(db, sql"PRAGMA journal_mode=WAL;")
+
 
 
 # Connect to DB
@@ -76,7 +79,7 @@ proc conn*(): DbConn =
 
     if not dbexists:
       discard existsOrCreateDir(db_folder)
-    
+
     var db = open(connection=db_host, user=db_user, password=db_pass, database=db_name)
 
     if not dbexists:
