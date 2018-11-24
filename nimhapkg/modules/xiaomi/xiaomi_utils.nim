@@ -205,7 +205,10 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
       # Create the gateway
       if gateway[0].len() == 0:
         xiaomiGatewayCreate(sid, "Gateway", token, getValue(db, sql"SELECT key FROM xiaomi_api"), "")
-        xiaomiGatewayUpdateSecret()
+        if gateway[4].len() == 0:
+          logit("xiaomi", "WARNING", "No API key was found")
+        else:
+          xiaomiGatewayUpdateSecret()
 
         # Create gateway in DB
         if getValue(db, sql"SELECT sid FROM xiaomi_api WHERE sid = ?", sid).len() == 0:
