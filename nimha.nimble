@@ -1,5 +1,5 @@
 # Package
-version       = "0.3.1"
+version       = "0.3.2"
 author        = "Thomas T. Jarløv (https://github.com/ThomasTJdev)"
 description   = "Nim Home Assistant"
 license       = "GPLv3"
@@ -25,7 +25,7 @@ task setup, "Setup started":
   if detectOs(Windows):
     echo "Cannot run on Windows"
     quit()
-    
+
 before install:
   setupTask()
 
