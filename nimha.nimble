@@ -5,6 +5,7 @@ description   = "Nim Home Assistant"
 license       = "GPLv3"
 bin           = @["nimha"]
 skipDirs      = @["private"]
+installDirs   = @["config", "public", "nimhapkg"]
 
 
 
