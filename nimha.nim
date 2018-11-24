@@ -124,8 +124,10 @@ proc launcherActivated() =
   wss     = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_websocket", options = {poParentStreams})
   # Gateway may first be started after wss
   sleep(2000)
-  gateway = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway", options = {poParentStreams})
   gatewayws = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway_ws", options = {poParentStreams})
+  sleep(1500)
+  gateway = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_gateway", options = {poParentStreams})
+  sleep(500)
   www     = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_webinterface", options = {poParentStreams})
   cron    = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_cron", options = {poParentStreams})
   sleep(2000)

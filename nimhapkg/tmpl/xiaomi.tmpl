@@ -10,8 +10,8 @@
 #
 #
 #
-#proc genXiaomiDevices(c: var TData): string = 
-# result = "" 
+#proc genXiaomiDevices(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -46,7 +46,7 @@
 
       <div id="pagewrapper">
         <div id="xiaomiDevices">
-         
+
           <h1>Xiaomi devices</h1>
 
           <div class="gatewayApi">
@@ -73,10 +73,11 @@
 
             <br>
 
-            <button class="btn btn-primary xiaomiDiscoverDevices">Auto discover</button>
-            
+            <button class="btn btn-primary xiaomiDiscoverDevices" style="display: none;">Auto discover</button>
+            <a href="/xiaomi/devices/all" class="btn btn-primary">Auto discover</a>
+
             <br>
-            
+
             <table class="deviceList table">
               <thead>
                 <tr class="thead-dark">
@@ -85,6 +86,23 @@
                   <th>Model</th>
                   <th>Creation</th>
                   <th></th>
+                </tr>
+                <tr class="xiaomiDeviceAdd">
+                  <td>
+                    <input class="sid" />
+                  </td>
+                  <td>
+                    <input class="name" />
+                  </td>
+                  <td>
+                    <input class="model" />
+                  </td>
+                  <td>
+                    <input disabled="disabled" />
+                  </td>
+                  <td class="btn btn-success xiaomiAddDevice">
+                    Add
+                  </td>
                 </tr>
                 <tr class="xiaomiDeviceEdit">
                   <td>
@@ -121,7 +139,9 @@
                   <td>
                     ${device[3]}
                   </td>
-                  <td></td>
+                  <td class="btn btn-danger xiaomiDeleteDevice" data-url="/xiaomi/devices/do?action=deletedevice&sid=${device[0]}">
+                    Delete
+                  </td>
                 </tr>
                 # end for
               </tbody>
@@ -158,7 +178,7 @@
                     Trigger alarm
                   </th>
                   <th>
-                    
+
                   </th>
                 </tr>
 
@@ -290,10 +310,10 @@
                     Value data
                   </th>
                   <th>
-                    
+
                   </th>
                   <th>
-                    
+
                   </th>
                 </tr>
 
@@ -371,7 +391,7 @@
                 <p>To create an action to stop the sound (good idea!), insert <kbd>10000</kbd> in the "Value data".</p>
               </div>
             </div>
-            
+
             <div class="color">
               <h4>Color</h4>
               <p>Insert <kbd>rgb</kbd> in the "Value name". Insert the prefered color code in "Value data". For a red light insert: <kbd>4294914304</kbd></p>
@@ -395,7 +415,7 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}

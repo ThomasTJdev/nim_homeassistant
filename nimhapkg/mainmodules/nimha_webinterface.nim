@@ -13,6 +13,7 @@ import re
 import strutils
 import times
 import uri
+import xiaomi
 
 from sequtils import deduplicate, foldl
 from osproc import execProcess, execCmd
@@ -313,7 +314,15 @@ routes:
     if not c.loggedIn:
       redirect("/login")
 
-    if @"action" == "addsensor":
+    if @"action" == "adddevice":
+      exec(db, sql"INSERT INTO xiaomi_devices (sid, name, model, short_id) VALUES (?, ?, ?, ?)", @"sid", @"name", @"model", "")
+      mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"adddevice\"}")
+
+    elif @"action" == "deletedevice":
+      exec(db, sql"DELETE FROM xiaomi_devices WHERE sid = ?", @"sid")
+      mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"deletedevice\"}")
+
+    elif @"action" == "addsensor":
       let triggerAlarm = if @"triggeralarm" notin ["armAway", "armHome"]: "false" else: @"triggeralarm"
 
       let valuedata = if @"triggeralarm" == "false": "" else: @"valuedata"
@@ -342,6 +351,24 @@ routes:
       mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"updatepassword\"}")
 
     redirect("/xiaomi/devices")
+
+
+  get "/xiaomi/devices/all":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    xiaomiConnect()
+    let deviceInfo = xiaomiDiscover()
+    let a = $(pretty(parseJson(deviceInfo)))
+    let devices = parseJson(deviceInfo)["xiaomi_devices"]
+    for device in items(devices):
+      let sid = device["sid"].getStr()
+      if getValue(db, sql"SELECT sid FROM xiaomi_devices WHERE sid = ?", sid) == "":
+        exec(db, sql"INSERT INTO xiaomi_devices (sid, name, model, short_id) VALUES (?, ?, ?, ?)", sid, sid, device["model"].getStr(), device["short_id"].getStr())
+
+    mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"reloaddevices\"}")
+    resp a
 
 
   get "/owntracks":

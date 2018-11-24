@@ -78,6 +78,8 @@ proc xiaomiGatewayCreate(gSid, gName, gToken, gPassword, gSecret: string) =
 proc xiaomiGatewayUpdateSecret(gToken = gateway[3]) =
   ## Updates the gateways token and secret
 
+  if gToken.len() == 0 or gateway[4].len() == 0:
+    return
   xiaomiSecretUpdate(gateway[4], gToken)
   gateway[3] = gToken
   gateway[5] = xiaomiGatewaySecret
@@ -162,6 +164,7 @@ proc xiaomiCheckAlarmStatus(sid, value, xdata, alarmStatus: string) {.async.} =
 
 proc xiaomiDiscoverUpdateDB(clearDB = false) =
   # Updates the database with new devices
+  ## TODO: THIS FAILS
 
   if clearDB:
     exec(db, sql"DELETE FROM xiaomi_devices")
@@ -199,7 +202,7 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
     let cmd = jn(js, "cmd")
 
     # If this is the gateway, get the token and update the secret
-    if jn(js, "cmd") == "heartbeat" and jn(js, "token") != "":
+    if cmd == "heartbeat" and jn(js, "token") != "":
       let token = jn(js, "token")
 
       # Create the gateway
@@ -299,6 +302,11 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
 
     of "deletetemplate":
       xiaomiLoadDevicesTemplates()
+
+    of "reloaddevices":
+      xiaomiLoadDevices()
+      xiaomiLoadDevicesTemplates()
+      xiaomiLoadDevicesAlarm()
 
 
 xiaomiConnect()

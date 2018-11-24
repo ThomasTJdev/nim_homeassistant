@@ -758,6 +758,20 @@ function xiaomiRefreshStatus(obj, value) {
 
 // Xiaomi devices
 $(function() {
+  // Add device
+  $( ".xiaomiAddDevice" ).click(function() {
+    var sid = $(".xiaomiDeviceAdd .sid").val();
+    var name = $(".xiaomiDeviceAdd .name").val();
+    var model = $(".xiaomiDeviceAdd .model").val();
+
+    location.href = "/xiaomi/devices/do?action=adddevice&sid=" + sid + "&name=" + name + "&model=" + model;
+  });
+
+  // Delete device
+  $( ".xiaomiDeleteDevice" ).click(function() {
+    location.href = $(this).attr("data-url");
+  });
+
   // Add sensor
   $( ".xiaomiAddSensor" ).click(function() {
     var sid = $(".xiaomiNewSensor .xiaomiActionSid option:selected").val();
