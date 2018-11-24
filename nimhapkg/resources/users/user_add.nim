@@ -7,18 +7,18 @@ import ../database/database
 import ../users/password
 
 
-proc createAdminUser*(args: seq[string]) = 
+proc createAdminUser*(args: seq[string]) =
   ## Create new admin user
   ## Input is done through stdin
 
   var db = conn()
-  
+
   echo("User: Checking if any Admin exists in DB")
   let anyAdmin = getAllRows(db, sql"SELECT id FROM person WHERE status = ?", "Admin")
-  
+
   if anyAdmin.len() < 1:
     echo("User: No Admin exists. Create it!")
-    
+
     var iName = ""
     var iEmail = ""
     var iPwd = ""
@@ -33,6 +33,7 @@ proc createAdminUser*(args: seq[string]) =
 
     if iName == "" or iPwd == "" or iEmail == "":
       echo("User: Missing either name, password or email to create the admin user")
+      return
 
     let salt = makeSalt()
     let password = makePassword(iPwd, salt)
