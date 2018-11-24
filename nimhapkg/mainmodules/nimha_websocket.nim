@@ -76,13 +76,13 @@ var db = conn()
 
 
 
-var msgHi: seq[string] = @[]   
+var msgHi: seq[string] = @[]
 
 proc wsmsgMessages*(): string =
 
   if msgHi.len() == 0:
     return ""
-    
+
   var json = ""
   for element in msgHi:
     if json != "":
@@ -132,13 +132,13 @@ proc newClient(ws: AsyncWebSocket, socket: AsyncSocket, hostname: string): Clien
   )
 
 
-  
+
 proc updateClientsNow() {.async.} =
   ## Updates clients list
 
   var newClients: seq[Client] = @[]
   for client in server.clients:
-    if not client.connected: 
+    if not client.connected:
       continue
     newClients.add(client)
 
@@ -154,7 +154,7 @@ proc wsConnectedUsers(): string =
   var users = ""
 
   for client in server.clients:
-    if not client.connected: 
+    if not client.connected:
       continue
 
     if users != "":
@@ -162,7 +162,7 @@ proc wsConnectedUsers(): string =
     users.add("{\"hostname\": \"" & client.hostname & "\", \"lastMessage\": \"" & epochDate($toInt(client.lastMessage), "DD MMM HH:mm") & "\"}")
 
   var json = "{\"handler\": \"action\", \"element\": \"websocket\", \"value\": \"connectedusers\", \"users\": [" & users & "]}"
-  
+
   return json
 
 
@@ -183,25 +183,25 @@ proc pong(server: Server) {.async.} =
   var updateClients = false
   while true:
     let json = wsmsgMessages()
-    
-    if not isNil(server.clients) and json != "":
+
+    if server.clients.len() != 0 and json != "":
       for client in server.clients:
 
         try:
-          if not client.connected: 
+          if not client.connected:
             continue
           await client.socket.sendText(json, false)
-          
+
         except:
           echo("WSS: Pong msg failed")
           client.connected = false
           updateClients = true
           continue
 
-    if updateClients:   
+    if updateClients:
       await updateClientsNow()
       updateClients = false
-    
+
     await sleepAsync(1500)
 
 
@@ -225,7 +225,7 @@ template jn(json: JsonNode, data: string): string =
 proc onRequest*(req: Request) {.async,gcsafe.} =
   ## Per request start listening on socket and
   ## update client list
-  ## 
+  ##
   ## This proc is not gcsafe, but removing pragma
   ## gcsafe corrupts waitFor serve()
 
@@ -234,9 +234,9 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
   if ws.isNil:
     logit("websocket", "ERROR", "WS negotiation failed")
     await req.respond(Http400, "WebSocket negotiation failed: " & error)
-    
+
     req.client.close()
-  
+
   else:
     var hostname = req.hostname
     if req.headers.hasKey("x-forwarded-for"):
@@ -246,13 +246,13 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
     server.clients.add(newClient(ws, req.client, hostname))
     var myClient = server.clients[^1]
     asyncCheck wsSendConnectedUsers()
-    
+
     when defined(dev):
       logit("websocket", "INFO", "Client connected from: " & hostname)
       logit("websocket", "INFO", "Active users: " & $server.clients.len())
-    
+
     while true:
-      
+
       try:
         let (opcode, data) = await myClient.ws.readData()
         #let (opcode, data) = await readData(myClient.socket, true)
@@ -260,7 +260,7 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
         if myClient.hostname == "127.0.0.1" and data.substr(0, localhostKeyLen-1) == localhostKey:
           logit("websocket", "DEBUG", "127.0.0.1 message: " & data.substr(localhostKeyLen, data.len()))
           msgHi.add(data.substr(localhostKeyLen, data.len()))
-          
+
         else:
 
           myClient.lastMessage = epochTime()
@@ -287,7 +287,7 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
               myClient.connected = false
               asyncCheck updateClientsNow()
               break
-            
+
             # Respond
             await myClient.socket.sendText("{\"event\": \"received\"}", false)
 
@@ -303,13 +303,13 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
             myClient.connected = false
             asyncCheck updateClientsNow()
             break
-          else: 
+          else:
             let (closeCode, reason) = extractCloseData(data)
             logit("websocket", "INFO", "Case else, close code: " & $closeCode & ", reason: " & $reason)
             myClient.connected = false
             asyncCheck updateClientsNow()
 
-        
+
       except:
         logit("websocket", "ERROR", "Encountered exception: " & getCurrentExceptionMsg())
         myClient.connected = false
@@ -322,8 +322,8 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
     myClient.userStatus = ""
     await myClient.ws.close()
     logit("websocket", "INFO", ".. socket went away.")
-  
-    
+
+
 
 
 when isMainModule:
@@ -342,6 +342,6 @@ when isMainModule:
 
   except IOError:
     logit("websocket", "ERROR", "IOError.. damn")
-    
+
 
   close(httpServer)
