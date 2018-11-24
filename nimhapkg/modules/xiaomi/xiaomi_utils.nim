@@ -11,15 +11,16 @@ import ../../resources/utils/parsers
 import ../../resources/mqtt/mqtt_func
 
 
-type 
+type
   Device = tuple[sid: string, name: string, model: string, alarmvalue: string]
+  DeviceAlarm = tuple[sid: string, alarmvalue: string, trigger: string]
   DeviceTemplate = tuple[id: string, sid: string, value_name: string, value_data: string]
   Gateway = tuple[sid: string, name: string, model: string, token: string, password: string, secret: string]
 
 
 var devices: seq[Device] = @[]
 var devicesTemplates: seq[DeviceTemplate] = @[]
-var devicesAlarm: seq[Device] = @[]
+var devicesAlarm: seq[DeviceAlarm] = @[]
 var gateway: Gateway
 
 
@@ -62,10 +63,10 @@ proc xiaomiLoadDevicesAlarm() =
 
   devicesAlarm = @[]
 
-  let allDevices = getAllRows(db, sql"SELECT xd.sid, xd.name, xd.model, xdd.value_data FROM xiaomi_devices AS xd LEFT JOIN xiaomi_devices_data AS xdd ON xdd.sid = xd.sid WHERE xdd.triggerAlarm != '' AND xdd.triggerAlarm != 'false' AND xdd.triggerAlarm IS NOT NULL")
+  let allDevices = getAllRows(db, sql"SELECT xd.sid, xdd.value_data, xdd.triggerAlarm FROM xiaomi_devices AS xd LEFT JOIN xiaomi_devices_data AS xdd ON xdd.sid = xd.sid WHERE xdd.triggerAlarm != '' AND xdd.triggerAlarm != 'false' AND xdd.triggerAlarm IS NOT NULL")
 
   for row in allDevices:
-    devicesAlarm.add((sid: row[0], name: row[1], model: row[2], alarmvalue: row[3]))
+    devicesAlarm.add((sid: row[0], alarmvalue: row[1], trigger: row[1]))
 
 
 proc xiaomiGatewayCreate(gSid, gName, gToken, gPassword, gSecret: string) =
@@ -76,7 +77,7 @@ proc xiaomiGatewayCreate(gSid, gName, gToken, gPassword, gSecret: string) =
 
 proc xiaomiGatewayUpdateSecret(gToken = gateway[3]) =
   ## Updates the gateways token and secret
-  
+
   xiaomiSecretUpdate(gateway[4], gToken)
   gateway[3] = gToken
   gateway[5] = xiaomiGatewaySecret
@@ -109,7 +110,7 @@ proc xiaomiSoundStop*(db: DbConn, sid: string) =
 
   xiaomiGatewaySecret = gateway[5]
   xiaomiWrite(sid, "\"mid\": 10000")
-    
+
 
 proc xiaomiGatewayLight*(db: DbConn, sid: string, color = "0") =
   ## Send Xiaomi command to enable gateway light
@@ -144,20 +145,20 @@ proc xiaomiWriteTemplate*(db: DbConn, id: string) =
 
       break
 
-
-proc xiaomiCheckAlarmStatus(sid, value, xdata: string) {.async.} =
+var alarmWaitForReset = false
+proc xiaomiCheckAlarmStatus(sid, value, xdata, alarmStatus: string) {.async.} =
   ## Check if the triggered device should trigger the alarm
 
   let alarmtrigger = jn(parseJson(xdata), value)
 
   for device in devicesAlarm:
-    if device[0] == sid and device[3] == alarmtrigger:
+    if device[0] == sid and device[1] == alarmtrigger and device[2] == alarmStatus:
       mqttSend("xiaomi", "alarm", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"triggered\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
-
+      alarmWaitForReset = true
       logit("xiaomi", "INFO", "xiaomiCheckAlarmStatus(): ALARM = " & xdata)
 
       break
-      
+
 
 proc xiaomiDiscoverUpdateDB(clearDB = false) =
   # Updates the database with new devices
@@ -189,7 +190,7 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
   except JsonParsingError:
     logit("xiaomi", "ERROR", "JSON parsing error")
     return
-  
+
   # Get SID
   let sid = jn(js, "sid")
 
@@ -226,7 +227,7 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
     let xdata = jn(js, "data")
     if xdata == "":
       return
-    
+
     # Check output
     if cmd == "report" or cmd == "read_ack":
       var value = ""
@@ -236,7 +237,7 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
 
       elif "motion" in xdata:
         value = "motion"
-      
+
       elif "lux" in xdata:
         value = "lux"
 
@@ -250,8 +251,11 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
         value = "illumination"
 
       # Check if the alarms needs to ring
-      if alarmStatus in ["armAway", "armHome"]:
-        asyncCheck xiaomiCheckAlarmStatus(sid, "status", xdata)     
+      if not alarmWaitForReset and alarmStatus in ["armAway", "armHome"]:
+        asyncCheck xiaomiCheckAlarmStatus(sid, "status", xdata, alarmStatus)
+
+      if alarmStatus in ["disarmed"]:
+        alarmWaitForReset = false
 
       # Add message
       mqttSend("xiaomi", "wss/to", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"read\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
@@ -264,7 +268,7 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
     case js["action"].getStr()
     of "discover":
       xiaomiDiscoverUpdateDB()
-    
+
     of "read":
       xiaomiSendRead(js["sid"].getStr())
 
@@ -286,7 +290,7 @@ proc xiaomiParseMqtt*(payload, alarmStatus: string) {.async.} =
       xiaomiLoadDevices()
       xiaomiLoadDevicesTemplates()
       xiaomiLoadDevicesAlarm()
-    
+
     of "addtemplate":
       xiaomiLoadDevicesTemplates()
 
