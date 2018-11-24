@@ -33,6 +33,8 @@ var www: Process
 var xiaomiList: Process
 
 
+if not fileExists(getAppDir() & "/config/secret.cfg"):
+  copyFile(getAppDir() & "/config/secret_default.cfg", getAppDir() & "/config/secret.cfg")
 let secretDir = getAppDir() & "/config/secret.cfg"
 let dict = loadConfig(secretDir)
 
@@ -243,7 +245,7 @@ proc compileIt() =
 
 
 proc requirements() =
-  discard existsOrCreateDir("tmp")
+  discard existsOrCreateDir(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/tmp")
   secretCfg()
   updateJsFile()
   checkMosquittoBroker()

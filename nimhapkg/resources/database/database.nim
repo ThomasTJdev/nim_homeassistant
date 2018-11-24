@@ -75,10 +75,10 @@ proc generateDB*(db: DbConn) =
 # Connect to DB
 proc conn*(): DbConn =
   try:
-    let dbexists = if fileExists(db_host): true else: false
+    let dbexists = if fileExists(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & db_host): true else: false
 
     if not dbexists:
-      discard existsOrCreateDir(db_folder)
+      discard existsOrCreateDir(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & db_folder)
 
     var db = open(connection=db_host, user=db_user, password=db_pass, database=db_name)
 
