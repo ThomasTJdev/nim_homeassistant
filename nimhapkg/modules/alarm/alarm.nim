@@ -99,7 +99,7 @@ proc alarmSetStatus(newStatus, trigger, device: string, userID = "") =
   asyncCheck mqttSendAsync("alarm", "alarminfo", "{\"action\": \"iotinfo\", \"element\": \"alarm\", \"status\": \"" & newStatus & "\", \"value\": \"\"}")
 
   alarm[0] = newStatus
-  discard tryExec(db, sql"UPDATE alarm SET status = ?", newStatus)
+  exec(db, sql"UPDATE alarm SET status = ?", newStatus)
 
   if userID != "":
     discard tryExec(db, sql"INSERT INTO alarm_history (status, trigger, device, userid) VALUES (?, ?, ?, ?)", newStatus, trigger, device, userID)
