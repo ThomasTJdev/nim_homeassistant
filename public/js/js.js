@@ -143,6 +143,12 @@ function websocketHandler(obj) {
       if (obj.data['voltage']) {
         xiaomiRefreshStatus(obj, "voltage");
       }
+      if (obj.data['temperature']) {
+        xiaomiRefreshStatus(obj, "temperature");
+      }
+      if (obj.data['humidity']) {
+        xiaomiRefreshStatus(obj, "humidity");
+      }
       if (obj.data['lux']) {
         xiaomiRefreshStatus(obj, "lux");
       }
@@ -750,6 +756,18 @@ function xiaomiRefreshStatus(obj, value) {
   else if (value == "no_motion") {
     console.log("Xiaomi - Sid: " + obj.sid + " - Value: " + obj.data.no_motion);
     $("." + obj.sid + ".device.motion .value").text(obj.data.no_motion + " sec");
+  }
+  else if (value == "temperature") {
+    var arr = obj.data.temperature.match(/.{2}/g);
+    var temp = arr.join('.');
+    console.log("Xiaomi - Sid: " + obj.sid + " - Value: " + temp);
+    $("." + obj.sid + ".device.temperature .value").text(temp + " C");
+  }
+  else if (value == "humidity") {
+    var arr = obj.data.humidity.match(/.{2}/g);
+    var humd = arr.join('.');
+    console.log("Xiaomi - Sid: " + obj.sid + " - Value: " + humd);
+    $("." + obj.sid + ".device.humidity .value").text(humd + " %");
   }
 
   // Show object
