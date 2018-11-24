@@ -1,5 +1,5 @@
 # Package
-version       = "0.3.2"
+version       = "0.3.3"
 author        = "Thomas T. Jarløv (https://github.com/ThomasTJdev)"
 description   = "Nim Home Assistant"
 license       = "GPLv3"
