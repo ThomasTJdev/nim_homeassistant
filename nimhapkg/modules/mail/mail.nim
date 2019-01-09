@@ -8,6 +8,7 @@ import strutils
 import ../../resources/database/database
 
 var db = conn()
+var dbMail = conn("dbMail.db")
 
 var smtpAddress    = ""
 var smtpPort       = ""
@@ -25,13 +26,13 @@ proc sendMailNow*(subject, message, recipient: string) {.async.} =
   #when defined(dev) and not defined(devemailon):
   #  echo "Dev is true, email is not send"
   #  return
-  const otherHeaders = @[("Content-Type", "text/html; charset=\"UTF-8\"")]  
-  
+  const otherHeaders = @[("Content-Type", "text/html; charset=\"UTF-8\"")]
+
   var client = newAsyncSmtp(useSsl = true, debug = false)
   await client.connect(smtpAddress, Port(parseInt(smtpPort)))
-  
+
   await client.auth(smtpUser, smtpPassword)
-  
+
   let from_addr = smtpFrom
   let toList = @[recipient]
 
@@ -51,25 +52,25 @@ proc sendMailNow*(subject, message, recipient: string) {.async.} =
     echo "Email send"
 
 
-proc sendMailDb*(db: DbConn, mailID: string) =
+proc sendMailDb*(mailID: string) =
   ## Get data from mail template and send
   ## Uses Sync Socket
 
   when defined(dev):
     echo "Dev: Mail start"
 
-  let mail = getRow(db, sql"SELECT recipient, subject, body FROM mail_templates WHERE id = ?", mailID)
+  let mail = getRow(dbMail, sql"SELECT recipient, subject, body FROM mail_templates WHERE id = ?", mailID)
 
   let recipient = mail[0]
   let subject   = mail[1]
   let message   = mail[2]
 
-  const otherHeaders = @[("Content-Type", "text/html; charset=\"UTF-8\"")]  
-  
+  const otherHeaders = @[("Content-Type", "text/html; charset=\"UTF-8\"")]
+
   var client = newSmtp(useSsl = true, debug = false)
   client.connect(smtpAddress, Port(parseInt(smtpPort)))
   client.auth(smtpUser, smtpPassword)
-  
+
   let from_addr = smtpFrom
   let toList = @[recipient]
 
@@ -88,10 +89,10 @@ proc sendMailDb*(db: DbConn, mailID: string) =
     echo "Email send"
 
 
-proc mailUpdateParameters*(db: DbConn) =
+proc mailUpdateParameters*() =
   ## Update mail settings in variables
 
-  let mailSettings = getRow(db, sql"SELECT address, port, fromaddress, user, password FROM mail_settings WHERE id = ?", "1")
+  let mailSettings = getRow(dbMail, sql"SELECT address, port, fromaddress, user, password FROM mail_settings WHERE id = ?", "1")
 
   smtpAddress    = mailSettings[0]
   smtpPort       = mailSettings[1]
@@ -100,4 +101,4 @@ proc mailUpdateParameters*(db: DbConn) =
   smtpPassword   = mailSettings[4]
 
 
-mailUpdateParameters(db)
+mailUpdateParameters()

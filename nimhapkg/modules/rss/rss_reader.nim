@@ -10,8 +10,9 @@ import ../../resources/database/database
 import ../../resources/mqtt/mqtt_func
 
 
-## Db connection
 var db = conn()
+var dbRss = conn("dbRss.db")
+
 
 proc rssFormatHtml(field, data: string, websocketMqtt: bool): string =
   ## Formats RSS data to HTML
@@ -50,7 +51,7 @@ proc rssReadUrl*(name, url: string, fields: varargs[string, `$`], skipNth = 0, w
   open(x, nn, "")
   next(x)
 
-  
+
   # Defined
   var rssOut = ""
   var skip = 0
@@ -73,7 +74,7 @@ proc rssReadUrl*(name, url: string, fields: varargs[string, `$`], skipNth = 0, w
               notStart = false
             else:
               notStart = true
-              
+
             if field == startField and startTag == true and notStart == true:
               startTag = true
               rssOut.add("\n</div>")
@@ -109,17 +110,17 @@ proc rssReadUrl*(name, url: string, fields: varargs[string, `$`], skipNth = 0, w
                 rssOut.add("\n</div>")
 
               continue
-          
+
 
       of xmlEof: break
       of xmlError:
         echo(errorMsg(x))
         x.next()
       else: x.next()
-    
+
     except AssertionError:
       continue
-    
+
     except:
       echo "Error: Something went wrong"
 
@@ -134,18 +135,18 @@ proc rssReadUrl*(name, url: string, fields: varargs[string, `$`], skipNth = 0, w
   return rssOut
 
 
-proc rssReadUrl*(db: DbConn, feedid: string, websocketMqtt = false): string =
+proc rssReadUrl*(feedid: string, websocketMqtt = false): string =
   ## Reads a RSS feed from data in database
 
-  let rssData = getRow(db, sql"SELECT url, fields, skip, name FROM rss_feeds WHERE id = ?", feedid)
+  let rssData = getRow(dbRss, sql"SELECT url, fields, skip, name FROM rss_feeds WHERE id = ?", feedid)
 
   return rssReadUrl(rssData[3], rssData[0], rssData[1].split(","), parseInt(rssData[2]), websocketMqtt)
 
 
-proc rssFeetchToWss(db: DbConn, feedid: string) {.async.} =
+proc rssFeetchToWss(feedid: string) {.async.} =
   ## Reads RSS and sends to WSS
 
-  mqttSend("rss", "wss/to", "{\"handler\": \"action\", \"element\": \"rss\", \"action\": \"update\", \"feedid\": \"" & feedid & "\", \"data\": \"" & rssReadUrl(db, feedid, true).replace("\n", "") & "\"}")
+  mqttSend("rss", "wss/to", "{\"handler\": \"action\", \"element\": \"rss\", \"action\": \"update\", \"feedid\": \"" & feedid & "\", \"data\": \"" & rssReadUrl(feedid, true).replace("\n", "") & "\"}")
 
 
 template jn(json: JsonNode, data: string): string =
@@ -165,8 +166,8 @@ proc rssParseMqtt*(payload: string) {.async.} =
     if feedid == "":
       return
 
-    asyncCheck rssFeetchToWss(db, feedid)
-    
+    asyncCheck rssFeetchToWss(feedid)
+
 
 
 #echo rssReadUrl("https://www.archlinux.org/feeds/packages/", ["title", "pubDate"], 0)

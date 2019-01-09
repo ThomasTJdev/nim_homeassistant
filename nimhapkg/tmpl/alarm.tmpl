@@ -3,8 +3,8 @@
 #
 #
 #
-#proc genAlarm(c: var TData): string = 
-# result = "" 
+#proc genAlarm(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -21,11 +21,11 @@
 
       <div id="pagewrapper">
         <div id="alarm">
-         
+
           <h1>Alarm</h1>
 
-          # let alarmCountdown = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
-          # let alarmArmtime = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "armtime")
+          # let alarmCountdown = getValue(dbAlarm, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
+          # let alarmArmtime = getValue(dbAlarm, sql"SELECT value FROM alarm_settings WHERE element = ?", "armtime")
           <div class="alarmDetails">
             <h3>Settings</h3>
             <div>
@@ -46,7 +46,7 @@
           <hr>
 
           <div class="alarmPasswords">
-            # let allPasswords = getAllRows(db, sql"SELECT person.id, person.name, alarm_password.creation FROM alarm_password LEFT JOIN person ON person.id = alarm_password.userid")
+            # let allPasswords = getAllRows(dbAlarm, sql"SELECT person.id, person.name, alarm_password.creation FROM alarm_password LEFT JOIN person ON person.id = alarm_password.userid")
 
             <h3>Alarm password</h3>
             <h5>Users with access to manage the alarm (only digits!)</h5>
@@ -98,17 +98,17 @@
           <hr>
 
           <div class="alarmActions">
-            # let allActions = getAllRows(db, sql"SELECT id, alarmstate, action, action_name, action_ref FROM alarm_actions ORDER BY action")
+            # let allActions = getAllRows(dbAlarm, sql"SELECT id, alarmstate, action, action_name, action_ref FROM alarm_actions ORDER BY action")
             #
-            # let pushAlarm = getAllRows(db, sql"SELECT id, name FROM pushbullet_templates")
+            # let pushAlarm = getAllRows(dbPushbullet, sql"SELECT id, name FROM pushbullet_templates")
             #
-            # let mailAlarm = getAllRows(db, sql"SELECT id, name FROM mail_templates")
+            # let mailAlarm = getAllRows(dbMail, sql"SELECT id, name FROM mail_templates")
             #
-            # let mqttActions = getAllRows(db, sql"SELECT id, name FROM mqtt_templates")
+            # let mqttActions = getAllRows(dbMqtt, sql"SELECT id, name FROM mqtt_templates")
             #
-            # let rpiActions = getAllRows(db, sql"SELECT id, name FROM rpi_templates")
+            # let rpiActions = getAllRows(dbRpi, sql"SELECT id, name FROM rpi_templates")
             #
-            # let xiaomiAlarm = getAllRows(db, sql"SELECT xda.id, xda.name, xd.name FROM xiaomi_templates AS xda LEFT JOIN xiaomi_devices AS xd ON xd.sid = xda.sid ORDER BY xda.name")
+            # let xiaomiAlarm = getAllRows(dbXiaomi, sql"SELECT xda.id, xda.name, xd.name FROM xiaomi_templates AS xda LEFT JOIN xiaomi_devices AS xd ON xd.sid = xda.sid ORDER BY xda.name")
             #
             # var select = ""
             #
@@ -174,7 +174,7 @@
               #  end if
               #
               #  rowBefore = action[2]
-              
+
               <tr>
                 <td>${action[1]}</td>
                 <td>${action[2]}</td>
@@ -191,7 +191,7 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}
@@ -205,8 +205,8 @@
 #
 #
 #
-#proc genAlarmCode(c: var TData): string = 
-# result = "" 
+#proc genAlarmCode(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>

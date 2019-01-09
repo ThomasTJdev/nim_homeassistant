@@ -12,6 +12,7 @@ import ../../resources/mqtt/mqtt_func
 var pushbulletAPI = ""
 
 var db = conn()
+var dbPushbullet = conn("dbPushbullet.db")
 
 
 proc pushbulletSendCurl(pushType = "note", title = "title", body = "body"): string =
@@ -33,32 +34,33 @@ template jsonHasKey(data: string): bool =
     false
 
 
+#[
 proc pushbulletHistory(db: DbConn, resp, title, body: string): string =
   ## Adds pushbullet to the history
 
   if jsonHasKey(resp):
     exec(db, sql"INSERT INTO history (element, identificer, value, error) VALUES (?, ?, ?, ?)", "pushbullet", "send", resp, "1")
-    
+
     mqttSend("wss/to", "pushbullet", "{\"handler\": \"response\", \"value\": \"Pushbullet error\", \"error\": \"true\"}")
 
   else:
     exec(db, sql"INSERT INTO history (element, identifier, value) VALUES (?, ?, ?)", "pushbullet", "send", "Notification delivered. Title: " & title & " - Body: " & body)
-    
+]#
 
 
-proc pushbulletSendDb*(db: DbConn, pushID: string) =
+proc pushbulletSendDb*(pushID: string) =
   ## Sends a push from database
 
-  let push = getRow(db, sql"SELECT title, body FROM pushbullet_templates WHERE id = ?", pushID)
+  let push = getRow(dbPushbullet, sql"SELECT title, body FROM pushbullet_templates WHERE id = ?", pushID)
 
   let resp = pushbulletSendCurl("note", push[0], push[1])
 
   # Why save the pushbullet history?
-  #discard pushbulletHistory(db, resp, push[0], push[1])
-   
+  #discard pushbulletHistory(dbPushbullet, resp, push[0], push[1])
 
 
-proc pushbulletSendTest*(db: DbConn) =
+
+proc pushbulletSendTest*() =
   ## Sends a test pushmessage
 
   let resp = pushbulletSendCurl("note", "Test title", "Test body")
@@ -77,10 +79,10 @@ proc pushbulletParseMqtt*(payload: string) =
   let js = parseJson(payload)
 
   if js["pushid"].getStr() == "test":
-    pushbulletSendTest(db)
+    pushbulletSendTest()
 
   else:
-    pushbulletSendDb(db, js["pushid"].getStr())
+    pushbulletSendDb(js["pushid"].getStr())
 
 
 
@@ -105,13 +107,13 @@ proc pushbulletSendWebsocket*(pushType, title, body: string): string =
   return pushbulletHistory(db, resp, title, body)
 ]#
 
-proc pushbulletUpdateApi*(db: DbConn) =
-  pushbulletAPI = getValue(db, sql"SELECT api FROM pushbullet_settings WHERE id = ?", "1")
+proc pushbulletUpdateApi*() =
+  pushbulletAPI = getValue(dbPushbullet, sql"SELECT api FROM pushbullet_settings WHERE id = ?", "1")
 
 
-proc pushbulletNewApi*(db: DbConn, api: string) =
-  exec(db, sql"UPDATE pushbullet_settings SET api = ? WHERE id = ?", api, "1")
+proc pushbulletNewApi*(api: string) =
+  exec(dbPushbullet, sql"UPDATE pushbullet_settings SET api = ? WHERE id = ?", api, "1")
   pushbulletAPI = api
 
 
-pushbulletUpdateApi(db)
+pushbulletUpdateApi()

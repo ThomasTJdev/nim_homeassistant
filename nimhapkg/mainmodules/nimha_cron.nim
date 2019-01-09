@@ -83,10 +83,10 @@ proc cronJobRun() {.async.} =
       case cronitem.element
       of "pushbullet":
         echo "push"
-        pushbulletSendDb(db, cronitem.jobid)
+        pushbulletSendDb(cronitem.jobid)
 
       of "mail":
-        sendMailDb(db, cronitem.jobid)
+        sendMailDb(cronitem.jobid)
 
       of "xiaomi":
         asyncCheck xiaomiWriteTemplate(db, cronitem.jobid)
@@ -113,10 +113,10 @@ proc cronJobRun(time: string) =
 
     case row[0]
     of "pushbullet":
-      pushbulletSendDb(db, row[1])
+      pushbulletSendDb(row[1])
 
     of "mail":
-      sendMailDb(db, row[1])
+      sendMailDb(row[1])
 
     of "mqtt":
       mqttActionSendDb(db, row[1])
@@ -127,7 +127,7 @@ proc cronJobRun(time: string) =
 
     of "xiaomi":
       ## TODO: This leads to error sometimes
-      xiaomiWriteTemplate(db, row[1])
+      xiaomiWriteTemplate(row[1])
 
     else:
       discard

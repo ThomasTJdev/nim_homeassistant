@@ -99,16 +99,28 @@ proc createDbTables() =
 
   var db = conn()
 
-  alarmDatabase(db)
-  mailDatabase(db)
-  owntracksDatabase(db)
-  pushbulletDatabase(db)
-  rssDatabase(db)
-  xiaomiDatabase(db)
-  cronDatabase(db)
-  filestreamDatabase(db)
-  mqttDatabase(db)
-  rpiDatabase(db)
+  var dbAlarm = conn("dbAlarm.db")
+  var dbCron = conn("dbCron.db")
+  var dbFile = conn("dbFile.db")
+  var dbMail = conn("dbMail.db")
+  var dbMqtt = conn("dbMqtt.db")
+  var dbOwntracks = conn("dbOwntracks.db")
+  var dbPushbullet = conn("dbPushbullet.db")
+  var dbRpi = conn("dbRpi.db")
+  var dbRss = conn("dbRss.db")
+  var dbXiaomi = conn("dbXiaomi.db")
+  var dbWeb = conn("dbWeb.db")
+
+  alarmDatabase(dbAlarm)
+  mailDatabase(dbMail)
+  owntracksDatabase(dbOwntracks)
+  pushbulletDatabase(dbPushbullet)
+  rssDatabase(dbRss)
+  xiaomiDatabase(dbXiaomi)
+  cronDatabase(dbCron)
+  filestreamDatabase(dbFile)
+  mqttDatabase(dbMqtt)
+  rpiDatabase(dbRpi)
 
 
 proc launcherActivated() =

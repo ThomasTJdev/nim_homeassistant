@@ -4,8 +4,8 @@
 #
 #
 #
-#proc genRpi(c: var TData): string = 
-# result = "" 
+#proc genRpi(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -22,13 +22,13 @@
 
       <div id="pagewrapper">
         <div id="rpi">
-         
+
           <h1>Raspberry Pi</h1>
-          
+
           <hr>
 
           <div class="rpiTemplates">
-            # let allRpi = getAllRows(db, sql"SELECT id, name, pin, pinMode, pinPull, digitalAction, analogAction, value FROM rpi_templates")
+            # let allRpi = getAllRows(dbRpi, sql"SELECT id, name, pin, pinMode, pinPull, digitalAction, analogAction, value FROM rpi_templates")
 
             <h3>Raspberry Pi templates</h3>
 
@@ -126,7 +126,7 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}

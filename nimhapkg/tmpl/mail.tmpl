@@ -4,8 +4,8 @@
 #
 #
 #
-#proc genMail(c: var TData): string = 
-# result = "" 
+#proc genMail(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -20,11 +20,11 @@
     <div class="wrapper">
       ${genMainSidebar()}
 
-      # let mailSettings = getRow(db, sql"SELECT address, port, fromaddress, user, password FROM mail_settings WHERE id = ?", "1")
+      # let mailSettings = getRow(dbMail, sql"SELECT address, port, fromaddress, user, password FROM mail_settings WHERE id = ?", "1")
 
       <div id="pagewrapper">
         <div id="mail">
-         
+
           <h1>Mail</h1>
 
           <div class="mailSettings">
@@ -96,11 +96,11 @@
               </tbody>
             </table>
           </div>
-          
+
           <hr>
 
           <div class="mailTemplates">
-            # let mailTemplates = getAllRows(db, sql"SELECT id, name, recipient, subject, body FROM mail_templates")
+            # let mailTemplates = getAllRows(dbMail, sql"SELECT id, name, recipient, subject, body FROM mail_templates")
 
             <h3>Mail templates</h3>
 
@@ -161,7 +161,7 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}

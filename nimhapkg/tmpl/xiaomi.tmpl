@@ -27,13 +27,13 @@
       ${genMainSidebar()}
 
 
-# let allSensors = getAllRows(db, sql"SELECT xdd.id, xd.sid, xd.name, xd.model, xdd.value_name, xdd.value_data, xdd.action, xdd.triggerAlarm FROM xiaomi_devices_data AS xdd LEFT JOIN xiaomi_devices AS xd ON xd.sid = xdd.sid ORDER BY xd.name ASC")
+# let allSensors = getAllRows(dbXiaomi, sql"SELECT xdd.id, xd.sid, xd.name, xd.model, xdd.value_name, xdd.value_data, xdd.action, xdd.triggerAlarm FROM xiaomi_devices_data AS xdd LEFT JOIN xiaomi_devices AS xd ON xd.sid = xdd.sid ORDER BY xd.name ASC")
 #
-# let allActions = getAllRows(db, sql"SELECT xdd.id, xd.sid, xdd.name, xd.name, xd.model, xdd.value_name, xdd.value_data FROM xiaomi_templates AS xdd LEFT JOIN xiaomi_devices AS xd ON xd.sid = xdd.sid ORDER BY xd.name ASC")
+# let allActions = getAllRows(dbXiaomi, sql"SELECT xdd.id, xd.sid, xdd.name, xd.name, xd.model, xdd.value_name, xdd.value_data FROM xiaomi_templates AS xdd LEFT JOIN xiaomi_devices AS xd ON xd.sid = xdd.sid ORDER BY xd.name ASC")
 #
-# let allDevices = getAllRows(db, sql"SELECT xd.sid, xd.name, xd.model, xd.creation FROM xiaomi_devices AS xd ORDER BY xd.creation DESC")
+# let allDevices = getAllRows(dbXiaomi, sql"SELECT xd.sid, xd.name, xd.model, xd.creation FROM xiaomi_devices AS xd ORDER BY xd.creation DESC")
 #
-# let gwApi = getAllRows(db, sql"SELECT gw.sid, gw.key, xi.name FROM xiaomi_api AS gw LEFT JOIN xiaomi_devices AS xi ON xi.sid = gw.sid")
+# let gwApi = getAllRows(dbXiaomi, sql"SELECT gw.sid, gw.key, xi.name FROM xiaomi_api AS gw LEFT JOIN xiaomi_devices AS xi ON xi.sid = gw.sid")
 #
 #
 # var select = ""

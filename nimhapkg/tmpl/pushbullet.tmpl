@@ -4,8 +4,8 @@
 #
 #
 #
-#proc genPushbullet(c: var TData): string = 
-# result = "" 
+#proc genPushbullet(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -22,12 +22,12 @@
 
       <div id="pagewrapper">
         <div id="pushbullet">
-         
+
           <h1>Pushbullet</h1>
 
           <div class="pushbulletApi">
 
-            # let pushApi = getValue(db, sql"SELECT api FROM pushbullet_settings WHERE id = ?", "1")
+            # let pushApi = getValue(dbPushbullet, sql"SELECT api FROM pushbullet_settings WHERE id = ?", "1")
 
             <hr>
 
@@ -57,7 +57,7 @@
           <hr>
 
           <div class="pushbulletTemplates">
-            # let pushTemplates = getAllRows(db, sql"SELECT id, name, title, body FROM pushbullet_templates")
+            # let pushTemplates = getAllRows(dbPushbullet, sql"SELECT id, name, title, body FROM pushbullet_templates")
 
             <h3>Pushbullet templates</h3>
 
@@ -111,7 +111,7 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}

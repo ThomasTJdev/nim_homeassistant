@@ -9,6 +9,7 @@ import ../../resources/utils/parsers
 from os import getAppDir
 
 var db = conn()
+var dbOwntracks = conn("dbOwntracks.db")
 
 
 let dict    = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
@@ -26,10 +27,10 @@ proc owntracksAddWaypoints(topic, data: string) {.async.} =
   let username  = split(topic, "/")[1]
 
   for waypoint in items(waypoints):
-    if getValue(db, sql"SELECT id FROM owntracks_waypoints WHERE username = ? AND desc = ?", username, waypoint["desc"].getStr()) == "":
-      exec(db, sql"INSERT INTO owntracks_waypoints (username, device_id, desc, lat, lon, rad) VALUES (?, ?, ?, ?, ?, ?)", username, deviceID, waypoint["desc"].getStr(), waypoint["lat"].getFloat(), waypoint["lon"].getFloat(), waypoint["rad"].getInt())
+    if getValue(dbOwntracks, sql"SELECT id FROM owntracks_waypoints WHERE username = ? AND desc = ?", username, waypoint["desc"].getStr()) == "":
+      exec(dbOwntracks, sql"INSERT INTO owntracks_waypoints (username, device_id, desc, lat, lon, rad) VALUES (?, ?, ?, ?, ?, ?)", username, deviceID, waypoint["desc"].getStr(), waypoint["lat"].getFloat(), waypoint["lon"].getFloat(), waypoint["rad"].getInt())
     else:
-      exec(db, sql"UPDATE owntracks_waypoints SET username = ?, device_id = ?, desc = ?, lat = ?, lon = ?, rad = ? WHERE username = ? AND device_id = ?", username, deviceID, waypoint["desc"].getStr(), waypoint["lat"].getFloat(), waypoint["lon"].getFloat(), waypoint["rad"].getInt(), username, deviceID)
+      exec(dbOwntracks, sql"UPDATE owntracks_waypoints SET username = ?, device_id = ?, desc = ?, lat = ?, lon = ?, rad = ? WHERE username = ? AND device_id = ?", username, deviceID, waypoint["desc"].getStr(), waypoint["lat"].getFloat(), waypoint["lon"].getFloat(), waypoint["rad"].getInt(), username, deviceID)
 
 
 
@@ -49,7 +50,7 @@ proc owntracksLastLocations(init = false) {.async.} =
     json.add(",\"home\": {\"lat\": \"" & homeLat & "\", \"lon\": \"" & homeLon & "\"}")
 
   # Get latest history data
-  let allLocations = getAllRows(db, sql"SELECT DISTINCT device_id, lat, lon, creation FROM owntracks_history GROUP BY device_id ORDER BY creation DESC")
+  let allLocations = getAllRows(dbOwntracks, sql"SELECT DISTINCT device_id, lat, lon, creation FROM owntracks_history GROUP BY device_id ORDER BY creation DESC")
   if allLocations.len() != 0:
     var moreThanOne = false
     json.add(", \"devices\": [")
@@ -69,7 +70,7 @@ proc owntracksLastLocations(init = false) {.async.} =
     json.add("]")
 
   # Get latest history data
-  let allWaypoints = getAllRows(db, sql"SELECT DISTINCT desc, lat, lon, rad, creation FROM owntracks_waypoints")
+  let allWaypoints = getAllRows(dbOwntracks, sql"SELECT DISTINCT desc, lat, lon, rad, creation FROM owntracks_waypoints")
   if allWaypoints.len() != 0:
     var moreThanOne = false
     json.add(", \"waypoints\": [")
@@ -88,10 +89,10 @@ proc owntracksLastLocations(init = false) {.async.} =
       moreThanOne = true
 
     json.add("]")
-    
-  
+
+
   json.add("}")
-  
+
   mqttSend("owntracks", "wss/to", json)
 
 
@@ -110,12 +111,12 @@ proc owntracksHistoryAdd(topic, data: string) {.async.} =
   let conn        = jn(js, "conn")
 
   # Check if device exists or add it
-  if getValue(db, sql"SELECT device_id FROM owntracks_devices WHERE device_id = ? AND tracker_id = ?", deviceID, trackerID) == "":
-    exec(db, sql"INSERT INTO owntracks_devices (device_id, username, tracker_id) VALUES (?, ?, ?)", deviceID, username, trackerID)
+  if getValue(dbOwntracks, sql"SELECT device_id FROM owntracks_devices WHERE device_id = ? AND tracker_id = ?", deviceID, trackerID) == "":
+    exec(dbOwntracks, sql"INSERT INTO owntracks_devices (device_id, username, tracker_id) VALUES (?, ?, ?)", deviceID, username, trackerID)
 
   # Add history
   if jn(js, "_type") == "location" and lat != 0 and lon != 0:
-    exec(db, sql"INSERT INTO owntracks_history (device_id, username, tracker_id, lat, lon, conn) VALUES (?, ?, ?, ?, ?, ?)", deviceID, username, trackerID, lat, lon, conn)
+    exec(dbOwntracks, sql"INSERT INTO owntracks_history (device_id, username, tracker_id, lat, lon, conn) VALUES (?, ?, ?, ?, ?, ?)", deviceID, username, trackerID, lat, lon, conn)
 
 
 proc owntracksParseMqtt*(payload, topic: string) {.async.} =
@@ -127,7 +128,7 @@ proc owntracksParseMqtt*(payload, topic: string) {.async.} =
   if hasKey(js, "_type"):
     if jn(js, "_type") == "location":
       asyncCheck owntracksHistoryAdd(topic, payload)
-    
+
     elif jn(js, "_type") == "waypoints":
       asyncCheck owntracksAddWaypoints(topic, payload)
 

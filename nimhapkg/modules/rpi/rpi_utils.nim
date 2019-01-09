@@ -12,20 +12,19 @@ import ../../resources/database/database
 import ../../resources/mqtt/mqtt_func
 import ../../resources/utils/logging
 
-type 
+type
   RpiTemplate = tuple[id: string, name: string, pin: string, pinMode: string, pinPull: string, digitalAction: string, analogAction: string, value: string]
 
 var rpiTemplate: seq[RpiTemplate] = @[]
 
-var db = conn()
-
+var dbRpi = conn("dbRpi.db")
 
 proc rpiLoadTemplates*() =
   ## Load the RPi templates
 
   rpiTemplate = @[]
 
-  let allRpi = getAllRows(db, sql"SELECT id, name, pin, pinMode, pinPull, digitalAction, analogAction, value FROM rpi_templates")
+  let allRpi = getAllRows(dbRpi, sql"SELECT id, name, pin, pinMode, pinPull, digitalAction, analogAction, value FROM rpi_templates")
 
   for rpi in allRpi:
     rpiTemplate.add((id: rpi[0], name: rpi[1], pin: rpi[2], pinMode: rpi[3], pinPull: rpi[4], digitalAction: rpi[5], analogAction: rpi[6], value: rpi[7]))
@@ -37,7 +36,7 @@ proc rpiAction*(rpiID: string): string =
   for rpi in rpiTemplate:
     if rpi[0] != rpiID:
       continue
-    
+
     if rpi[2].len() == 0:
       return
     let rpiPin = toU32(parseInt(rpi[2]))
@@ -89,7 +88,7 @@ proc rpiAction*(rpiID: string): string =
         return $piDigitalRead(rpiPin)
       else:
         discard
-    
+
     # Analog:
     elif rpi[6].len() != 0:
       case rpi[6]
@@ -99,7 +98,7 @@ proc rpiAction*(rpiID: string): string =
         return $analogRead(rpiPin)
       else:
         discard
-    
+
 
 proc rpiParseMqtt*(payload: string) {.async.} =
   let js = parseJson(payload)
@@ -131,6 +130,6 @@ proc rpiInit() =
 
   rpiLoadTemplates()
   logit("rpi", "DEBUG", "piSetup(): Setup complete")
-  
+
 
 rpiInit()

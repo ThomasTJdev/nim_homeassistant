@@ -7,7 +7,7 @@
 # result = ""
 <div data-id="cardAlarm" class="cardAlarm item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
-    # let alarmStatus = getValue(db, sql"SELECT status FROM alarm")
+    # let alarmStatus = getValue(dbAlarm, sql"SELECT status FROM alarm")
     # template alarmClass(status: string): string =
     #   if status == alarmStatus:
     #     if alarmStatus == "disarmed":
@@ -82,7 +82,7 @@
 #
 #proc cardCertificates(c: var TData): string =
 # result = ""
-# let certificates = getAllRows(db, sql"SELECT name, url, port FROM certificates ORDER BY name ASC")
+# let certificates = getAllRows(dbWeb, sql"SELECT name, url, port FROM certificates ORDER BY name ASC")
 # if certificates.len() > 0:
 <div data-id="cardCertificates" class="cardCertificates item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
@@ -113,7 +113,7 @@
 #
 #proc cardPushbullet(c: var TData): string =
 # result = ""
-# let pushAll = getAllRows(db, sql"SELECT id, name FROM pushbullet_templates")
+# let pushAll = getAllRows(dbPushbullet, sql"SELECT id, name FROM pushbullet_templates")
 # if pushAll.len() > 0:
 <div data-id="cardPushbullet" class="cardPushbullet item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
@@ -141,7 +141,7 @@
 #
 #proc cardXiaomiDevice(c: var TData): string =
 # result = ""
-# let xiaomiDevices = getAllRows(db, sql"SELECT xdd.sid, xd.name, xdd.value_name, xdd.action FROM xiaomi_devices_data AS xdd LEFT JOIN xiaomi_devices AS xd ON xd.sid = xdd.sid WHERE xdd.triggerAlarm = ? ORDER BY xd.name ASC", "false")
+# let xiaomiDevices = getAllRows(dbXiaomi, sql"SELECT xdd.sid, xd.name, xdd.value_name, xdd.action FROM xiaomi_devices_data AS xdd LEFT JOIN xiaomi_devices AS xd ON xd.sid = xdd.sid WHERE xdd.triggerAlarm = ? ORDER BY xd.name ASC", "false")
 # if xiaomiDevices.len() > 0:
 <div data-id="cardXiaomiDevice" class="cardXiaomiDevice item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
@@ -170,7 +170,7 @@
 #
 #proc cardOwntracks(c: var TData): string =
 # result = ""
-# if getAllRows(db, sql"SELECT id FROM owntracks_history").len() > 0:
+# if getAllRows(dbOwntracks, sql"SELECT id FROM owntracks_history").len() > 0:
 <div data-id="cardOwntracks" class="cardOwntracks item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">
     <div class="owntracks">
@@ -194,9 +194,9 @@
 # result = ""
 # var filestreams: seq[Row]
 # if cardNumber == "":
-#   filestreams = getAllRows(db, sql"SELECT id, name, url, download, html FROM filestream")
+#   filestreams = getAllRows(dbFile, sql"SELECT id, name, url, download, html FROM filestream")
 # else:
-#   filestreams = getAllRows(db, sql"SELECT id, name, url, download, html FROM filestream WHERE id = ?", cardNumber)
+#   filestreams = getAllRows(dbFile, sql"SELECT id, name, url, download, html FROM filestream WHERE id = ?", cardNumber)
 # end if
 # for stream in filestreams:
 <div data-id="cardFilestream-${stream[0]}" class="cardFilestream item col-12 col-sm-6 col-md-6 col-lg-3">
@@ -231,7 +231,7 @@
 #
 #proc cardRss(c: var TData): string =
 # result = ""
-# let rssFeeds = getAllRows(db, sql"SELECT id, url, skip, fields, name FROM rss_feeds")
+# let rssFeeds = getAllRows(dbRss, sql"SELECT id, url, skip, fields, name FROM rss_feeds")
 # for feed in rssFeeds:
 <div data-id="cardRss" class="cardRss item col-12 col-sm-6 col-md-6 col-lg-3">
   <div class="inner">

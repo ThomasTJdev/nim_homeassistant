@@ -3,8 +3,8 @@
 #
 #
 #
-#proc genFilestream(c: var TData): string = 
-# result = "" 
+#proc genFilestream(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -21,7 +21,7 @@
 
       <div id="pagewrapper">
         <div id="filestream">
-         
+
           <h1>Filestreams</h1>
 
           <p>This enables a stream of a file to your dashboard. This could be a image or video.</p>
@@ -62,7 +62,7 @@
 
               <tbody>
 
-              # let filestreams = getAllRows(db, sql"SELECT id, name, url, download, html FROM filestream")
+              # let filestreams = getAllRows(dbFile, sql"SELECT id, name, url, download, html FROM filestream")
               # for stream in filestreams:
               <tr>
                 <td>${stream[1]}</td>
@@ -82,7 +82,7 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}

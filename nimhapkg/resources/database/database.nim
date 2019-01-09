@@ -90,3 +90,24 @@ proc conn*(): DbConn =
   except:
     echo "ERROR: Connection to DB could not be established"
     quit()
+
+
+proc conn*(dbName: string): DbConn =
+  let db_host = "data/" & dbName
+  let db_name = dbName
+  try:
+    let dbexists = if fileExists(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & db_host): true else: false
+
+    if not dbexists:
+      discard existsOrCreateDir(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & db_folder)
+
+    var db = open(connection=db_host, user=db_user, password=db_pass, database=db_name)
+
+    if not dbexists:
+      generateDB(db)
+
+    return db
+
+  except:
+    echo "ERROR: Connection to DB could not be established"
+    quit()

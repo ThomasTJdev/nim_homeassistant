@@ -4,8 +4,8 @@
 #
 #
 #
-#proc genCertificates(c: var TData): string = 
-# result = "" 
+#proc genCertificates(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -20,11 +20,11 @@
     <div class="wrapper">
       ${genMainSidebar()}
 
-      # let allCerts = getAllRows(db, sql"SELECT id, name, url, port, creation FROM certificates ORDER BY name ASC")
+      # let allCerts = getAllRows(dbWeb, sql"SELECT id, name, url, port, creation FROM certificates ORDER BY name ASC")
 
       <div id="pagewrapper">
         <div id="certificates">
-         
+
           <h1>Certificates</h1>
 
           <div class="certList">
@@ -84,7 +84,7 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}

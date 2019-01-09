@@ -35,14 +35,15 @@ var alarmActions: seq[AlarmActions] = @[]
 
 
 var db = conn()
+var dbAlarm = conn("dbAlarm.db")
 
 
 proc alarmLoadStatus() =
   ## Load alarm status
 
-  let aStatus = getValue(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
-  let aArmtime = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "armtime")
-  let aCountdown = getValue(db, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
+  let aStatus = getValue(dbAlarm, sql"SELECT status FROM alarm WHERE id = ?", "1")
+  let aArmtime = getValue(dbAlarm, sql"SELECT value FROM alarm_settings WHERE element = ?", "armtime")
+  let aCountdown = getValue(dbAlarm, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
 
   alarm = (status: aStatus, armtime: aArmtime, countdown: aCountdown, armedtime: $toInt(epochTime()))
 
@@ -62,7 +63,7 @@ proc alarmLoadActions() =
 
   alarmActions = @[]
 
-  let allActions = getAllRows(db, sql"SELECT id, action, action_ref, alarmstate FROM alarm_actions")
+  let allActions = getAllRows(dbAlarm, sql"SELECT id, action, action_ref, alarmstate FROM alarm_actions")
   for row in allActions:
     alarmActions.add((id: row[0], action: row[1], action_ref: row[2], alarmstate: row[3]))
 
@@ -81,16 +82,16 @@ proc alarmAction() =
 
       case action[1]
       of "pushbullet":
-        pushbulletSendDb(db, action[2])
+        pushbulletSendDb(action[2])
       of "mail":
-        sendMailDb(db, action[2])
+        sendMailDb(action[2])
       of "mqtt":
         mqttActionSendDb(db, action[2])
       of "rpi":
         when defined(rpi):
           discard rpiAction(action[2])
       of "xiaomi":
-        xiaomiWriteTemplate(db, action[2])
+        xiaomiWriteTemplate(action[2])
 
 
 proc alarmSetStatus(newStatus, trigger, device: string, userID = "") =
@@ -99,12 +100,12 @@ proc alarmSetStatus(newStatus, trigger, device: string, userID = "") =
   asyncCheck mqttSendAsync("alarm", "alarminfo", "{\"action\": \"iotinfo\", \"element\": \"alarm\", \"status\": \"" & newStatus & "\", \"value\": \"\"}")
 
   alarm[0] = newStatus
-  exec(db, sql"UPDATE alarm SET status = ?", newStatus)
+  exec(dbAlarm, sql"UPDATE alarm SET status = ?", newStatus)
 
   if userID != "":
-    discard tryExec(db, sql"INSERT INTO alarm_history (status, trigger, device, userid) VALUES (?, ?, ?, ?)", newStatus, trigger, device, userID)
+    discard tryExec(dbAlarm, sql"INSERT INTO alarm_history (status, trigger, device, userid) VALUES (?, ?, ?, ?)", newStatus, trigger, device, userID)
   else:
-    discard tryExec(db, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", newStatus, trigger, device)
+    discard tryExec(dbAlarm, sql"INSERT INTO alarm_history (status, trigger, device) VALUES (?, ?, ?)", newStatus, trigger, device)
 
   alarmAction()
 

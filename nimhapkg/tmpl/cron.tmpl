@@ -3,8 +3,8 @@
 #
 #
 #
-#proc genCron(c: var TData): string = 
-# result = "" 
+#proc genCron(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -21,21 +21,21 @@
 
       <div id="pagewrapper">
         <div id="cron">
-         
+
           <h1>Cron jobs</h1>
 
           <div class="cronActions">
-            # let allActions = getAllRows(db, sql"SELECT id, element, action_name, action_ref, time, active FROM cron_actions")
+            # let allActions = getAllRows(dbCron, sql"SELECT id, element, action_name, action_ref, time, active FROM cron_actions")
             #
-            # let pushAlarm = getAllRows(db, sql"SELECT id, name FROM pushbullet_templates")
+            # let pushAlarm = getAllRows(dbPushbullet, sql"SELECT id, name FROM pushbullet_templates")
             #
-            # let mailAlarm = getAllRows(db, sql"SELECT id, name FROM mail_templates")
+            # let mailAlarm = getAllRows(dbMail, sql"SELECT id, name FROM mail_templates")
             #
-            # let mqttActions = getAllRows(db, sql"SELECT id, name FROM mqtt_templates")
+            # let mqttActions = getAllRows(dbMqtt, sql"SELECT id, name FROM mqtt_templates")
             #
-            # let rpiActions = getAllRows(db, sql"SELECT id, name FROM rpi_templates")
+            # let rpiActions = getAllRows(dbRpi, sql"SELECT id, name FROM rpi_templates")
             #
-            # let xiaomiAlarm = getAllRows(db, sql"SELECT xda.id, xda.name, xd.name FROM xiaomi_templates AS xda LEFT JOIN xiaomi_devices AS xd ON xd.sid = xda.sid ORDER BY xda.name")
+            # let xiaomiAlarm = getAllRows(dbXiaomi, sql"SELECT xda.id, xda.name, xd.name FROM xiaomi_templates AS xda LEFT JOIN xiaomi_devices AS xd ON xd.sid = xda.sid ORDER BY xda.name")
             #
             # var select = ""
             #
@@ -93,7 +93,7 @@
               #  end if
               #
               #  rowBefore = action[2]
-              
+
               <tr>
                 <td>${action[1]}</td>
                 <td>${action[2]}</td>
@@ -110,7 +110,7 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}

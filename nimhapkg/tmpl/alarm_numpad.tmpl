@@ -8,8 +8,8 @@
 #
 #
 #proc genAlarmNumpad(c: var TData, onlyCode = false): string =
-# result = "" 
-# let alarmStatus = getValue(db, sql"SELECT status FROM alarm WHERE id = ?", "1")
+# result = ""
+# let alarmStatus = getValue(dbAlarm, sql"SELECT status FROM alarm WHERE id = ?", "1")
 #
 # var alarmPretty = ""
 # if alarmStatus == "disarmed":

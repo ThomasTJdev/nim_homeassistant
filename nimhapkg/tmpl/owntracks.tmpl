@@ -6,8 +6,8 @@
 #
 #
 #
-#proc genOwntracks(c: var TData): string = 
-# result = "" 
+#proc genOwntracks(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -22,14 +22,14 @@
     <div class="wrapper">
       ${genMainSidebar()}
 
-      # let allWaypoints = getAllRows(db, sql"SELECT owntracks_waypoints.id, owntracks_waypoints.username, owntracks_waypoints.device_id, owntracks_waypoints.desc, owntracks_waypoints.lat, owntracks_waypoints.lon, owntracks_waypoints.rad, owntracks_waypoints.creation FROM owntracks_waypoints LEFT JOIN owntracks_devices ON owntracks_devices.username = owntracks_waypoints.username ORDER BY owntracks_devices.username ASC")
+      # let allWaypoints = getAllRows(dbOwntracks, sql"SELECT owntracks_waypoints.id, owntracks_waypoints.username, owntracks_waypoints.device_id, owntracks_waypoints.desc, owntracks_waypoints.lat, owntracks_waypoints.lon, owntracks_waypoints.rad, owntracks_waypoints.creation FROM owntracks_waypoints LEFT JOIN owntracks_devices ON owntracks_devices.username = owntracks_waypoints.username ORDER BY owntracks_devices.username ASC")
       #
-      # let allDevices = getAllRows(db, sql"SELECT username, device_id, tracker_id, creation FROM owntracks_devices ORDER BY username DESC")
+      # let allDevices = getAllRows(dbOwntracks, sql"SELECT username, device_id, tracker_id, creation FROM owntracks_devices ORDER BY username DESC")
 
       <div id="pagewrapper">
 
         <div id="owntracksDevices">
-         
+
           <h1>Owntracks</h1>
 
           <div class="deviceList">
@@ -62,7 +62,7 @@
                     ${epochDate(device[3], "YYYY-MM-DD HH:mm")}
                   </td>
                   <td>
-                    ${getAllRows(db, sql"SELECT id FROM owntracks_history WHERE username = ? AND device_id = ?", device[0], device[1]).len()}
+                    ${getAllRows(dbOwntracks, sql"SELECT id FROM owntracks_history WHERE username = ? AND device_id = ?", device[0], device[1]).len()}
                   </td>
                   <td data-username="${device[0]}" data-deviceid="${device[1]}" class="btn-primary owntracksClearhistoryDevice" style="cursor: pointer;">
                     Del history
@@ -132,7 +132,7 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}

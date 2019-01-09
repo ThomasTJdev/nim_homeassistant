@@ -44,6 +44,17 @@ __________________________________________________]#
 
 # Database connection
 var db = conn()
+var dbAlarm = conn("dbAlarm.db")
+var dbCron = conn("dbCron.db")
+var dbFile = conn("dbFile.db")
+var dbMail = conn("dbMail.db")
+var dbMqtt = conn("dbMqtt.db")
+var dbOwntracks = conn("dbOwntracks.db")
+var dbPushbullet = conn("dbPushbullet.db")
+var dbRpi = conn("dbRpi.db")
+var dbRss = conn("dbRss.db")
+var dbXiaomi = conn("dbXiaomi.db")
+var dbWeb = conn("dbWeb.db")
 
 
 
@@ -293,10 +304,10 @@ routes:
       redirect("/login")
 
     if @"action" == "addcert":
-      exec(db, sql"INSERT INTO certificates (name, url, port) VALUES (?, ?, ?)", @"name", @"url", @"port")
+      exec(dbWeb, sql"INSERT INTO certificates (name, url, port) VALUES (?, ?, ?)", @"name", @"url", @"port")
 
     elif @"action" == "deletecert":
-      exec(db, sql"DELETE FROM certificates WHERE id = ?", @"id")
+      exec(dbWeb, sql"DELETE FROM certificates WHERE id = ?", @"id")
 
     redirect("/certificates")
 
@@ -315,11 +326,11 @@ routes:
       redirect("/login")
 
     if @"action" == "adddevice":
-      exec(db, sql"INSERT INTO xiaomi_devices (sid, name, model, short_id) VALUES (?, ?, ?, ?)", @"sid", @"name", @"model", "")
+      exec(dbXiaomi, sql"INSERT INTO xiaomi_devices (sid, name, model, short_id) VALUES (?, ?, ?, ?)", @"sid", @"name", @"model", "")
       mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"adddevice\"}")
 
     elif @"action" == "deletedevice":
-      exec(db, sql"DELETE FROM xiaomi_devices WHERE sid = ?", @"sid")
+      exec(dbXiaomi, sql"DELETE FROM xiaomi_devices WHERE sid = ?", @"sid")
       mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"deletedevice\"}")
 
     elif @"action" == "addsensor":
@@ -327,27 +338,27 @@ routes:
 
       let valuedata = if @"triggeralarm" == "false": "" else: @"valuedata"
 
-      exec(db, sql"INSERT INTO xiaomi_devices_data (sid, value_name, value_data, action, triggerAlarm) VALUES (?, ?, ?, ?, ?)", @"sid", @"valuename", valuedata, @"handling", triggerAlarm)
+      exec(dbXiaomi, sql"INSERT INTO xiaomi_devices_data (sid, value_name, value_data, action, triggerAlarm) VALUES (?, ?, ?, ?, ?)", @"sid", @"valuename", valuedata, @"handling", triggerAlarm)
       mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"adddevice\"}")
 
     elif @"action" == "deletesensor":
-      exec(db, sql"DELETE FROM xiaomi_devices_data WHERE id = ?", @"id")
+      exec(dbXiaomi, sql"DELETE FROM xiaomi_devices_data WHERE id = ?", @"id")
       mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"deletedevice\"}")
 
     elif @"action" == "addaction":
-      exec(db, sql"INSERT INTO xiaomi_templates (sid, name, value_name, value_data) VALUES (?, ?, ?, ?)", @"sid", @"name", @"valuename", @"valuedata")
+      exec(dbXiaomi, sql"INSERT INTO xiaomi_templates (sid, name, value_name, value_data) VALUES (?, ?, ?, ?)", @"sid", @"name", @"valuename", @"valuedata")
       mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"addtemplate\"}")
 
     elif @"action" == "deleteaction":
-      exec(db, sql"DELETE FROM xiaomi_templates WHERE id = ?", @"id")
+      exec(dbXiaomi, sql"DELETE FROM xiaomi_templates WHERE id = ?", @"id")
       mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"deletetemplate\"}")
 
     elif @"action" == "updatedevice":
-      exec(db, sql"UPDATE xiaomi_devices SET name = ? WHERE sid = ?", @"name", @"sid")
+      exec(dbXiaomi, sql"UPDATE xiaomi_devices SET name = ? WHERE sid = ?", @"name", @"sid")
       mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"updatedevice\"}")
 
     elif @"action" == "updatepassword":
-      exec(db, sql"UPDATE xiaomi_api SET key = ? WHERE sid = ?", @"password", @"sid")
+      exec(dbXiaomi, sql"UPDATE xiaomi_api SET key = ? WHERE sid = ?", @"password", @"sid")
       mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"updatepassword\"}")
 
     redirect("/xiaomi/devices")
@@ -364,8 +375,8 @@ routes:
     let devices = parseJson(deviceInfo)["xiaomi_devices"]
     for device in items(devices):
       let sid = device["sid"].getStr()
-      if getValue(db, sql"SELECT sid FROM xiaomi_devices WHERE sid = ?", sid) == "":
-        exec(db, sql"INSERT INTO xiaomi_devices (sid, name, model, short_id) VALUES (?, ?, ?, ?)", sid, sid, device["model"].getStr(), device["short_id"].getStr())
+      if getValue(dbXiaomi, sql"SELECT sid FROM xiaomi_devices WHERE sid = ?", sid) == "":
+        exec(dbXiaomi, sql"INSERT INTO xiaomi_devices (sid, name, model, short_id) VALUES (?, ?, ?, ?)", sid, sid, device["model"].getStr(), device["short_id"].getStr())
 
     mqttSend("mqttaction", "xiaomi", "{\"element\": \"xiaomi\", \"action\": \"reloaddevices\"}")
     resp a
@@ -385,14 +396,14 @@ routes:
       redirect("/login")
 
     if @"action" == "deletedevice":
-      exec(db, sql"DELETE FROM owntracks_devices WHERE username = ? AND device_id = ?", @"username", @"deviceid")
-      exec(db, sql"DELETE FROM owntracks_history WHERE username = ? AND device_id = ?", @"username", @"deviceid")
+      exec(dbOwntracks, sql"DELETE FROM owntracks_devices WHERE username = ? AND device_id = ?", @"username", @"deviceid")
+      exec(dbOwntracks, sql"DELETE FROM owntracks_history WHERE username = ? AND device_id = ?", @"username", @"deviceid")
 
     elif @"action" == "clearhistory":
-      exec(db, sql"DELETE FROM owntracks_history WHERE username = ? AND device_id = ?", @"username", @"deviceid")
+      exec(dbOwntracks, sql"DELETE FROM owntracks_history WHERE username = ? AND device_id = ?", @"username", @"deviceid")
 
     elif @"action" == "deletewaypoint":
-      exec(db, sql"DELETE FROM owntracks_waypoints WHERE id = ?", @"waypointid")
+      exec(dbOwntracks, sql"DELETE FROM owntracks_waypoints WHERE id = ?", @"waypointid")
 
     redirect("/owntracks")
 
@@ -424,37 +435,38 @@ routes:
     if @"action" == "addaction":
 
       let query = "SELECT name FROM " & @"alarmelement" & "_templates WHERE id = ?"
-      let name = getValue(db, sql(query), @"alarmid")
+      var dbConn = conn("db" & capitalizeAscii(@"alarmelement") & ".db")
+      let name = getValue(dbConn, sql(query), @"alarmid")
 
-      exec(db, sql"INSERT INTO alarm_actions (alarmstate, action, action_ref, action_name) VALUES (?, ?, ?, ?)", @"alarmstate", @"alarmelement", @"alarmid", name)
+      exec(dbAlarm, sql"INSERT INTO alarm_actions (alarmstate, action, action_ref, action_name) VALUES (?, ?, ?, ?)", @"alarmstate", @"alarmelement", @"alarmid", name)
       mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"adddevice\"}")
 
     elif @"action" == "deleteaction":
-      exec(db, sql"DELETE FROM alarm_actions WHERE id = ?", @"actionid")
+      exec(dbAlarm, sql"DELETE FROM alarm_actions WHERE id = ?", @"actionid")
       mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"deletedevice\"}")
 
     elif @"action" == "updatecountdown":
-      exec(db, sql"UPDATE alarm_settings SET value = ? WHERE element = ?", @"countdown", "countdown")
+      exec(dbAlarm, sql"UPDATE alarm_settings SET value = ? WHERE element = ?", @"countdown", "countdown")
       mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updatealarm\"}")
 
     elif @"action" == "updatecarmtime":
-      exec(db, sql"UPDATE alarm_settings SET value = ? WHERE element = ?", @"armtime", "armtime")
+      exec(dbAlarm, sql"UPDATE alarm_settings SET value = ? WHERE element = ?", @"armtime", "armtime")
       mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updatealarm\"}")
 
     elif @"action" == "adduser":
       # Check if user exists
-      let userExists = getValue(db, sql"SELECT id FROM alarm_password WHERE userid = ?", @"userid")
+      let userExists = getValue(dbAlarm, sql"SELECT id FROM alarm_password WHERE userid = ?", @"userid")
 
       if userExists == "" and isDigit(@"password"):
         let salt = makeSalt()
         let password = makePassword(@"password", salt)
 
-        discard insertID(db, sql"INSERT INTO alarm_password (userid, password, salt) VALUES (?, ?, ?)", @"userid", password, salt)
+        discard insertID(dbAlarm, sql"INSERT INTO alarm_password (userid, password, salt) VALUES (?, ?, ?)", @"userid", password, salt)
 
         mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updateuser\"}")
 
     elif @"action" == "deleteuser":
-      exec(db, sql"DELETE FROM alarm_password WHERE userid = ?", @"userid")
+      exec(dbAlarm, sql"DELETE FROM alarm_password WHERE userid = ?", @"userid")
       mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updateuser\"}")
 
     redirect("/alarm")
@@ -477,15 +489,15 @@ routes:
       asyncCheck sendMailNow("NimHA: Testmail", "A testmail", @"recipient")
 
     elif @"action" == "updatesettings":
-      exec(db, sql"UPDATE mail_settings SET address = ?, port = ?, fromaddress = ?, user = ?, password = ? WHERE id = ?", @"address", @"port", @"from", @"user", @"password", "1")
+      exec(dbMail, sql"UPDATE mail_settings SET address = ?, port = ?, fromaddress = ?, user = ?, password = ? WHERE id = ?", @"address", @"port", @"from", @"user", @"password", "1")
 
-      mailUpdateParameters(db)
+      mailUpdateParameters()
 
     elif @"action" == "addmail":
-      exec(db, sql"INSERT INTO mail_templates (name, recipient, subject, body) VALUES (?, ?, ?, ?)", @"name", @"recipient", @"subject", @"body")
+      exec(dbMail, sql"INSERT INTO mail_templates (name, recipient, subject, body) VALUES (?, ?, ?, ?)", @"name", @"recipient", @"subject", @"body")
 
     elif @"action" == "deletemail":
-      exec(db, sql"DELETE FROM mail_templates WHERE id = ?", @"mailid")
+      exec(dbMail, sql"DELETE FROM mail_templates WHERE id = ?", @"mailid")
 
     redirect("/mail")
 
@@ -504,13 +516,13 @@ routes:
       redirect("/login")
 
     if @"action" == "updateapi":
-      pushbulletNewApi(db, @"api")
+      pushbulletNewApi(@"api")
 
     elif @"action" == "addpush":
-      exec(db, sql"INSERT INTO pushbullet_templates (name, title, body) VALUES (?, ?, ?)", @"name", @"title", @"body")
+      exec(dbPushbullet, sql"INSERT INTO pushbullet_templates (name, title, body) VALUES (?, ?, ?)", @"name", @"title", @"body")
 
     elif @"action" == "deletepush":
-      exec(db, sql"DELETE FROM pushbullet_templates WHERE id = ?", @"pushid")
+      exec(dbPushbullet, sql"DELETE FROM pushbullet_templates WHERE id = ?", @"pushid")
 
     redirect("/pushbullet")
 
@@ -530,10 +542,10 @@ routes:
 
     if @"action" == "addfeed":
       let skip = if @"skip" == "" or not isDigit(@"skip"): "0" else: @"skip"
-      exec(db, sql"INSERT INTO rss_feeds (url, skip, fields, name) VALUES (?, ?, ?, ?)", @"url", skip, @"fields", @"name")
+      exec(dbRss, sql"INSERT INTO rss_feeds (url, skip, fields, name) VALUES (?, ?, ?, ?)", @"url", skip, @"fields", @"name")
 
     elif @"action" == "deletefeed":
-      exec(db, sql"DELETE FROM rss_feeds WHERE id = ?", @"feedid")
+      exec(dbRss, sql"DELETE FROM rss_feeds WHERE id = ?", @"feedid")
 
     elif @"action" == "testfeed":
       let skip = if @"skip" == "" or not isDigit(@"skip"): 0 else: parseInt(@"skip")
@@ -558,12 +570,13 @@ routes:
 
     if @"action" == "addaction":
       let query = "SELECT name FROM " & @"cronelement" & "_templates WHERE id = ?"
-      let name = getValue(db, sql(query), @"cronid")
+      var dbConn = conn("db" & capitalizeAscii(@"cronelement") & ".db")
+      let name = getValue(dbConn, sql(query), @"cronid")
 
-      exec(db, sql"INSERT INTO cron_actions (element, action_name, action_ref, time, active) VALUES (?, ?, ?, ?, ?)", @"cronelement", name, @"cronid", @"time", "true")
+      exec(dbCron, sql"INSERT INTO cron_actions (element, action_name, action_ref, time, active) VALUES (?, ?, ?, ?, ?)", @"cronelement", name, @"cronid", @"time", "true")
 
     elif @"action" == "deleteaction":
-      exec(db, sql"DELETE FROM cron_actions WHERE id = ?", @"cronid")
+      exec(dbCron, sql"DELETE FROM cron_actions WHERE id = ?", @"cronid")
 
     redirect("/cron")
 
@@ -585,10 +598,10 @@ routes:
     if @"action" == "addstream":
       let download = if @"streamdownload" notin ["true", "false"]: "false" else: @"streamdownload"
       let html = if @"streamhtml" notin ["img", "video"]: "img" else: @"streamhtml"
-      exec(db, sql"INSERT INTO filestream (name, url, download, html) VALUES (?, ?, ?, ?)", @"streamname", @"streamurl", download, html)
+      exec(dbFile, sql"INSERT INTO filestream (name, url, download, html) VALUES (?, ?, ?, ?)", @"streamname", @"streamurl", download, html)
 
     elif @"action" == "deletestream":
-      exec(db, sql"DELETE FROM filestream WHERE id = ?", @"streamid")
+      exec(dbFile, sql"DELETE FROM filestream WHERE id = ?", @"streamid")
 
     redirect("/filestream")
 
@@ -625,10 +638,10 @@ routes:
       redirect("/login")
 
     if @"action" == "addmqtt":
-      exec(db, sql"INSERT INTO mqtt_templates (name, topic, message) VALUES (?, ?, ?)", @"mqttname", @"mqtttopic", @"mqttmessage")
+      exec(dbMqtt, sql"INSERT INTO mqtt_templates (name, topic, message) VALUES (?, ?, ?)", @"mqttname", @"mqtttopic", @"mqttmessage")
 
     elif @"action" == "deletemqtt":
-      exec(db, sql"DELETE FROM mqtt_templates WHERE id = ?", @"actionid")
+      exec(dbMqtt, sql"DELETE FROM mqtt_templates WHERE id = ?", @"actionid")
 
     elif @"action" == "sendtest":
       asyncCheck mqttSendAsync("mqttaction", @"topic", @"message")
@@ -650,10 +663,10 @@ routes:
       redirect("/login")
 
     if @"action" == "addrpi":
-      exec(db, sql"INSERT INTO rpi_templates (name, pin, pinMode, pinPull, digitalAction, analogAction, value) VALUES (?, ?, ?, ?, ?, ?, ?)", @"name", @"pin", @"mode", @"pull", @"digital", @"analog", @"value")
+      exec(dbRpi, sql"INSERT INTO rpi_templates (name, pin, pinMode, pinPull, digitalAction, analogAction, value) VALUES (?, ?, ?, ?, ?, ?, ?)", @"name", @"pin", @"mode", @"pull", @"digital", @"analog", @"value")
 
     elif @"action" == "deleterpi":
-      exec(db, sql"DELETE FROM rpi_templates WHERE id = ?", @"rpiid")
+      exec(dbRpi, sql"DELETE FROM rpi_templates WHERE id = ?", @"rpiid")
 
     redirect("/rpi")
 

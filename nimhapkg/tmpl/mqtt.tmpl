@@ -3,8 +3,8 @@
 #
 #
 #
-#proc genMqtt(c: var TData): string = 
-# result = "" 
+#proc genMqtt(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -21,7 +21,7 @@
 
       <div id="pagewrapper">
         <div id="mqtt">
-         
+
           <h1>MQTT</h1>
 
           <div>
@@ -65,7 +65,7 @@
 
                 <tbody>
 
-                # let mqttActions = getAllRows(db, sql"SELECT id, name, topic, message FROM mqtt_templates")
+                # let mqttActions = getAllRows(dbMqtt, sql"SELECT id, name, topic, message FROM mqtt_templates")
                 # for action in mqttActions:
                 <tr>
                   <td>${action[1]}</td>
@@ -86,7 +86,7 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}
