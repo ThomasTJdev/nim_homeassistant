@@ -155,14 +155,7 @@ proc xiaomiCheckAlarmStatus(sid, value, xdata, alarmStatus: string) {.async.} =
   let alarmtrigger = jn(parseJson(xdata), value)
 
   for device in devicesAlarm:
-    echo "Device1: " & device[0]
-    echo "Device1: " & device[1]
-    echo "Device1: " & device[2]
-    echo "SID: " & sid
-    echo "Alarmtrigger: " & alarmtrigger
-    echo "Alarmstatus: " & alarmStatus
     if device[0] == sid and device[1] == alarmtrigger and device[2] == alarmStatus:
-      echo "Device1 in: " & device[2]
       mqttSend("xiaomi", "alarm", "{\"handler\": \"action\", \"element\": \"xiaomi\", \"action\": \"triggered\", \"sid\": \"" & sid & "\", \"value\": \"" & value & "\", \"data\": " & xdata & "}")
       alarmWaitForReset = true
       logit("xiaomi", "INFO", "xiaomiCheckAlarmStatus(): ALARM = " & xdata)
