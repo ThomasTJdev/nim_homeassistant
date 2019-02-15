@@ -320,8 +320,11 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
     myClient.connected = false
     myClient.key = ""
     myClient.userStatus = ""
-    await myClient.ws.close()
-    logit("websocket", "INFO", ".. socket went away.")
+    try:
+      await myClient.ws.close()
+      logit("websocket", "INFO", ".. socket went away.")
+    except:
+      logit("websocket", "INFO", ".. socket went away but couldn't close it")
 
 
 
