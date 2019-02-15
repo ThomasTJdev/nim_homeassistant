@@ -190,7 +190,7 @@ proc pong(server: Server) {.async.} =
         try:
           if not client.connected:
             continue
-          await client.socket.sendText(json, false)
+          await client.ws.sendText(json)
 
         except:
           echo("WSS: Pong msg failed")
@@ -289,7 +289,7 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
               break
 
             # Respond
-            await myClient.socket.sendText("{\"event\": \"received\"}", false)
+            await myClient.ws.sendText("{\"event\": \"received\"}")
 
             if data == "ping":
               discard

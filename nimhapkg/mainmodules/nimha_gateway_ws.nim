@@ -17,7 +17,7 @@ import ../resources/utils/logging
 var ws: AsyncWebSocket
 
 var localhostKey = ""
-  
+
 
 proc setupWs() =
   ## Setup connection to WS
@@ -36,14 +36,14 @@ proc mosquittoParse(payload: string) {.async.} =
 
   let topicName = payload.split(" ")[0]
   let message   = payload.replace(topicName & " ", "")
-  
+
   logit("WSgateway", "DEBUG", "Payload: " & message)
 
   if isNil(ws):
     setupWs()
 
   if not isNil(ws):
-    waitFor ws.sendText(localhostKey & message, false)
+    waitFor ws.sendText(localhostKey & message)
   else:
     logit("WSgateway", "ERROR", "127.0.0.1 client websocket not connected")
 
