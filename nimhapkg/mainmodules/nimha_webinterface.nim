@@ -540,17 +540,19 @@ routes:
     if not c.loggedIn:
       redirect("/login")
 
+    # Test RSS output
+    if @"action" == "testfeed":
+      let skip = if @"skip" == "" or not isDigit(@"skip"): 0 else: parseInt(@"skip")
+      resp genRss(c, rssReadUrl("Test", @"url", [@"fields"], skip))
+
+    # Add RSS feed
     if @"action" == "addfeed":
       let skip = if @"skip" == "" or not isDigit(@"skip"): "0" else: @"skip"
       exec(dbRss, sql"INSERT INTO rss_feeds (url, skip, fields, name) VALUES (?, ?, ?, ?)", @"url", skip, @"fields", @"name")
 
+    # Delete RSS feed
     elif @"action" == "deletefeed":
       exec(dbRss, sql"DELETE FROM rss_feeds WHERE id = ?", @"feedid")
-
-    elif @"action" == "testfeed":
-      let skip = if @"skip" == "" or not isDigit(@"skip"): 0 else: parseInt(@"skip")
-      resp genRss(c, rssReadUrl("Test", @"url", [@"fields"], skip))
-
 
     redirect("/rss")
 
