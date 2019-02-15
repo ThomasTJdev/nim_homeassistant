@@ -623,7 +623,6 @@ $(function() {
 
     ws.send('{' + cookieSidJson() + '"element": "alarm", "action": "activate", "status": "' + status + '", "password": "' + password + '"}');
 
-    $('#alarmModel').modal('toggle');
     $("#alarmNumpad .password").val("");
 
     if (onlyCode == "false") {
