@@ -10,14 +10,15 @@ installDirs   = @["config", "public", "nimhapkg"]
 
 
 # Dependencies
-requires "nim >= 0.18.1"
-requires "jester >= 0.4.0"
+requires "nim >= 0.19.0"
+requires "jester 0.4.1"
+requires "httpbeast 0.2.1"
 requires "recaptcha >= 1.0.2"
 requires "bcrypt >= 0.2.1"
-requires "multicast >= 0.1.1"
+requires "multicast 0.1.4"
 requires "websocket 0.3.5"
 requires "wiringPiNim >= 0.1.0"
-requires "xiaomi >= 0.1.2"
+requires "xiaomi >= 0.1.3"
 
 
 import distros
