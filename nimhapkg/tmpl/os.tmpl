@@ -1,0 +1,93 @@
+#? stdtmpl | standard
+#
+#
+#
+#
+#
+#proc genOs(c: var TData): string =
+# result = ""
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="os" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="os">
+
+          <h1>OS utils</h1>
+
+          <hr>
+
+          <div class="osTemplates">
+            # let osTemplates = getAllRows(dbOs, sql"SELECT id, name, command FROM os_templates")
+
+            <h3>OS test command</h3>
+            <i>Command is only shown on terminal output.</i>
+            <div class="osTest">
+              <label>Run command</label>
+              <input class="form-control form-control-sm testos command" />
+              <button class="btn btn-primary osTestCommand">Run</button>
+            </div>
+
+            <hr>
+
+            <h3>OS templates</h3>
+            <table class="osTemplates table">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Name</th>
+                  <th>Command</th>
+                  <th></th>
+                </tr>
+                <tr class="osTemplatesEdit">
+                  <td>
+                    <input class="form-control form-control-sm name" />
+                  </td>
+                  <td>
+                    <input class="form-control form-control-sm command" />
+                  </td>
+                  <td class="btn btn-success osTemplateAdd">
+                    Add
+                  </td>
+                </tr>
+              </thead>
+              <tbody>
+                # for os in osTemplates:
+                <tr class="os">
+                  <td>
+                    ${os[1]}
+                  </td>
+                  <td>
+                    ${os[2]}
+                  </td>
+                  <td data-os="${os[0]}" class="btn btn-danger osTemplateDelete">
+                    Del
+                  </td>
+                </tr>
+                # end for
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()}
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+#end proc

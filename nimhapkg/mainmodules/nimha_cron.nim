@@ -6,6 +6,7 @@ from os import sleep
 
 import ../resources/database/database
 import ../modules/mail/mail
+import ../modules/os/os_utils
 import ../resources/mqtt/mqtt_templates
 import ../modules/pushbullet/pushbullet
 when defined(rpi):
@@ -117,6 +118,9 @@ proc cronJobRun(time: string) =
 
     of "mail":
       sendMailDb(row[1])
+
+    of "os":
+      asyncCheck osRunTemplate(row[1])
 
     of "mqtt":
       mqttActionSendDb(db, row[1])

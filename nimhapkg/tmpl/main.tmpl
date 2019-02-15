@@ -7,8 +7,8 @@
 #
 #
 #
-#proc genMainHead(c: var TData): string = 
-# result = "" 
+#proc genMainHead(c: var TData): string =
+# result = ""
 <meta name="description" content="Nim Website Creator">
 <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -33,8 +33,8 @@
 #end proc
 #
 #
-#proc genMainHeader(): string = 
-# result = "" 
+#proc genMainHeader(): string =
+# result = ""
 <nav id="navbar" class="navbar navbar-expand-md navbar-dark">
   <div class="heading">
     <a id="sidebarToggle" class="navbar-brand">Nim Home Assistant</a>
@@ -43,8 +43,8 @@
 #end proc
 #
 #
-#proc genMainSidebar(): string = 
-# result = "" 
+#proc genMainSidebar(): string =
+# result = ""
 <nav id="sidebar">
   <div class="sidebar-header">
     <h3>Menu</h3>
@@ -60,6 +60,7 @@
         <li><a href="/mail">Mail</a></li>
         <li><a href="/filestream">Filestream</a></li>
         <li><a href="/mqtt">MQTT</a></li>
+        <li><a href="/os">OS</a></li>
         <li><a href="/owntracks">Owntracks</a></li>
         <li><a href="/pushbullet">Pushbullet</a></li>
         <li><a href="/rpi">Raspberry Pi</a></li>
@@ -74,8 +75,8 @@
 #end proc
 #
 #
-#proc genMainFooter(): string = 
-# result = "" 
+#proc genMainFooter(): string =
+# result = ""
 <div id="footerInside">
   <div class="container-fluid">
     <div class="row">
@@ -93,12 +94,12 @@
       </div>
     </div>
   </div>
-</div>   
+</div>
 #end proc
 #
 #
-#proc genMainNotify(): string = 
-# result = "" 
+#proc genMainNotify(): string =
+# result = ""
 <div id="notification">
   <div class="inner">
     Notification
@@ -108,7 +109,7 @@
 #
 #
 #
-#proc genMain(c: var TData): string = 
+#proc genMain(c: var TData): string =
 # result = ""
 #
 #
@@ -126,17 +127,17 @@
 <head>
   <meta name="description" content="Nim Website Creator">
   <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0" />
-  
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
   <link rel="stylesheet" href="/css/style.css">
-  
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous" defer></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous" defer></script>
-  
+
   # if c.loggedIn:
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@2.2.0/src/js.cookie.min.js" defer></script>
-    
+
     # if gMapsApi == "":
       <script src="http://maps.google.com/maps/api/js" type="text/javascript" defer></script>
     # else:
@@ -178,7 +179,7 @@
                     <a class="dropdown-item cardToggle" data-card="$card" data-visible="false" href="#!"><span style="color: red; font-weight: 700; margin-right: 10px;">OFF</span>$cardName</a>
               #   end if
               # end for
-            
+
             </div>
           </li>
           <li class="nav-item">
@@ -239,7 +240,7 @@
             #   end if
             # end for
 
-            
+
 
           </div>
         </div>
@@ -252,7 +253,7 @@
   ${genAlarmNumpad(c)}
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}

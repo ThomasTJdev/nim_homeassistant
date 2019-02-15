@@ -24,6 +24,7 @@ import ../resources/www/google_recaptcha
 import ../resources/database/database
 import ../modules/mail/mail
 import ../resources/mqtt/mqtt_func
+import ../modules/os/os_utils
 import ../modules/pushbullet/pushbullet
 when defined(rpi):
   import ../modules/rpi/rpi_utils
@@ -49,6 +50,7 @@ var dbCron = conn("dbCron.db")
 var dbFile = conn("dbFile.db")
 var dbMail = conn("dbMail.db")
 var dbMqtt = conn("dbMqtt.db")
+var dbOs = conn("dbOs.db")
 var dbOwntracks = conn("dbOwntracks.db")
 var dbPushbullet = conn("dbPushbullet.db")
 var dbRpi = conn("dbRpi.db")
@@ -203,6 +205,7 @@ include "../tmpl/alarm.tmpl"
 include "../tmpl/cron.tmpl"
 include "../tmpl/users.tmpl"
 include "../tmpl/mail.tmpl"
+include "../tmpl/os.tmpl"
 include "../tmpl/filestream.tmpl"
 include "../tmpl/mqtt.tmpl"
 include "../tmpl/certificates.tmpl"
@@ -500,6 +503,31 @@ routes:
       exec(dbMail, sql"DELETE FROM mail_templates WHERE id = ?", @"mailid")
 
     redirect("/mail")
+
+
+  get "/os":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    resp genOs(c)
+
+
+  get "/os/do":
+    createTFD()
+    if not c.loggedIn:
+      redirect("/login")
+
+    if @"action" == "test":
+      osRunCommand(@"command")
+
+    elif @"action" == "add":
+      exec(dbOs, sql"INSERT INTO os_templates (name, command) VALUES (?, ?)", @"name", @"command")
+
+    elif @"action" == "delete":
+      exec(dbOs, sql"DELETE FROM os_templates WHERE id = ?", @"osid")
+
+    redirect("/os")
 
 
   get "/pushbullet":

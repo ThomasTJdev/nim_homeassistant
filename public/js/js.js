@@ -26,7 +26,7 @@ function websocketInit() {
   }
 
   ws.onopen = function() {
-    notify(jQuery.parseJSON('{"error": "false", "value": "Websocket connected"}'));
+    //notify(jQuery.parseJSON('{"error": "false", "value": "Websocket connected"}'));
 
     if (pageType == "dashboard" && pageInit == true) {
       ws.send('{' + cookieSidJson() + '"element": "main", "data": "connected"}');
@@ -546,6 +546,29 @@ $(function() {
 
 
 /*
+    OS
+________________________________*/
+$(function() {
+  $( ".osTestCommand" ).click(function() {
+    var command = $(".testos.command").val();
+    location.href = "/os/do?action=test&command=" + command;
+  });
+
+  $( ".osTemplateAdd" ).click(function() {
+    var name      = $(".osTemplatesEdit .name").val();
+    var command   = $(".osTemplatesEdit .command").val();
+    location.href = "/os/do?action=add&name=" + name + "&command=" + command;
+  });
+
+  $( ".osTemplateDelete" ).click(function() {
+    var osid    = $(this).attr("data-os");
+    location.href = "/os/do?action=delete&osid=" + osid;
+  });
+});
+
+
+
+/*
     Raspberry Pi
 ________________________________*/
 $(function() {
@@ -585,7 +608,7 @@ function rpi(obj) {
 ________________________________*/
 $(function() {
   if (pageType == "alarmNumpad") {
-    $('#alarmModel').modal('show');
+    $('#alarmModel').modal({show: true, backdrop: 'static', keyboard: false});
   }
 
   $( "div.alarm .activate" ).click(function() {
@@ -627,6 +650,8 @@ $(function() {
 
     if (onlyCode == "false") {
       $('#alarmModel').modal('toggle');
+    } else {
+      $(".currentAlarm").text(status);
     }
   });
 

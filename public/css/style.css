@@ -176,7 +176,7 @@ ______________________________*/
   position: absolute;
   z-index: 9999;
   top: 0;
-  text-align: right;  
+  text-align: right;
   width: 100%;
 }
 #notification .inner {
@@ -252,7 +252,7 @@ nav#sidebar .sidebar-header {
   }
   /* Reappearing the sidebar on toggle button click */
   nav#sidebar {
-    margin-left: -250px; 
+    margin-left: -250px;
   }
 }
 
@@ -286,7 +286,7 @@ ______________________________*/
 
 
 /*
-    Login 
+    Login
 ______________________________*/
 div#login {
   width: 250px;
@@ -304,7 +304,7 @@ div#login button {
 
 
 /*
-    Dashboard 
+    Dashboard
 ______________________________*/
 /* Card items */
 .item .inner {
@@ -362,7 +362,7 @@ _____________________________*/
   width: 180px;
   margin-bottom: 2px;
   margin-top: 2px;
-} 
+}
 .item .inner .certexpiryInner div.cert .certRefresh {
   cursor: pointer;
 }
@@ -383,7 +383,7 @@ _____________________________*/
   width: 150px;
   margin-bottom: 2px;
   margin-top: 2px;
-} 
+}
 .item .inner .alarmInner span.badge-secondary {
   margin-right: 5px;
 }
@@ -415,7 +415,7 @@ div.alarmInner span.status.badge:hover {
   width: 180px;
   margin-bottom: 2px;
   margin-top: 2px;
-} 
+}
 .item .inner .pushbulletInner .badge {
   cursor: pointer;
 }
@@ -500,7 +500,7 @@ div.alarmInner span.status.badge:hover {
   width: 150px;
   margin-bottom: 2px;
   margin-top: 2px;
-} 
+}
 .item .inner .xiaomiInner div.device .xiaomiRefresh {
   cursor: pointer;
 }
@@ -733,15 +733,16 @@ div#mail div.mailSettings label {
 div#mail div.mailSettings input.recipient {
   width: 250px;
 }
-div#mail div.alarmPasswords select,
-div#mail div.alarmPasswords input {
+
+
+/*
+  OS
+*/
+div#os table.osTemplates {
+  width: 800px;
+}
+div#os div.osTest {
   width: 250px;
-}
-div#mail div.alarmPasswords button {
-  display: block;
-}
-div#mail table.alarmActions {
-  max-width: 800px;
 }
 
 

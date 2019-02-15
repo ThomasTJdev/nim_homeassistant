@@ -17,6 +17,7 @@ import ../../resources/mqtt/mqtt_templates
 import ../../resources/users/password
 import ../../resources/utils/logging
 import ../mail/mail
+import ../os/os_utils
 import ../pushbullet/pushbullet
 when defined(rpi):
   import ../rpi/rpi_utils
@@ -85,6 +86,8 @@ proc alarmAction() =
         pushbulletSendDb(action[2])
       of "mail":
         sendMailDb(action[2])
+      of "os":
+        asyncCheck osRunTemplate(action[2])
       of "mqtt":
         mqttActionSendDb(db, action[2])
       of "rpi":
