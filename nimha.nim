@@ -16,6 +16,7 @@ import nimhapkg/resources/database/modules/cron_database
 import nimhapkg/resources/database/modules/mail_database
 import nimhapkg/resources/database/modules/filestream_database
 import nimhapkg/resources/database/modules/mqtt_database
+import nimhapkg/resources/database/modules/os_database
 import nimhapkg/resources/database/modules/owntracks_database
 import nimhapkg/resources/database/modules/pushbullet_database
 import nimhapkg/resources/database/modules/rpi_database
@@ -104,6 +105,7 @@ proc createDbTables() =
   var dbFile = conn("dbFile.db")
   var dbMail = conn("dbMail.db")
   var dbMqtt = conn("dbMqtt.db")
+  var dbOs = conn("dbOs.db")
   var dbOwntracks = conn("dbOwntracks.db")
   var dbPushbullet = conn("dbPushbullet.db")
   var dbRpi = conn("dbRpi.db")
@@ -113,6 +115,7 @@ proc createDbTables() =
 
   alarmDatabase(dbAlarm)
   mailDatabase(dbMail)
+  osDatabase(dbOs)
   owntracksDatabase(dbOwntracks)
   pushbulletDatabase(dbPushbullet)
   rssDatabase(dbRss)
@@ -157,7 +160,7 @@ proc launcherActivated() =
       echo "nimha_websocket exited. Killing gatewayWS and starting again.."
       kill(gatewayws)
       wss = startProcess(getAppDir() & "/nimhapkg/mainmodules/nimha_websocket", options = {poParentStreams})
-      sleep(1500)
+      sleep(2000)
 
     # Gateway may first be started, when wss is running.
     # Otherwise it will miss the connection and the local key exchange
