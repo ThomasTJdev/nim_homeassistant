@@ -12,8 +12,8 @@ Please visit the [Wiki page](https://github.com/ThomasTJdev/nim_homeassistant/wi
 
 > NimHA is currently in **BETA**.
 
-Work before reaching stable (some might be missing - please add an issue):
-- Avoid database lock error (multiple connections at the same time - which SQLite does not like)
+Work before reaching stable:
+~~- Avoid database lock error (multiple connections at the same time - which SQLite does not like)~~
 - The alarm module's countdown proc() is currently not working (this means that when the alarm has been triggered, it will immediately go into ringing mode)
 
 ____
@@ -52,10 +52,17 @@ ____
 * Add custom waypoints to the map
 * Use [Google maps](https://github.com/ThomasTJdev/nim_homeassistant/wiki/Google-Maps)
 
+### [Mail](https://github.com/ThomasTJdev/nim_homeassistant/wiki/Mail)
+* Connect to your mail server and create mail templates, which can be used in the different modules
+
 ### [MQTT](https://github.com/ThomasTJdev/nim_homeassistant/wiki/MQTT)
 * Define custom MQTT templates (topic and message)
 * Send MQTT message when the alarm changes status or with cronjobs
 * Send test messages via MQTT
+
+### [OS commands](https://github.com/ThomasTJdev/nim_homeassistant/wiki/OS-commands)
+* Create templates which can be used in different modules
+* Test commands from the browser
 
 ### OS stats
 * Monitor the health of your system
@@ -77,8 +84,6 @@ ____
 ### [Pushbullet](https://github.com/ThomasTJdev/nim_homeassistant/wiki/Pushbullet)
 * Stay notified with the Pushbullet integration on all your devices
 
-### [Mail](https://github.com/ThomasTJdev/nim_homeassistant/wiki/Mail)
-* Connect to your mail server and create mail templates, which can be used in the different modules
 
 ### .. and more to come
 
