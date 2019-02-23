@@ -518,14 +518,15 @@ routes:
     if not c.loggedIn:
       redirect("/login")
 
-    if @"action" == "test":
-      osRunCommand(@"command")
+    if c.rank == Admin:
+      if @"action" == "test":
+        osRunCommand(@"command")
 
-    elif @"action" == "add":
-      exec(dbOs, sql"INSERT INTO os_templates (name, command) VALUES (?, ?)", @"name", @"command")
+      elif @"action" == "add":
+        exec(dbOs, sql"INSERT INTO os_templates (name, command) VALUES (?, ?)", @"name", @"command")
 
-    elif @"action" == "delete":
-      exec(dbOs, sql"DELETE FROM os_templates WHERE id = ?", @"osid")
+      elif @"action" == "delete":
+        exec(dbOs, sql"DELETE FROM os_templates WHERE id = ?", @"osid")
 
     redirect("/os")
 
