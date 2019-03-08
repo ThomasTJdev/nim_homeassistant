@@ -3,6 +3,10 @@
 # Do not include database
 data/*
 
+# Log
+log
+log/*
+
 # Include screenshots
 private/*
 !private/screenshots/
