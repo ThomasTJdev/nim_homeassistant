@@ -10,7 +10,7 @@ from osproc import execProcess
 
 import ../../resources/database/database
 import ../../resources/mqtt/mqtt_func
-import ../../resources/utils/logging
+import ../../resources/utils/log_utils
 
 type
   RpiTemplate = tuple[id: string, name: string, pin: string, pinMode: string, pinPull: string, digitalAction: string, analogAction: string, value: string]

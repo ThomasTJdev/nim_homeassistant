@@ -15,7 +15,7 @@ import ../../resources/database/database
 import ../../resources/mqtt/mqtt_func
 import ../../resources/mqtt/mqtt_templates
 import ../../resources/users/password
-import ../../resources/utils/logging
+import ../../resources/utils/log_utils
 import ../mail/mail
 import ../os/os_utils
 import ../pushbullet/pushbullet

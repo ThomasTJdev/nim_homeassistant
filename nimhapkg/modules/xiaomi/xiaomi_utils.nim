@@ -6,7 +6,7 @@ import nimcrypto
 import xiaomi
 
 import ../../resources/database/database
-import ../../resources/utils/logging
+import ../../resources/utils/log_utils
 import ../../resources/utils/parsers
 import ../../resources/mqtt/mqtt_func
 
