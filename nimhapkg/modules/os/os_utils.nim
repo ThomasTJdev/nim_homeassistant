@@ -4,7 +4,7 @@ import osproc, strutils, asyncdispatch, json, db_sqlite
 
 import ../../resources/database/database
 import ../../resources/mqtt/mqtt_func
-import ../../resources/utils/logging
+import ../../resources/utils/log_utils
 
 var db = conn()
 var dbOs = conn("dbOs.db")
@@ -54,5 +54,4 @@ proc osRunTemplate*(osID: string) {.async.} =
   ## Run os template command
 
   let command = getValue(dbOs, sql("SELECT command FROM os_templates WHERE id = ?"), osID)
-  if execCmd(command) == 1:
-    logit("osutils", "ERROR", "Command failed: " & command)
+  let pros = execProcesses([command], options = {poEvalCommand})
