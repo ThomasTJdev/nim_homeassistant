@@ -1,9 +1,9 @@
 import os, logging, strutils, re, times
 
-setCurrentDir(getAppDir().replace(re"/nimhapkg.*", "") & "/")
-const logFile = "log/log.log"
+let logFile = replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/log/log.log"
 
-discard existsOrCreateDir("log")
+discard existsOrCreateDir(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/log")
+if not fileExists(logFile): open(logFile, fmWrite).close()
 
 #var console_logger = newConsoleLogger(fmtStr = verboseFmtStr) # Logs to terminal.
 when defined(release):
