@@ -1,3 +1,12 @@
+# v0.4.2
+- Server info page
+- Check NimHA log in browser
+- Restart system or NimHA
+
+# v0.4.1
+- OS templates, run a local command when e.g. the alarm is ringing
+- Fix websocket #22
+
 # v0.4.0
 - Databases splitted into multiple instances instead of 1. This is due to problems with concurrency in SQLite databases. If you would like to preserve your current DB values, make a copy of your DB and name them as below inside the `data` folder.
 1) dbAlarm.db
