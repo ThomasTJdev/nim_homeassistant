@@ -26,7 +26,7 @@ import ../xiaomi/xiaomi_utils
 
 
 type
-  Alarm = tuple[status: string, armtime: string, countdown: string, armedtime: string]
+  Alarm = tuple[status: string, armtime: string, countdownTime: string, armedtime: string]
   AlarmPasswords = tuple[userid: string, password: string, salt: string]
   AlarmActions = tuple[id: string, action: string, action_ref: string, alarmstate: string]
 
@@ -46,7 +46,7 @@ proc alarmLoadStatus() =
   let aArmtime = getValue(dbAlarm, sql"SELECT value FROM alarm_settings WHERE element = ?", "armtime")
   let aCountdown = getValue(dbAlarm, sql"SELECT value FROM alarm_settings WHERE element = ?", "countdown")
 
-  alarm = (status: aStatus, armtime: aArmtime, countdown: aCountdown, armedtime: $toInt(epochTime()))
+  alarm = (status: aStatus, armtime: aArmtime, countdownTime: aCountdown, armedtime: $toInt(epochTime()))
 
 
 proc alarmLoadPasswords() =
