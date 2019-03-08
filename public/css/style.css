@@ -238,7 +238,8 @@ nav#sidebar ul li a:hover {
   color: rgb(52, 40, 207);
   background: #fff;
 }
-nav#sidebar #submenu1 li {
+nav#sidebar #submenu1 li,
+nav#sidebar #submenu2 li {
   padding-left: 15px;
 }
 nav#sidebar .sidebar-header {
@@ -840,4 +841,7 @@ div#mqtt table.mjpegmqttstream .mqttActionAdd {
 */
 div#settings div.settings.restart a {
   margin-bottom: 20px;
+}
+div#settings table.serverinfo {
+  background: white;
 }
