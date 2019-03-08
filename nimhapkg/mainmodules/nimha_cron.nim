@@ -12,7 +12,7 @@ import ../modules/pushbullet/pushbullet
 when defined(rpi):
   import ../modules/rpi/rpi_utils
 import ../modules/xiaomi/xiaomi_utils
-import ../resources/utils/logging
+import ../resources/utils/log_utils
 
 
 var db = conn()

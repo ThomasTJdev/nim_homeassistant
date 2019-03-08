@@ -25,7 +25,7 @@ import ../resources/database/database
 import ../resources/mqtt/mqtt_func
 import ../resources/users/password
 import ../resources/utils/dates
-import ../resources/utils/logging
+import ../resources/utils/log_utils
 
 
 type

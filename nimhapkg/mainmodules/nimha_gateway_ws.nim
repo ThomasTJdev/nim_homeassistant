@@ -11,7 +11,7 @@ import websocket
 from os import sleep, getAppDir
 
 import ../resources/mqtt/mqtt_func
-import ../resources/utils/logging
+import ../resources/utils/log_utils
 
 
 var ws: AsyncWebSocket

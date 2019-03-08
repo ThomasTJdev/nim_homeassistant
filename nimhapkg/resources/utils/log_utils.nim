@@ -1,5 +1,17 @@
-import strutils, times
+import os, logging, strutils, re, times
 
+setCurrentDir(getAppDir().replace(re"/nimhapkg.*", "") & "/")
+const logFile = "log/log.log"
+
+discard existsOrCreateDir("log")
+
+#var console_logger = newConsoleLogger(fmtStr = verboseFmtStr) # Logs to terminal.
+when defined(release):
+  var rolling_file_logger = newRollingFileLogger(logFile, levelThreshold = lvlWarn, mode = fmReadWriteExisting, fmtStr = verboseFmtStr)
+else:
+  var rolling_file_logger = newRollingFileLogger(logFile, mode = fmReadWriteExisting, fmtStr = verboseFmtStr)
+
+addHandler(rolling_file_logger)
 
 template echoLog(element, level, msg: string) =
   echo $now() & " [" & level & "] [" & element & "] " & msg
@@ -8,12 +20,18 @@ template echoLog(element, level, msg: string) =
 proc logit*(element, level, msg: string) =
   ## Debug information
 
+  if level in ["WARNING"]:
+    warn("[" & element & "] - " & msg)
+
+  if level in ["WARNING", "ERROR"]:
+    error("[" & element & "] - " & msg)
+
   when defined(logoutput) or defined(logxiaomi):
     if element == "xiaomi": echoLog(element, level, msg)
 
   when defined(logoutput) or defined(logcron):
     if element == "cron": echoLog(element, level, msg)
-  
+
   when defined(logoutput) or defined(logwsgateway):
     if element == "WSgateway": echoLog(element, level, msg)
 

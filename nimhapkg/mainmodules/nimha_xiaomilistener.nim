@@ -2,7 +2,7 @@
 import xiaomi
 
 import ../resources/mqtt/mqtt_func
-import ../resources/utils/logging
+import ../resources/utils/log_utils
 
 
 proc xiaomiListen() =
@@ -12,7 +12,7 @@ proc xiaomiListen() =
 
   while true:
       mqttSend("xiaomilisten", "xiaomi", xiaomiReadMessage())
-      
+
   xiaomiDisconnect()
 
 

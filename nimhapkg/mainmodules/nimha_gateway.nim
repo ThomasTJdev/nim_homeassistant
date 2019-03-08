@@ -15,7 +15,7 @@ when defined(rpi):
 import ../modules/rss/rss_reader
 import ../modules/web/web_utils
 import ../modules/xiaomi/xiaomi_utils
-import ../resources/utils/logging
+import ../resources/utils/log_utils
 
 
 proc mosquittoParse(payload: string) {.async.} =
