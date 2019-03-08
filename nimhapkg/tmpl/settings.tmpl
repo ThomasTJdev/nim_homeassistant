@@ -3,8 +3,8 @@
 #
 #
 #
-#proc genSettings(c: var TData): string = 
-# result = "" 
+#proc genSystemCommands(c: var TData): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -21,10 +21,20 @@
 
       <div id="pagewrapper">
         <div id="settings">
-         
-          <h1>Settings</h1>
+
+          <h1>System commands</h1>
 
           <p>Main settings for NimHA. Only the <kbd>admin</kbd> user can use the tools.</p>
+
+          <div class="settings restart">
+            <h3>System</h3>
+
+            <div class="btn-group-vertical">
+              <a href="/settings/restart?module=nimha" class="btn btn-danger">Kill NimHA</a>
+              <a href="/settings/restart?module=system" class="btn btn-danger">Reboot system</a>
+            </div>
+
+          </div>
 
           <div class="settings restart">
             <h3>Restart main modules</h3>
@@ -39,7 +49,7 @@
               <a href="/settings/restart?module=websocket" class="btn btn-danger">Websocket</a>
               <a href="/settings/restart?module=xiaomi" class="btn btn-danger">Xiaomi</a>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -47,11 +57,209 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
 
   ${genMainNotify()}
 
 </body>
+#end proc
+#
+#
+#
+#import httpclient  #HACK: Do NOT move to main,leave it here.
+#
+#proc genServerInfo(c: var TData): string =
+# result = ""
+#
+#  let hostn = getHostname()
+#  let uptim = execCmdEx("uptime --pretty").output.strip
+#  let disks = execCmdEx("df --human-readable --local --output=avail " & getCurrentDir()).output.strip
+#  const uname = staticExec("uname -a").strip
+#  const distr = staticExec("lsb_release -a").strip
+#  let pubip = newHttpClient().getContent("http://api.ipify.org").strip
+#
+<head>
+  ${genMainHead(c)}
+</head>
 
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="settings" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="settings">
+
+          <h1>Server info</h1>
+
+          <!-- Credit NimWC (Nim Website Creator) - https://github.com/ThomasTJdev/nim_websitecreator -->
+          <table border=1 class="table serverinfo">
+              <thead>
+                <tr>
+                  <th style="width: 200px;">Name</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tfoot>
+                <tr>
+                  <th>Name</th>
+                  <th>Value</th>
+                </tr>
+              </tfoot>
+              <tbody class="is-family-monospace">
+              <tr>
+                <td> <b>System</b> </td>            <td> $uname </td>
+              </tr>
+              <tr>
+                <td> <b>Distro</b> </td>            <td> $distr </td>
+              </tr>
+              <tr>
+                <td> <b>Uptime</b> </td>            <td> $uptim </td>
+              </tr>
+              <tr>
+                <td> <b>Public IP</b> </td>         <td> $pubip </td>
+              </tr>
+              <tr>
+                <td> <b>Disk</b> </td>              <td> $disks </td>
+              </tr>
+              <tr>
+                <td> <b>Hostname</b> </td>          <td> $hostn </td>
+              </tr>
+              <tr>
+                <td> <b>Compile Date</b> </td>      <td> $CompileDate </td>
+              </tr>
+              <tr>
+                <td> <b>Compile Time</b> </td>      <td> $CompileTime </td>
+              </tr>
+              <tr>
+                <td> <b>Nim Version</b> </td>       <td> $NimVersion </td>
+              </tr>
+              <tr>
+                <td> <b>CPU</b> </td>               <td> $hostCPU.toUpperAscii </td>
+              </tr>
+              <tr>
+                <td> <b>CPU Count</b> </td>         <td>${countProcessors()}</td>
+              </tr>
+              <tr>
+                <td> <b>OS</b> </td>                <td>$hostOS.toUpperAscii</td>
+              </tr>
+              <tr>
+                <td> <b>Endian</b> </td>            <td>$cpuEndian</td>
+              </tr>
+              <tr>
+                <td> <b>Temp Directory</b> </td>    <td>${getTempDir()}</td>
+              </tr>
+              <tr>
+                <td> <b>Current Directory</b> </td> <td>${getCurrentDir()}</td>
+              </tr>
+              <tr>
+                <td> <b>Log File</b> </td>          <td>${defaultFilename()}</td>
+              </tr>
+              <tr>
+                <td> <b>App Directory</b> </td>     <td>${getAppDir()}</td>
+              </tr>
+              <tr>
+                <td> <b>Biggest Integer</b> </td>   <td>$int.high</td>
+              </tr>
+              <tr>
+                <td> <b>Server DateTime</b> </td>   <td>${now()}</td>
+              </tr>
+              <tr>
+                <td> <b>SSL enabled</b> </td>       <td>${defined(ssl)}</td>
+              </tr>
+              <tr>
+                <td> <b>ReCaptcha enabled</b> </td> <td>$useCaptcha</td>
+              </tr>
+              <tr>
+                <td> <b>Release Build</b> </td>    <td>${defined(release)}</td>
+              </tr>
+              <tr>
+                <td> <b>Force Recompile enabled</b> </td>  <td>${defined(rc)}</td>
+              </tr>
+              <tr>
+                <td> <b>Development Mode enabled</b> </td> <td>${defined(dev)}</td>
+              </tr>
+              <tr>
+                <td> <b>Free Memory</b> </td>       <td>${getFreeMem()}</td>
+              </tr>
+              <tr>
+                <td> <b>Total Memory</b> </td>      <td>${getTotalMem()}</td>
+              </tr>
+              <tr>
+                <td> <b>Occupied Memory</b> </td>   <td>${getOccupiedMem()}</td>
+              </tr>
+              <tr>
+                <td> <b>Garbage Collector</b> </td> <td>${GC_getStatistics()}</td>
+              </tr>
+            </tbody>
+            </table>
+
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()}
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+#end proc
+#
+#
+#
+#
+#proc genServerLog(c: var TData): string =
+# result = ""
+#
+# let logcontent = readFile(getAppDir().replace(re"/nimhapkg.*", "") & "/log/log.log")
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="settings" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="settings">
+
+          <h1>Server log</h1>
+
+
+          <h1 class="has-text-centered">Logs</h1>
+          <textarea class="form-control" name="logs" id="logs" title="Log Size: $logcontent.splitLines.len Lines." dir="auto" rows=20 readonly autofocus spellcheck style="width:99% !important;height:90% !important">
+          $logcontent.strip
+          </textarea>
+          <br>
+          <a title="Copy Logs" onclick="document.querySelector('#logs').select();document.execCommand('copy')">
+            <button class="btn btn-secondary">Copy</button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()}
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
 #end proc

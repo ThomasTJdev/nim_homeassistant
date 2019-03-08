@@ -8,6 +8,7 @@ import json
 import logging
 import macros
 import os
+import osproc
 import parsecfg
 import re
 import strutils
@@ -16,7 +17,7 @@ import uri
 import xiaomi
 
 from sequtils import deduplicate, foldl
-from osproc import execProcess, execCmd
+from nativesockets import getHostname
 
 import recaptcha
 import ../resources/www/google_recaptcha
@@ -702,12 +703,28 @@ routes:
     redirect("/rpi")
 
 
-  get "/settings":
+  get "/settings/serverinfo":
     createTFD()
     if not c.loggedIn or c.rank != Admin:
       redirect("/login")
 
-    resp(genSettings(c))
+    resp(genServerInfo(c))
+
+
+  get "/settings/log":
+    createTFD()
+    if not c.loggedIn or c.rank != Admin:
+      redirect("/login")
+
+    resp(genServerLog(c))
+
+
+  get "/settings/system":
+    createTFD()
+    if not c.loggedIn or c.rank != Admin:
+      redirect("/login")
+
+    resp(genSystemCommands(c))
 
 
   get "/settings/restart":
@@ -715,22 +732,39 @@ routes:
     if not c.loggedIn or c.rank != Admin:
       redirect("/login")
 
-    if @"module" == "cron":
+    case @"module"
+
+    of "cron":
       discard execCmd("pkill nimha_cron")
 
-    elif @"module" == "gateway":
+    of "gateway":
       discard execCmd("pkill nimha_gateway")
 
-    elif @"module" == "gatewayws":
+    of "gatewayws":
       discard execCmd("pkill nimha_gateway_ws")
 
-    elif @"module" == "webinterface":
+    of "webinterface":
       discard execCmd("pkill nimha_webinterface")
 
-    elif @"module" == "websocket":
+    of "websocket":
       discard execCmd("pkill nimha_websocket")
 
-    elif @"module" == "xiaomi":
+    of "xiaomi":
       discard execCmd("pkill nimha_xiaomi")
+
+    of "nimha":
+      discard execCmd("pkill -x nimha")
+      discard execCmd("pkill -x nimha_websocket")
+      discard execCmd("pkill -x nimha_gateway_ws")
+      discard execCmd("pkill -x nimha_gateway")
+      discard execCmd("pkill -x nimha_webinterface")
+      discard execCmd("pkill -x nimha_cron")
+      discard execCmd("pkill -x nimha_xiaomilistener")
+
+    of "system":
+      discard execCmd("reboot")
+
+    else:
+      discard
 
     redirect("/settings")
