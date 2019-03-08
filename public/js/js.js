@@ -4,7 +4,7 @@
     Websocket
 ________________________________*/
 var ws          = "";
-var wsAddress   = "192.168.1.20";
+var wsAddress   = "127.0.0.1";
 var wsProtocol  = "ws";
 var wsPort      = "25437";
 var wsError     = false;
