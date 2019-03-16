@@ -13,7 +13,7 @@ proc alarmDatabase*(db: DbConn) =
     modified timestamp NOT NULL default (STRFTIME('%s', 'now'))
   );"""):
     echo "ERROR: Alarm table could not be created"
-  
+
   if getAllRows(db, sql"SELECT id FROM alarm").len() <= 0:
     exec(db, sql"INSERT INTO alarm (status) VALUES (?)", "disarmed")
 
@@ -39,7 +39,7 @@ proc alarmDatabase*(db: DbConn) =
     creation timestamp NOT NULL default (STRFTIME('%s', 'now'))
   );"""):
     echo "ERROR: Alarm settings table could not be created"
-  
+
   if getAllRows(db, sql"SELECT id FROM alarm_settings").len() <= 0:
     exec(db, sql"INSERT INTO alarm_settings (element, value) VALUES (?, ?)", "countdown", "20")
     exec(db, sql"INSERT INTO alarm_settings (element, value) VALUES (?, ?)", "armtime", "20")

@@ -12,6 +12,7 @@ from os import sleep, getAppDir
 
 import ../resources/mqtt/mqtt_func
 import ../resources/utils/log_utils
+import ../resources/utils/common
 
 
 var ws: AsyncWebSocket
@@ -27,7 +28,7 @@ proc setupWs() =
   ws = waitFor newAsyncWebsocketClient("127.0.0.1", Port(25437), path = "/", protocols = @["nimha"])
 
   # Set WSS key for communication without verification on 127.0.0.1
-  var dict = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
+  let dict = loadConf("gateway_ws")
   localhostKey = dict.getSectionValue("Websocket", "wsLocalKey")
 
 

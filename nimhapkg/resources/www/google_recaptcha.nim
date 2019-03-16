@@ -4,15 +4,16 @@ import recaptcha, parsecfg, asyncdispatch
 
 from os import getAppDir
 from strutils import replace
+import ../../resources/utils/common
 
 
 var
   useCaptcha*: bool
   captcha*: ReCaptcha
-  
+
 
 # Using config.ini
-let dict = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
+let dict = loadConf("google_recaptcha")
 
 # Web settings
 let recaptchaSecretKey = dict.getSectionValue("reCAPTCHA","Secretkey")

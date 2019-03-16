@@ -5,6 +5,7 @@ import ../../resources/database/database
 import ../../resources/mqtt/mqtt_func
 import ../../resources/utils/dates
 import ../../resources/utils/parsers
+import ../../resources/utils/common
 
 from os import getAppDir
 
@@ -12,7 +13,7 @@ var db = conn()
 var dbOwntracks = conn("dbOwntracks.db")
 
 
-let dict    = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
+let dict = loadConf("owntrack")
 let homeLat = dict.getSectionValue("Home","lat")
 let homeLon = dict.getSectionValue("Home","lon")
 

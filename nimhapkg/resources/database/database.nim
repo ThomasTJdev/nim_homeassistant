@@ -1,6 +1,7 @@
 # Copyright 2018 - Thomas T. Jarløv
 
 import parseCfg, db_sqlite, os, strutils
+import ../../resources/utils/common
 
 let dict = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
 
