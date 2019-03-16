@@ -7,6 +7,7 @@ import jester
 import json
 import logging
 import macros
+import net
 import os
 import osproc
 import parsecfg
@@ -238,11 +239,26 @@ proc handler() {.noconv.} =
       Init
 __________________________________________________]#
 
+
+proc getEgressIPAddr*(dest = parseIpAddress("8.8.8.8")): IpAddress =
+  ## Finds the local IP address used to reach an external address.
+  ## No traffic is sent.
+  ##
+  ## Supports IPv4 and v6.
+  ## Raises OSError if external networking is not set up.
+  let socket =
+    if dest.family == IpAddressFamily.IPv4:
+      newSocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
+    else:
+      newSocket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)
+  socket.connect($dest, 80.Port)
+  socket.getLocalAddr()[0].parseIpAddress()
+
 when isMainModule:
   setControlCHook(handler)
 
-  let hostIp = execProcess("/sbin/ifconfig | grep -Eo 'inet (addr:)?([0-9]*\\.){3}[0-9]*' | grep -Eo '([0-9]*\\.){3}[0-9]*' | grep -v '127.0.0.1'")
-  echo "\nAccess the webinterface on " & replace(hostIp, "\n", "") & ":5000\n"
+  let external_ipaddr = getEgressIPAddr()
+  echo "\nAccess the webinterface on " & $external_ipaddr & ":5000\n"
 
   #[
   # Save startup time
