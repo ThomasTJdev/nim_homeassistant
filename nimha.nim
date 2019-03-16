@@ -23,6 +23,7 @@ import nimhapkg/resources/database/modules/pushbullet_database
 import nimhapkg/resources/database/modules/rpi_database
 import nimhapkg/resources/database/modules/rss_database
 import nimhapkg/resources/database/modules/xiaomi_database
+import nimhapkg/modules/web/web_certs
 
 
 var runInLoop = true
@@ -123,6 +124,7 @@ proc createDbTables() =
   filestreamDatabase(dbFile)
   mqttDatabase(dbMqtt)
   rpiDatabase(dbRpi)
+  certDatabase(dbWeb)
 
 
 proc launcherActivated() =
