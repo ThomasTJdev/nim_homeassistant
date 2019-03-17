@@ -15,7 +15,7 @@ import ../modules/xiaomi/xiaomi_utils
 import ../resources/utils/log_utils
 
 
-var db = conn()
+var db = conn("dbCron.db")
 
 
 
