@@ -4,12 +4,12 @@ import parseCfg, db_sqlite, os, strutils
 import ../../resources/utils/common
 
 let dict = loadConf("database")
+const default_db_dir = "/var/lib/nimha/db"
+
 
 let db_user = dict.getSectionValue("Database","user")
 let db_pass = dict.getSectionValue("Database","pass")
 let db_name = dict.getSectionValue("Database","name")
-let db_host = replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & dict.getSectionValue("Database","host")
-let db_folder = dict.getSectionValue("Database","folder")
 
 proc generateDB*(db: DbConn) =
 
@@ -71,40 +71,28 @@ proc generateDB*(db: DbConn) =
   # Set WAL - https://www.sqlite.org/wal.html
   exec(db, sql"PRAGMA journal_mode=WAL;")
 
+proc setupDbBasedir(): string =
+  ## Create database base directory if needed
+  result =
+    when defined(dev):
+      let db_folder = dict.getSectionValue("Database","folder")
+      replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & db_folder
+    else:
+      default_db_dir
 
+  discard existsOrCreateDir(result)
 
-# Connect to DB
-proc conn*(): DbConn =
+proc conn*(dbName="nimha.db"): DbConn =
+  ## Connect to the Database, creating dirs and files as needed.
+  let db_dir = setupDbBasedir()
+  let db_fn = db_dir / dbName
+  echo "Opening " & db_fn
+  let dbexists = fileExists(db_fn)
   try:
-    let dbexists = if fileExists(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & db_host): true else: false
+    var db = open(connection=db_fn, user=db_user, password=db_pass, database=db_name)
 
     if not dbexists:
-      discard existsOrCreateDir(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & db_folder)
-
-    var db = open(connection=db_host, user=db_user, password=db_pass, database=db_name)
-
-    if not dbexists:
-      generateDB(db)
-
-    return db
-
-  except:
-    echo "ERROR: Connection to DB could not be established"
-    quit()
-
-
-proc conn*(dbName: string): DbConn =
-  let db_host = "data/" & dbName
-  let db_name = dbName
-  try:
-    let dbexists = if fileExists(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & db_host): true else: false
-
-    if not dbexists:
-      discard existsOrCreateDir(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & db_folder)
-
-    var db = open(connection=db_host, user=db_user, password=db_pass, database=db_name)
-
-    if not dbexists:
+      echo "Creating tables in " & db_fn
       generateDB(db)
 
     return db
