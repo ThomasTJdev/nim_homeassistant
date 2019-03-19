@@ -125,8 +125,18 @@ proc createDbTables() =
 
 proc spawnModule(name: string) =
   let fn = modulesDir / "nimha_" & name
-  echo "Spawning " & name & " at " & fn
-  let p = startProcess(fn, options = {poParentStreams})
+  let default_sandbox_cmd = dict.getSectionValue("Home", "default_sandbox")
+  if default_sandbox_cmd == "":
+    echo "Warning: running modules without sandbox"
+  let cmdline =
+    if default_sandbox_cmd == "":
+      fn
+    else:
+      default_sandbox_cmd & " " & fn
+  let exe = cmdline.splitWhitespace()[0]
+  let args = cmdline.splitWhitespace()[1..^1]
+  echo "Spawning " & name & " as " & cmdline
+  let p = startProcess(exe, args=args, options = {poParentStreams})
   modules[name] = p
 
 proc launcherActivated() =
