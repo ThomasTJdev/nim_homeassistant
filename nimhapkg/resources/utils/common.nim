@@ -9,9 +9,9 @@ proc loadConf*(modulename: string): Config =
   when defined(dev):
     if modulename == "":
       # main daemon
-      fn = getAppDir() & "/config/secret.cfg"
+      fn = getAppDir() & "/config/nimha_dev.cfg"
     else:
-      fn = replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg"
+      fn = replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/nimha_dev.cfg"
   else:
     fn = "/etc/nimha/nimha.cfg"
 

@@ -32,4 +32,5 @@ before install:
   setupTask()
 
 after install:
-  echo "secret.cfg: Please update secret.cfg with your details. The file is located in the nimble package directory at config/secret.cfg\n"
+  echo "Development: Copy config/nimha_default.cfg to config/nimha_dev.cfg\n"
+  echo "Production:  Copy config/nimha_default.cfg to /etc/nimha/nimha.cfg\n"
