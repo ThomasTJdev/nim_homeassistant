@@ -35,6 +35,7 @@ import ../resources/users/user_add
 import ../resources/users/user_check
 import ../resources/utils/parsers
 import ../resources/utils/dates
+import ../resources/utils/common
 
 
 setCurrentDir(replace(getAppDir(), "/nimhapkg/mainmodules", ""))
@@ -66,7 +67,7 @@ settings:
   port = Port(5000)
 
 
-let dict = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
+let dict = loadConf("webinterface")
 let gMapsApi = dict.getSectionValue("Google","mapsAPI")
 
 
@@ -240,7 +241,7 @@ __________________________________________________]#
 when isMainModule:
   setControlCHook(handler)
 
-  let hostIp = execProcess("ifconfig | grep -Eo 'inet (addr:)?([0-9]*\\.){3}[0-9]*' | grep -Eo '([0-9]*\\.){3}[0-9]*' | grep -v '127.0.0.1'")
+  let hostIp = execProcess("/sbin/ifconfig | grep -Eo 'inet (addr:)?([0-9]*\\.){3}[0-9]*' | grep -Eo '([0-9]*\\.){3}[0-9]*' | grep -v '127.0.0.1'")
   echo "\nAccess the webinterface on " & replace(hostIp, "\n", "") & ":5000\n"
 
   #[

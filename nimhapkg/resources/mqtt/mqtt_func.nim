@@ -3,8 +3,9 @@ import osproc
 import parsecfg
 from os import getAppDir
 from strutils import replace
+import ../../resources/utils/common
 
-let dict              = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
+let dict = loadConf("mqtt_func")
 let s_mqttPathSub*    = dict.getSectionValue("MQTT","mqttPathSub")
 let s_mqttPathPub*    = dict.getSectionValue("MQTT","mqttPathPub")
 let s_mqttIp*         = dict.getSectionValue("MQTT","mqttIp")

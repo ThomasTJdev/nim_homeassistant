@@ -44,7 +44,7 @@ proc certExpiraryAll*(db: DbConn) {.async.} =
   for cert in allCerts:
     asyncCheck certExpiraryJson(cert[0], cert[1])
 
-    
+
 
 proc certDatabase*(db: DbConn) =
   ## Creates web certificates tables in database

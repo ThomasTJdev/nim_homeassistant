@@ -1,8 +1,9 @@
 # Copyright 2018 - Thomas T. Jarløv
 
 import parseCfg, db_sqlite, os, strutils
+import ../../resources/utils/common
 
-let dict = loadConfig(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg")
+let dict = loadConf("database")
 
 let db_user = dict.getSectionValue("Database","user")
 let db_pass = dict.getSectionValue("Database","pass")

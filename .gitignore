@@ -22,7 +22,7 @@ nimcache
 */*/*/nimcache
 
 # Secret details
-config/secret.cfg
+config/nimha_dev.cfg
 
 # Main modules
 nimhapkg/mainmodules/nimha_cron

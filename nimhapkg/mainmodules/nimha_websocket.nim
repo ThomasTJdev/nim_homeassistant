@@ -26,6 +26,7 @@ import ../resources/mqtt/mqtt_func
 import ../resources/users/password
 import ../resources/utils/dates
 import ../resources/utils/log_utils
+import ../resources/utils/common
 
 
 type
@@ -66,7 +67,8 @@ for i in countUp(1, 62):
   of 2: localhostKey.add(rand(rDigit))
   else: discard
 let localhostKeyLen = localhostKey.len()
-for fn in [replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/secret.cfg"]:
+let configFile = when defined(dev): replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/nimha_dev.cfg" else: "/etc/nimha/nimha.cfg"
+for fn in [configFile]:
   # When using setSectionKey formatting and comments are deleted..
   fn.writeFile fn.readFile.replace(re("wsLocalKey = \".*\""), "wsLocalKey = \"" & localhostKey & "\"")
 
