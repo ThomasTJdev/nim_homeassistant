@@ -88,10 +88,6 @@ proc checkMosquittoBroker() =
     echo "\n\nMosquitto broker: Error in path. No file found at " & dict.getSectionValue("MQTT","mqttPathSub") & "\n"
     quit()
 
-  if dict.getSectionValue("MQTT", "mqttIp") == "":
-    echo "\n\nMosquitto broker: Missing connection details - You have not update config file with your details.\nPlease insert your data in\n Development: " & getAppDir() & "/config/nimha_dev.cfg\n Production: /etc/nimha/nimha.cfg\n"
-    quit()
-
 
 proc createDbTables() =
   ## Create all tables

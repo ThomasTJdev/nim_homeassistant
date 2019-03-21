@@ -13,14 +13,25 @@ let s_mqttPort*       = dict.getSectionValue("MQTT","mqttPort")
 let s_mqttUsername*   = dict.getSectionValue("MQTT","mqttUsername")
 let s_mqttPassword*   = dict.getSectionValue("MQTT","mqttPassword")
 
+proc setupBaseCmd(): string =
+  result = s_mqttPathPub & " -p " & s_mqttPort
+  if s_mqttIp != "":
+    result.add " -h " & s_mqttIp
+  if s_mqttUsername != "":
+    result.add " -u " & s_mqttUsername
+  if s_mqttPassword != "":
+    result.add " -P " & s_mqttPassword
+
+let baseCmd = setupBaseCmd()
 
 
-proc mqttSend*(clientID, topic, message: string) = 
+proc mqttSend*(clientID, topic, message: string) =
   ## Send <message> to <topic>
-  
-  discard execCmd(s_mqttPathPub & " -i " & clientID & " -t " & topic & " -u " & s_mqttUsername & " -P " & s_mqttPassword & " -h " & s_mqttIp & " -p " & s_mqttPort & " -m '" & message & "'")
-  
+  let cmd = baseCmd & " -i " & clientID & " -t " & topic & " -m '" & message & "'"
+  discard execCmd(cmd)
 
-proc mqttSendAsync*(clientID, topic, message: string) {.async.} = 
+
+proc mqttSendAsync*(clientID, topic, message: string) {.async.} =
   ## Send <message> to <topic>
-  discard execCmd(s_mqttPathPub & " -i " & clientID & " -t " & topic & " -u " & s_mqttUsername & " -P " & s_mqttPassword & " -h " & s_mqttIp & " -p " & s_mqttPort & " -m '" & message & "'")
+  let cmd = baseCmd & " -i " & clientID & " -t " & topic & " -m '" & message & "'"
+  discard execCmd(cmd)
