@@ -54,15 +54,20 @@ setControlCHook(handler)
 
 
 proc secretCfg() =
-  ## Check if secret.cfg exists
+  ## Check if config file exists
 
-  let secretFn = getAppDir() / "config/secret.cfg"
-  if not fileExists(secretFn):
-    copyFile(getAppDir() & "/config/secret_default.cfg", secretFn)
-    echo "\nYour secret.cfg has been generated at " & secretFn & ". Please fill in your data\n"
+  when defined(dev):
+    let secretFn = getAppDir() / "config/nimha_dev.cfg"
+    if not fileExists(secretFn):
+      copyFile(getAppDir() & "/config/nimha_default.cfg", secretFn)
+      echo "\nThe config file has been generated at " & secretFn & ". Please fill in your data\n"
+  else:
+    if not fileExists("/etc/nimha/nimha.cfg"):
+      echo "\nConfig file /etc/nimha/nimha.cfg does not exists\n"
+      quit(0)
 
 proc updateJsFile() =
-  ## Updates the JS file with Websocket details from secret.cfg
+  ## Updates the JS file with Websocket details from the config file
 
   let wsAddressTo     = "var wsAddress   = \"" & dict.getSectionValue("Websocket","wsAddress") & "\""
   let wsProtocolTo    = "var wsProtocol  = \"" & dict.getSectionValue("Websocket","wsProtocol") & "\""
@@ -89,7 +94,7 @@ proc checkMosquittoBroker() =
     quit()
 
   if dict.getSectionValue("MQTT", "mqttIp") == "":
-    echo "\n\nMosquitto broker: Missing connection details - You have not update secret.cfg with your details. Please insert your data in " & getAppDir() & "/config/secret_default.cfg to continue\n"
+    echo "\n\nMosquitto broker: Missing connection details - You have not update config file with your details.\nPlease insert your data in\n Development: " & getAppDir() & "/config/nimha_dev.cfg\n Production: /etc/nimha/nimha.cfg\n"
     quit()
 
 
