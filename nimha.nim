@@ -6,6 +6,7 @@ import parsecfg
 import re
 import sequtils
 import strutils
+import tables
 
 import nimhapkg/resources/utils/common
 import nimhapkg/resources/users/user_add
@@ -25,32 +26,26 @@ import nimhapkg/resources/database/modules/rss_database
 import nimhapkg/resources/database/modules/xiaomi_database
 import nimhapkg/modules/web/web_certs
 
+const moduleNames = ["websocket", "gateway_ws", "gateway", "webinterface", "cron",
+  "xiaomilistener"]
 
 var runInLoop = true
 
-var cron: Process
-var gateway: Process
-var gatewayws: Process
-var wss: Process
-var www: Process
-var xiaomiList: Process
+var modules = initTable[string, Process]()
 
 var modulesDir = getAppDir() / "nimhapkg/mainmodules/"
 let dict = loadConf("")
 
 
-proc handler() {.noconv.} =
+proc stop_and_quit() {.noconv.} =
   runInLoop = false
-  kill(cron)
-  kill(gateway)
-  kill(gatewayws)
-  kill(wss)
-  kill(www)
-  kill(xiaomiList)
+  for name, p in modules.pairs:
+    echo "Stopping " & name
+    kill(p)
   echo "Program quitted."
   quit()
 
-setControlCHook(handler)
+setControlCHook(stop_and_quit)
 
 
 proc secretCfg() =
@@ -132,6 +127,12 @@ proc createDbTables() =
   certDatabase(dbWeb)
 
 
+proc spawnModule(name: string) =
+  let fn = modulesDir / "nimha_" & name
+  echo "Spawning " & name & " at " & fn
+  let p = startProcess(fn, options = {poParentStreams})
+  modules[name] = p
+
 proc launcherActivated() =
   ## Executing the main-program in a loop.
 
@@ -142,18 +143,9 @@ proc launcherActivated() =
   echo "\nNim Home Assistant: Starting launcher"
   echo " .. please wait\n"
 
-  wss     = startProcess(modulesDir / "nimha_websocket", options = {poParentStreams})
-  # Gateway may first be started after wss
-  sleep(2000)
-  gatewayws = startProcess(modulesDir / "nimha_gateway_ws", options = {poParentStreams})
-  sleep(1500)
-  gateway = startProcess(modulesDir / "nimha_gateway", options = {poParentStreams})
-  sleep(500)
-  www     = startProcess(modulesDir / "nimha_webinterface", options = {poParentStreams})
-  cron    = startProcess(modulesDir / "nimha_cron", options = {poParentStreams})
-  sleep(2000)
-  xiaomiList  = startProcess(modulesDir / "nimha_xiaomilistener", options = {poParentStreams})
-  sleep(1000)
+  for name in moduleNames:
+    spawnModule(name)
+    sleep(2000)
 
   echo "\n .. waiting time over"
   echo "Nim Home Assistant: Launcher initialized\n"
@@ -162,33 +154,13 @@ proc launcherActivated() =
 
     sleep(3000)
 
-    if not running(wss):
-      echo "nimha_websocket exited. Killing gatewayWS and starting again.."
-      kill(gatewayws)
-      wss = startProcess(modulesDir / "nimha_websocket", options = {poParentStreams})
-      sleep(2000)
-
-    # Gateway may first be started, when wss is running.
-    # Otherwise it will miss the connection and the local key exchange
-    if not running(gatewayws) and running(wss):
-      echo "gateway_ws exited. Starting again.."
-      gateway = startProcess(modulesDir / "nimha_gateway_ws", options = {poParentStreams})
-
-    if not running(gateway):
-      echo "gateway exited. Starting again.."
-      gateway = startProcess(modulesDir / "nimha_gateway", options = {poParentStreams})
-
-    if not running(www):
-      echo "nimha_webinterface exited. Starting again.."
-      www = startProcess(modulesDir / "nimha_webinterface", options = {poParentStreams})
-
-    if not running(cron):
-      echo "nimha_cron exited. Starting again.."
-      cron = startProcess(modulesDir / "nimha_cron", options = {poParentStreams})
-
-    if not running(xiaomiList):
-      echo "nimha_xiaomilistener exited. Starting again.."
-      xiaomiList = startProcess(modulesDir / "nimha_xiaomilistener", options = {poParentStreams})
+    for name, p in modules.pairs:
+      if not running(p):
+        echo name & " exited."
+        if name == "websocket":
+          kill(modules["gateway_ws"])
+        spawnModule(name)
+        sleep(2000)
 
   echo "Nim Home Assistant: Quitted"
 
