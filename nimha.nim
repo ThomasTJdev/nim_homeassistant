@@ -189,7 +189,7 @@ proc compileIt() =
   if not fileExists(modulesDir / "nimha_websocket") or defined(rc) or defined(rcwss):
     let outputWSS = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_websocket.nim")
     if outputWSS == 1:
-      echo "\nAn error occured nimha_websocket\n\n"
+      echo "\nAn error occurred nimha_websocket\n\n"
       quit()
     else:
       echo "nimha_websocket compiling done\n\n"
@@ -199,7 +199,7 @@ proc compileIt() =
   if not fileExists(modulesDir / "nimha_cron") or defined(rc) or defined(rccron):
     let outputAlarm = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_cron.nim")
     if outputAlarm == 1:
-      echo "\nAn error occured nimha_cron\n\n"
+      echo "\nAn error occurred nimha_cron\n\n"
       quit()
     else:
       echo "nimha_cron compiling done\n\n"
@@ -209,7 +209,7 @@ proc compileIt() =
   if not fileExists(modulesDir / "nimha_webinterface") or defined(rc) or defined(rcwebinterface):
     let outputWww = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_webinterface.nim")
     if outputWww == 1:
-      echo "\nAn error occured nimha_webinterface\n\n"
+      echo "\nAn error occurred nimha_webinterface\n\n"
       quit()
     else:
       echo "nimha_webinterface compiling done\n\n"
@@ -219,7 +219,7 @@ proc compileIt() =
   if not fileExists(modulesDir / "nimha_gateway_ws") or defined(rc) or defined(rcgatewayws):
     let outputGateway = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_gateway_ws.nim")
     if outputGateway == 1:
-      echo "\nAn error occured nimha_gateway_ws\n\n"
+      echo "\nAn error occurred nimha_gateway_ws\n\n"
       quit()
     else:
       echo "nimha_gateway_ws compiling done\n\n"
@@ -229,7 +229,7 @@ proc compileIt() =
   if not fileExists(modulesDir / "nimha_gateway") or defined(rc) or defined(rcgateway):
     let outputGateway = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_gateway.nim")
     if outputGateway == 1:
-      echo "\nAn error occured nimha_gateway\n\n"
+      echo "\nAn error occurred nimha_gateway\n\n"
       quit()
     else:
       echo "nimha_gateway compiling done\n\n"
@@ -239,7 +239,7 @@ proc compileIt() =
   if not fileExists(modulesDir / "nimha_xiaomilistener") or defined(rc) or defined(rcxlistener):
     let outputXiaomiListener = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_xiaomilistener.nim")
     if outputXiaomiListener == 1:
-      echo "\nAn error occured nimha_xiaomi\n\n"
+      echo "\nAn error occurred nimha_xiaomi\n\n"
       quit()
     else:
       echo "outputXiaomiListener compiling done\n\n"
