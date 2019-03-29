@@ -49,14 +49,20 @@ proc mosquittoParse(payload: string) {.async.} =
     logit("WSgateway", "ERROR", "127.0.0.1 client websocket not connected")
 
 
-var mqttProcess: Process
-
 proc mosquittoSub() =
   ## Start Mosquitto sub listening on #
 
   logit("WSgateway", "INFO", "Mosquitto WS started")
 
-  mqttProcess = startProcess(s_mqttPathSub & " -v -t \"wss/to\" -u nimhagate -P " & s_mqttPassword & " -h " & s_mqttIp & " -p " & s_mqttPort, options = {poEvalCommand})
+  # TODO: this leaks the password in the process name
+  # https://github.com/eclipse/mosquitto/issues/1141
+  var cmd = s_mqttPathSub & " -v -t \"wss/to\" -u nimhagate -p " & s_mqttPort
+  if s_mqttPassword != "":
+    cmd.add " -P " & s_mqttPassword
+  if s_mqttIp != "":
+    cmd.add " -h " & s_mqttIp
+
+  let mqttProcess = startProcess(cmd, options = {poEvalCommand})
 
   while running(mqttProcess):
     asyncCheck mosquittoParse(readLine(outputStream(mqttProcess)))

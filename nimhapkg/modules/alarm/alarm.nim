@@ -54,7 +54,7 @@ proc alarmLoadPasswords() =
 
   alarmPasswords = @[]
 
-  let allPasswords = getAllRows(db, sql"SELECT userid, password, salt FROM alarm_password ")
+  let allPasswords = getAllRows(dbAlarm, sql"SELECT userid, password, salt FROM alarm_password ")
   for row in allPasswords:
     alarmPasswords.add((userid: row[0], password: row[1], salt: row[2]))
 

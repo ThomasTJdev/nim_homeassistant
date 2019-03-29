@@ -88,10 +88,6 @@ proc checkMosquittoBroker() =
     echo "\n\nMosquitto broker: Error in path. No file found at " & dict.getSectionValue("MQTT","mqttPathSub") & "\n"
     quit()
 
-  if dict.getSectionValue("MQTT", "mqttIp") == "":
-    echo "\n\nMosquitto broker: Missing connection details - You have not update config file with your details.\nPlease insert your data in\n Development: " & getAppDir() & "/config/nimha_dev.cfg\n Production: /etc/nimha/nimha.cfg\n"
-    quit()
-
 
 proc createDbTables() =
   ## Create all tables
@@ -129,8 +125,18 @@ proc createDbTables() =
 
 proc spawnModule(name: string) =
   let fn = modulesDir / "nimha_" & name
-  echo "Spawning " & name & " at " & fn
-  let p = startProcess(fn, options = {poParentStreams})
+  let default_sandbox_cmd = dict.getSectionValue("Home", "default_sandbox")
+  if default_sandbox_cmd == "":
+    echo "Warning: running modules without sandbox"
+  let cmdline =
+    if default_sandbox_cmd == "":
+      fn
+    else:
+      default_sandbox_cmd & " " & fn
+  let exe = cmdline.splitWhitespace()[0]
+  let args = cmdline.splitWhitespace()[1..^1]
+  echo "Spawning " & name & " as " & cmdline
+  let p = startProcess(exe, args=args, options = {poParentStreams})
   modules[name] = p
 
 proc launcherActivated() =
