@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+export DH_VERBOSE=1
+# hardened using nim.cfg
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	nimble build --verbose
+
+override_dh_installsystemd:
+	dh_installsystemd --name=nimha
+
+override_dh_dwz:
+	true

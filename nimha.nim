@@ -33,7 +33,13 @@ var runInLoop = true
 
 var modules = initTable[string, Process]()
 
-var modulesDir = getAppDir() / "nimhapkg/mainmodules/"
+let modulesDir =
+  when defined(dev):
+    getAppDir() / "nimhapkg/mainmodules/"
+  else:
+    #installpath
+    "/var/lib/nimha/mainmodules"
+
 let dict = loadConf("")
 
 
@@ -54,7 +60,7 @@ proc secretCfg() =
   when defined(dev):
     let secretFn = getAppDir() / "config/nimha_dev.cfg"
     if not fileExists(secretFn):
-      copyFile(getAppDir() & "/config/nimha_default.cfg", secretFn)
+      copyFile(getAppDir() / "config/nimha_default.cfg", secretFn)
       echo "\nThe config file has been generated at " & secretFn & ". Please fill in your data\n"
   else:
     if not fileExists("/etc/nimha/nimha.cfg"):
@@ -72,10 +78,17 @@ proc updateJsFile() =
   let wsProtocolFrom  = "var wsProtocol  = \"ws\""
   let wsPortFrom      = "var wsPort      = \"25437\""
 
-  for fn in [getAppDir() & "/public/js/js.js"]:
-    fn.writeFile fn.readFile.replace(re("var wsAddress   = \".*\""), wsAddressTo)
-    fn.writeFile fn.readFile.replace(re("var wsProtocol  = \".*\""), wsProtocolTo)
-    fn.writeFile fn.readFile.replace(re("var wsPort      = \".*\""), wsPortTo)
+  #installpath
+  const persistent_dir = "/var/lib/nimha"
+  let fn =
+    when defined(dev):
+      getAppDir() / "public/js/js.js"
+    else:
+      persistent_dir / "public/js/js.js"
+
+  fn.writeFile fn.readFile.replace(re("var wsAddress   = \".*\""), wsAddressTo)
+  fn.writeFile fn.readFile.replace(re("var wsProtocol  = \".*\""), wsProtocolTo)
+  fn.writeFile fn.readFile.replace(re("var wsPort      = \".*\""), wsPortTo)
 
   echo "Javascript: File updated with websocket connection details\n"
 
@@ -170,11 +183,26 @@ proc launcherActivated() =
 
   echo "Nim Home Assistant: Quitted"
 
+proc compileModule(devC, modulename: string) =
+  ## Compile a module using Nim
+  echo "compiling " & modulename
+  let nimblepath = getNimbleCache() / "pkgs"
+  let fn = modulesDir / modulename & ".nim"
+  if not fileExists(fn):
+    echo "ERROR: " & fn & " not found"
+    quit(1)
+  let cmd = "nim c --NimblePath:" & nimblepath & " -d:ssl " & devC & " " & fn
+  echo "running " & cmd
+  if execCmd(cmd) == 0:
+    echo modulename & " compiling done"
+  else:
+    echo "An error has occurred compiling " & modulename
+    # TODO: handle broken modules
+    quit(1)
 
 
 proc compileIt() =
-  echo "Checking if runners need compiling"
-  echo " .. please wait\n"
+  echo "Checking if runners in $# need compiling" % modulesDir
 
   var devC = ""
   when defined(dev):
@@ -184,70 +212,44 @@ proc compileIt() =
   when defined(logoutput):
     devC.add(" -d:logoutput "  )
 
+  when not defined(dev):
+    block:
+      #installpath
+      echo "Setting up Nimble and required dependencies"
+      let cmd = "nimble install -y --verbose websocket bcrypt multicast nimcrypto xiaomi jester recaptcha --nimbleDir:" & getNimbleCache()
+      echo cmd
+      if execCmd(cmd) != 0:
+        echo "Error running nimble"
+        quit(1)
 
   # Websocket
   if not fileExists(modulesDir / "nimha_websocket") or defined(rc) or defined(rcwss):
-    let outputWSS = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_websocket.nim")
-    if outputWSS == 1:
-      echo "\nAn error occured nimha_websocket\n\n"
-      quit()
-    else:
-      echo "nimha_websocket compiling done\n\n"
-
+    compileModule(devC, "nimha_websocket")
 
   # Cron jobs
   if not fileExists(modulesDir / "nimha_cron") or defined(rc) or defined(rccron):
-    let outputAlarm = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_cron.nim")
-    if outputAlarm == 1:
-      echo "\nAn error occured nimha_cron\n\n"
-      quit()
-    else:
-      echo "nimha_cron compiling done\n\n"
-
+    compileModule(devC, "nimha_cron")
 
   # Webinterface
   if not fileExists(modulesDir / "nimha_webinterface") or defined(rc) or defined(rcwebinterface):
-    let outputWww = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_webinterface.nim")
-    if outputWww == 1:
-      echo "\nAn error occured nimha_webinterface\n\n"
-      quit()
-    else:
-      echo "nimha_webinterface compiling done\n\n"
-
+    compileModule(devC, "nimha_webinterface")
 
   # Gateway websocket
   if not fileExists(modulesDir / "nimha_gateway_ws") or defined(rc) or defined(rcgatewayws):
-    let outputGateway = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_gateway_ws.nim")
-    if outputGateway == 1:
-      echo "\nAn error occured nimha_gateway_ws\n\n"
-      quit()
-    else:
-      echo "nimha_gateway_ws compiling done\n\n"
-
+    compileModule(devC, "nimha_gateway_ws")
 
   # Gateway
   if not fileExists(modulesDir / "nimha_gateway") or defined(rc) or defined(rcgateway):
-    let outputGateway = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_gateway.nim")
-    if outputGateway == 1:
-      echo "\nAn error occured nimha_gateway\n\n"
-      quit()
-    else:
-      echo "nimha_gateway compiling done\n\n"
-
+    compileModule(devC, "nimha_gateway")
 
   # Xiaomi listener
   if not fileExists(modulesDir / "nimha_xiaomilistener") or defined(rc) or defined(rcxlistener):
-    let outputXiaomiListener = execCmd("nim c -d:ssl " & devC & modulesDir / "nimha_xiaomilistener.nim")
-    if outputXiaomiListener == 1:
-      echo "\nAn error occured nimha_xiaomi\n\n"
-      quit()
-    else:
-      echo "outputXiaomiListener compiling done\n\n"
+    compileModule(devC, "nimha_xiaomilistener")
 
 
 proc requirements() =
-  discard existsOrCreateDir(replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/tmp")
   when defined(dev):
+    discard existsOrCreateDir(getTmpDir())
     secretCfg()
   updateJsFile()
   checkMosquittoBroker()
