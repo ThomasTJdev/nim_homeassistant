@@ -21,7 +21,7 @@ proc loadConf*(modulename: string): Config =
 #installpath
 const systmp = "/var/run/nimha/tmp"
 
-proc getTmpDir*(modulename: string): string =
+proc getTmpDir*(modulename = ""): string =
   ## Temporary directory, not persistent across restarts
   when defined(dev):
     replace(getAppDir(), "/nimhapkg/mainmodules", "") / "/tmp"
