@@ -82,9 +82,9 @@ proc updateJsFile() =
   const persistent_dir = "/var/lib/nimha"
   let fn =
     when defined(dev) or not defined(systemInstall):
-      getAppDir() / "public/js/js.js"
+      getAppDir() / "public/js/script.js"
     else:
-      persistent_dir / "public/js/js.js"
+      persistent_dir / "public/js/script.js"
 
   fn.writeFile fn.readFile.replace(re("var wsAddress   = \".*\""), wsAddressTo)
   fn.writeFile fn.readFile.replace(re("var wsProtocol  = \".*\""), wsProtocolTo)

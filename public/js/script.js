@@ -20,7 +20,7 @@ $(function() {
 function websocketInit() {
   if (pageType == "dashboard" || pageType == "alarmNumpad" || pageType == "pushbullet" || pageType == "xiaomidevices") {
     if (wsAddress == "127.0.0.1") {
-      console.log("Please change the Websocket address in js.js. Otherwise external user will not connect.");
+      console.log("Please change the Websocket address in script.js. Otherwise external user will not connect.");
     }
     ws = new WebSocket(wsProtocol + "://" + wsAddress + ":" + wsPort + "", ["nimha"]);
   }
