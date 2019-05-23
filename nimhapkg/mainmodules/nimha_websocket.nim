@@ -67,7 +67,7 @@ for i in countUp(1, 62):
   of 2: localhostKey.add(rand(rDigit))
   else: discard
 let localhostKeyLen = localhostKey.len()
-let configFile = when defined(dev): replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/nimha_dev.cfg" else: "/etc/nimha/nimha.cfg"
+let configFile = when defined(dev) or not defined(systemInstall): replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/config/nimha_dev.cfg" else: "/etc/nimha/nimha.cfg"
 for fn in [configFile]:
   # When using setSectionKey formatting and comments are deleted..
   fn.writeFile fn.readFile.replace(re("wsLocalKey = \".*\""), "wsLocalKey = \"" & localhostKey & "\"")

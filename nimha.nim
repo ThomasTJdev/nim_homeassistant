@@ -34,7 +34,7 @@ var runInLoop = true
 var modules = initTable[string, Process]()
 
 let modulesDir =
-  when defined(dev):
+  when defined(dev) or not defined(systemInstall):
     getAppDir() / "nimhapkg/mainmodules/"
   else:
     #installpath
@@ -57,7 +57,7 @@ setControlCHook(stop_and_quit)
 proc secretCfg() =
   ## Check if config file exists
 
-  when defined(dev):
+  when defined(dev) or not defined(systemInstall):
     let secretFn = getAppDir() / "config/nimha_dev.cfg"
     if not fileExists(secretFn):
       copyFile(getAppDir() / "config/nimha_default.cfg", secretFn)
@@ -81,7 +81,7 @@ proc updateJsFile() =
   #installpath
   const persistent_dir = "/var/lib/nimha"
   let fn =
-    when defined(dev):
+    when defined(dev) or not defined(systemInstall):
       getAppDir() / "public/js/js.js"
     else:
       persistent_dir / "public/js/js.js"
@@ -212,7 +212,7 @@ proc compileIt() =
   when defined(logoutput):
     devC.add(" -d:logoutput "  )
 
-  when not defined(dev):
+  when not defined(dev) and defined(systemInstall):
     block:
       #installpath
       echo "Setting up Nimble and required dependencies"
@@ -248,7 +248,7 @@ proc compileIt() =
 
 
 proc requirements() =
-  when defined(dev):
+  when defined(dev) or not defined(systemInstall):
     discard existsOrCreateDir(getTmpDir())
     secretCfg()
   updateJsFile()

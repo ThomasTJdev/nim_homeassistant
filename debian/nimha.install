@@ -1,7 +1,0 @@
-nimha usr/sbin
-
-# Install UI-related files that can be modified
-public var/lib/nimha
-
-# Install modules that can be modified and required shared code
-nimhapkg/* var/lib/nimha

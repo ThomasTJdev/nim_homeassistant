@@ -74,7 +74,7 @@ proc generateDB*(db: DbConn) =
 proc setupDbBasedir(): string =
   ## Create database base directory if needed
   result =
-    when defined(dev):
+    when defined(dev) or not defined(systemInstall):
       let db_folder = dict.getSectionValue("Database","folder")
       replace(getAppDir(), "/nimhapkg/mainmodules", "") & "/" & db_folder
     else:
