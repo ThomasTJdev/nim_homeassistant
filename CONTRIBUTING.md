@@ -14,6 +14,6 @@ See [Develop new module](https://github.com/ThomasTJdev/nim_homeassistant/wiki/D
 
 ## Packaging
 
-See the `#installpath` comments to update system paths before build.
+See the `#installpath` comments to update system paths before build and compile with `-d:systemInstall`.
 
 NimHA installs a dedicated Nimble package cache and runs Nim to build the modules.
