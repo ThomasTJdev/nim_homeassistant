@@ -15,6 +15,10 @@ private/*
 tmp
 tmp/*
 
+# Nimblecache (systemInstall)
+nimblecache
+nimblecache/*
+
 # Nimcache folders
 nimcache
 nimcache/*
