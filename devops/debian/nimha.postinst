@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+user=nimha
+group=nimha
+
+if [ "$1" = "configure" ]; then
+    if ! getent passwd $user >/dev/null; then
+        addgroup --system --quiet $user
+        adduser --system --quiet --ingroup $group --no-create-home --home /var/lib/$user $user
+    fi
+    chown -R nimha:nimha /var/lib/nimha
+    chown -R nimha:nimha /var/run/nimha
+    # delete binaries built from previous versions
+    find /var/lib/nimha -type f -executable -delete
+    # empty tmp dir
+    rm /var/run/nimha/* -rf
+
+fi
+
+#DEBHELPER#
+
+exit 0

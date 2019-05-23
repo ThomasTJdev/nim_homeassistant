@@ -123,7 +123,7 @@ proc cronJobRun(time: string) =
       asyncCheck osRunTemplate(row[1])
 
     of "mqtt":
-      mqttActionSendDb(db, row[1])
+      mqttActionSendDb(row[1])
 
     of "rpi":
       when defined(rpi):

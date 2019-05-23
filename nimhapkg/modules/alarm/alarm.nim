@@ -89,7 +89,7 @@ proc alarmAction() =
       of "os":
         asyncCheck osRunTemplate(action[2])
       of "mqtt":
-        mqttActionSendDb(db, action[2])
+        mqttActionSendDb(action[2])
       of "rpi":
         when defined(rpi):
           discard rpiAction(action[2])

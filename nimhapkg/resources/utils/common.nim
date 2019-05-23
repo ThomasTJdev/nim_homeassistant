@@ -1,12 +1,12 @@
 
 import parsecfg
-from os import getAppDir
+from os import getAppDir, `/`
 from strutils import replace
 
 proc loadConf*(modulename: string): Config =
   ## Load config for the main daemon or a module
   var fn = ""
-  when defined(dev):
+  when defined(dev) or not defined(systemInstall):
     if modulename == "":
       # main daemon
       fn = getAppDir() & "/config/nimha_dev.cfg"
@@ -17,4 +17,26 @@ proc loadConf*(modulename: string): Config =
 
   echo("Reading cfg file " & fn)
   loadConfig(fn)
+
+#installpath
+const systmp = "/var/run/nimha/tmp"
+
+proc getTmpDir*(modulename = ""): string =
+  ## Temporary directory, not persistent across restarts
+  when defined(dev) or not defined(systemInstall):
+    replace(getAppDir(), "/nimhapkg/mainmodules", "") / "/tmp"
+  else:
+    if modulename == "":
+      systmp / "nimha"
+    else:
+      # TODO: check for path traversal?
+      systmp / modulename
+
+proc getNimbleCache*(): string =
+  ## Get Nimble cache
+  when defined(dev) or not defined(systemInstall):
+    replace(getAppDir(), "/nimhapkg/mainmodules", "") / "/nimblecache"
+  else:
+    #installpath
+    "/var/run/nimha/nimblecache"
 

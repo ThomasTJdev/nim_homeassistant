@@ -40,3 +40,6 @@ proc logit*(element, level, msg: string) =
 
   when defined(logoutput) or defined(logwebsocket):
     if element == "websocket": echoLog(element, level, msg)
+
+  when defined(logoutput) or defined(logalarm):
+    if element == "alarm": echoLog(element, level, msg)
