@@ -197,7 +197,7 @@ $(function() {
   $( "#sidebarToggle" ).click(function() {
     $('#sidebar').toggleClass('active');
   });
-  if ($(window).width() > 1000) {
+  if ($(window).width() < 1000) {
     $('#sidebar').addClass('active');
   }
 });
