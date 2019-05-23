@@ -17,6 +17,7 @@ tmp/*
 
 # Nimcache folders
 nimcache
+nimcache/*
 */nimcache
 */*/nimcache
 */*/*/nimcache
