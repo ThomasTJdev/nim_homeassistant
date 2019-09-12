@@ -46,7 +46,7 @@
           <hr>
 
           <div class="alarmPasswords">
-            # let allPasswords = getAllRows(dbAlarm, sql"SELECT person.id, person.name, alarm_password.creation FROM alarm_password LEFT JOIN person ON person.id = alarm_password.userid")
+            # let allPasswords = getAllRows(dbAlarm, sql"SELECT id, name, creation FROM alarm_password")
 
             <h3>Alarm password</h3>
             <h5>Users with access to manage the alarm (only digits!)</h5>

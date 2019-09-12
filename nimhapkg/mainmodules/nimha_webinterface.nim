@@ -476,13 +476,15 @@ routes:
 
     elif @"action" == "adduser":
       # Check if user exists
-      let userExists = getValue(dbAlarm, sql"SELECT id FROM alarm_password WHERE userid = ?", @"userid")
+      let userExists = getValue(dbAlarm, sql"SELECT name FROM alarm_password WHERE userid = ?", @"userid")
 
       if userExists == "" and isDigit(@"password"):
+        let userName = getValue(db, sql"SELECT name FROM person WHERE id = ?", @"userid")
+
         let salt = makeSalt()
         let password = makePassword(@"password", salt)
 
-        discard insertID(dbAlarm, sql"INSERT INTO alarm_password (userid, password, salt) VALUES (?, ?, ?)", @"userid", password, salt)
+        discard insertID(dbAlarm, sql"INSERT INTO alarm_password (userid, name, password, salt) VALUES (?, ?, ?, ?)", @"userid", userName, password, salt)
 
         mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updateuser\"}")
 

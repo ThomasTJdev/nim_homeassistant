@@ -49,6 +49,7 @@ proc alarmDatabase*(db: DbConn) =
   CREATE TABLE IF NOT EXISTS alarm_password (
     id INTEGER PRIMARY KEY,
     userid INTEGER,
+    name VARCHAR(300),
     password VARCHAR(300) NOT NULL,
     salt VARBIN(128) NOT NULL,
     creation timestamp NOT NULL default (STRFTIME('%s', 'now')),

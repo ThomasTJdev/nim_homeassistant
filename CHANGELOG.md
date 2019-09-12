@@ -1,3 +1,10 @@
+# Master
+- New column in dbAlarm database:
+```
+sqlite3 data/dbAlarm.db
+ALTER TABLE alarm_password ADD COLUMN name VARCHAR(300);
+```
+
 # v0.4.2
 - Server info page
 - Check NimHA log in browser
