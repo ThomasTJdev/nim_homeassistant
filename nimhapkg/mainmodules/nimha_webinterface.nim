@@ -720,6 +720,40 @@ routes:
     redirect("/rpi")
 
 
+  get "/settings/users":
+    createTFD()
+    if not c.loggedIn or c.rank != Admin:
+      redirect("/login")
+
+    resp(genUsers(c))
+
+
+  post "/settings/users/add":
+    createTFD()
+    if not c.loggedIn or c.rank != Admin:
+      redirect("/login")
+
+    if @"email" == getValue(db, sql("SELECT email FROM person WHERE email = ?"), @"email"):
+      redirect("/settings/users")
+
+    let salt = makeSalt()
+    let password = makePassword(@"password", salt)
+
+    discard insertID(db, sql"INSERT INTO person (name, email, password, salt, status) VALUES (?, ?, ?, ?, ?)", @"name", @"email", password, salt, "Normal")
+
+    redirect("/settings/users")
+
+
+  get "/settings/users/delete":
+    createTFD()
+    if not c.loggedIn or c.rank != Admin:
+      redirect("/login")
+
+    exec(db, sql("DELETE FROM person WHERE email = ?"), @"email")
+
+    redirect("/settings/users")
+
+
   get "/settings/serverinfo":
     createTFD()
     if not c.loggedIn or c.rank != Admin:
