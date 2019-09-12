@@ -3,8 +3,8 @@
 #
 #
 #
-#proc genLogin(c: var TData, errorMsg = ""): string = 
-# result = "" 
+#proc genLogin(c: var TData, errorMsg = ""): string =
+# result = ""
 <head>
   ${genMainHead(c)}
 </head>
@@ -20,7 +20,7 @@
 
       <div id="pagewrapper">
         <div id="login">
-         
+
           <h1>Login</h1>
 
           # if errorMsg != "":
@@ -34,7 +34,7 @@
             #if useCaptcha:
             <div id="recaptcha">
               <div class="g-recaptcha" data-sitekey="${recaptchaSiteKey}" data-theme="light" style="transform:scale(0.93);-webkit-transform:scale(0.93);transform-origin:0 0;-webkit-transform-origin:0 0;"></div>
-              <script src="https://www.google.com/recaptcha/api.js" async defer></script>      
+              <script src="https://www.google.com/recaptcha/api.js" async defer></script>
             </div>
             #end if
 
@@ -47,8 +47,100 @@
   </main>
 
   <footer>
-    ${genMainFooter()} 
+    ${genMainFooter()}
   </footer>
+
+</body>
+#end proc
+#
+#
+#proc genUsers(c: var TData): string =
+# result = ""
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="settings" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="settings">
+
+          <h1>Users</h1>
+
+          <p>You can only add an <kbd>admin</kbd> user from the command line.</p>
+
+          <hr>
+
+          <div class="settings users">
+            <h3>Add user</h3>
+
+            <form method="POST" action="/settings/users/add">
+              <div>
+                <input name="email" type="email" placeholder="Email" class="form-control" required>
+              </div>
+              <div>
+                <input name="name" type="text" placeholder="Name" class="form-control" required>
+              </div>
+              <div>
+                <input name="password" type="password" placeholder="Password" class="form-control" required>
+              </div>
+              <br>
+              <input type="submit" value="Add user" class="btn btn-primary">
+            </form>
+
+          </div>
+
+          <hr>
+
+          <div class="settings userlist">
+            <h3>Users</h3>
+
+            # let usersAll = getAllRows(db, sql"SELECT name, email, status, lastOnline FROM person;")
+            <table class="table">
+              <thead>
+                <tr class="thead-dark">
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Last login</th>
+                  <th>Del</th>
+                </tr>
+              </thead>
+              <tbody>
+                # for user in usersAll:
+                <tr>
+                  <td>${user[0]}</td>
+                  <td>${user[1]}</td>
+                  <td>${user[2]}</td>
+                  <td>${epochDate(user[3], "YYYY-MM-DD HH:mm")}</td>
+                # if user[2] == "Admin":
+                  <td></td>
+                # else:
+                  <td class="btn btn-danger"><a href="/settings/users/delete?email=${user[1]}">Del</a></td>
+                # end if
+                </tr>
+                # end for
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()}
+  </footer>
+
+  ${genMainNotify()}
 
 </body>
 #end proc
