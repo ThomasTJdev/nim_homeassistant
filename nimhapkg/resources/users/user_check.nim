@@ -13,7 +13,7 @@ type
   Session* = object of RootObj
     loggedIn*: bool
     username*, userpass*, email*: string
-    
+
   TData* = ref object of Session
     req*: jester.Request
     userid*: string         # User ID
