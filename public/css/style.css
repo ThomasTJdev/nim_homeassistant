@@ -305,6 +305,18 @@ div#login button {
 
 
 /*
+    Users
+______________________________*/
+div.settings.users form {
+  max-width: 350px;
+}
+div.settings.userlist {
+  max-width: 1000px;
+}
+
+
+
+/*
     Dashboard
 ______________________________*/
 /* Card items */
