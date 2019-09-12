@@ -607,8 +607,14 @@ function rpi(obj) {
     Alarm
 ________________________________*/
 $(function() {
+  $('#alarmModel').on('hidden.bs.modal', function (e) {
+    $("#alarmNumpad .password").val("");
+  })
   if (pageType == "alarmNumpad") {
     $('#alarmModel').modal({show: true, backdrop: 'static', keyboard: false});
+    $(".alarmSubmitCancel").hide();
+    $(".alarmSubmit").css("width", "100%");
+    $(".modal-header .close").hide();
   }
 
   $( "div.alarm .activate" ).click(function() {
