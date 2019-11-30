@@ -2,6 +2,7 @@
 
 import md5, bcrypt
 import math, random, os
+from strutils import multireplace
 randomize()
 
 
@@ -22,6 +23,8 @@ proc makeSalt*(): string =
   else:
     for i in 0..127:
       result.add(chr(rand(94) + 32)) # Generate numbers from 32 to 94 + 32 = 126
+
+  result = result.multireplace([("\"", "_"), ("\'", "_"), ("\\", "_")])
 
 
 proc makeSessionKey*(): string =

@@ -155,7 +155,6 @@ proc alarmParseMqtt*(payload: string) {.async.} =
 
   let js = parseJson(payload)
   let action = jn(js, "action")
-  echo payload
 
   if action == "adddevice":
     alarmLoadActions()

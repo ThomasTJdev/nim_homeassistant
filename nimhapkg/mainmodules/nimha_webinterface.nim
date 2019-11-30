@@ -489,7 +489,7 @@ routes:
         mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updateuser\"}")
 
     elif @"action" == "deleteuser":
-      exec(dbAlarm, sql"DELETE FROM alarm_password WHERE userid = ?", @"userid")
+      exec(dbAlarm, sql"DELETE FROM alarm_password WHERE id = ?", @"userid")
       mqttSend("mqttaction", "alarm", "{\"element\": \"alarm\", \"action\": \"updateuser\"}")
 
     redirect("/alarm")
