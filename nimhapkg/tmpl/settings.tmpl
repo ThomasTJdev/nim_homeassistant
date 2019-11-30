@@ -263,3 +263,53 @@
 
 </body>
 #end proc
+#
+#
+#
+#
+#proc genAlarmLog(c: var TData): string =
+# result = ""
+#
+# let logcontent = getAllRows(dbAlarm, sql"SELECT id, userid, status, trigger, device, creation FROM alarm_history ORDER BY creation DESC")
+<head>
+  ${genMainHead(c)}
+</head>
+
+<body>
+  <header>
+    ${genMainHeader()}
+  </header>
+
+  <main>
+    <div id="pageType" data-userid="${c.userid}" data-type="settings" style="display: none;"></div>
+    <div class="wrapper">
+      ${genMainSidebar()}
+
+      <div id="pagewrapper">
+        <div id="settings">
+
+          <h1>Alarm log</h1>
+
+          <h1 class="has-text-centered">Logs</h1>
+          <textarea class="form-control" name="logs" id="logs" dir="auto" rows=20 readonly autofocus spellcheck style="width:99% !important;height:90% !important">
+          # for log in logcontent:
+            ${log}
+          # end for
+          </textarea>
+          <br>
+          <a title="Copy Logs" onclick="document.querySelector('#logs').select();document.execCommand('copy')">
+            <button class="btn btn-secondary">Copy</button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    ${genMainFooter()}
+  </footer>
+
+  ${genMainNotify()}
+
+</body>
+#end proc

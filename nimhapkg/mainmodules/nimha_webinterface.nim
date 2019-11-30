@@ -771,6 +771,12 @@ routes:
 
     resp(genServerLog(c))
 
+  get "/settings/alarmlog":
+    createTFD()
+    if not c.loggedIn or c.rank != Admin:
+      redirect("/login")
+
+    resp(genAlarmLog(c))
 
   get "/settings/system":
     createTFD()
