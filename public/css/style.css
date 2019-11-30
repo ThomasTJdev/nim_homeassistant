@@ -406,6 +406,9 @@ _____________________________*/
 div.alarmInner span.status.badge {
   cursor: default;
 }
+div.alarmInner button {
+  cursor: pointer;
+}
 div.alarmInner span.status.badge:hover {
   -webkit-box-shadow: none;
   -moz-box-shadow: none;

@@ -4,7 +4,7 @@
     Websocket
 ________________________________*/
 var ws          = "";
-var wsAddress   = "127.0.0.1";
+var wsAddress   = "192.168.1.20";
 var wsProtocol  = "ws";
 var wsPort      = "25437";
 var wsError     = false;
@@ -617,11 +617,17 @@ $(function() {
     $(".modal-header .close").hide();
   }
 
+  // When activating the alarm, check if the user has status as an Admin.
+  // If the user is Admin, do not request password.
   $( "div.alarm .activate" ).click(function() {
     var status = $(this).attr("data-status");
-    $('#alarmModel div#alarmNumpad').attr("data-status", status);
-    $('#alarmModel h5.modal-title').text("Alarm (" + status + ")");
-    $('#alarmModel').modal('toggle');
+    if ($("#pageType").attr("data-userstatus") == "Admin") {
+      ws.send('{' + cookieSidJson() + '"element": "alarm", "action": "activatenocode", "status": "' + status + '"}');
+    } else {
+      $('#alarmModel div#alarmNumpad').attr("data-status", status);
+      $('#alarmModel h5.modal-title').text("Alarm (" + status + ")");
+      $('#alarmModel').modal('toggle');
+    }
   });
 
   // Alarm numpad
@@ -650,7 +656,11 @@ $(function() {
       status = $("div#alarmNumpad .onlyCode option:selected").val();
     }
 
-    ws.send('{' + cookieSidJson() + '"element": "alarm", "action": "activate", "status": "' + status + '", "password": "' + password + '"}');
+    if ($("#pageType").attr("data-userstatus") == "Admin") {
+      ws.send('{' + cookieSidJson() + '"element": "alarm", "action": "activatenocode", "status": "' + status + '"}');
+    } else {
+      ws.send('{' + cookieSidJson() + '"element": "alarm", "action": "activate", "status": "' + status + '", "password": "' + password + '"}');
+    }
 
     $("#alarmNumpad .password").val("");
 
@@ -717,8 +727,8 @@ function alarmSetStatus(obj) {
   }
   $(".alarm ." + obj.value + " span.status").text("True");
 
-  $(".alarm span.activate").show(200);
-  $(".alarm ." + obj.value + " span.activate").hide(200);
+  $(".alarm button.activate").show(200);
+  $(".alarm ." + obj.value + " button.activate").hide(200);
 }
 
 

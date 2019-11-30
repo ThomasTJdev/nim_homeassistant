@@ -15,7 +15,7 @@
   </header>
 
   <main>
-    <div id="pageType" data-userid="${c.userid}" data-type="alarm" style="display: none;"></div>
+    <div id="pageType" data-userid="${c.userid}" data-userstatus="${c.rank}" data-type="alarm" style="display: none;"></div>
     <div class="wrapper">
       ${genMainSidebar()}
 
@@ -50,6 +50,7 @@
 
             <h3>Alarm password</h3>
             <h5>Users with access to manage the alarm (only digits!)</h5>
+            <h5>Admin user can change status without password.</h5>
 
             # if c.rank == Admin:
             #   let allUsers = getAllRows(db, sql"SELECT id, name FROM person")
@@ -220,7 +221,7 @@
 <body>
   <nav id="navbar" style="display: none;"></nav>
   <main>
-    <div id="pageType" data-userid="${c.userid}" data-type="alarmNumpad" style="display: none;"></div>
+    <div id="pageType" data-userid="${c.userid}" data-userstatus="${c.rank}" data-type="alarmNumpad" style="display: none;"></div>
 
     <div class="wrapper">
       ${genAlarmNumpad(c, true)}

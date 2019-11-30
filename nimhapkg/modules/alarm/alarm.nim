@@ -172,6 +172,30 @@ proc alarmParseMqtt*(payload: string) {.async.} =
   elif action == "triggered" and alarm[0] in ["armAway", "armHome"]:
     alarmTriggered(db, jn(js, "value"), jn(js, "sid"))
 
+  # Change alarm status as Admin, which require no code
+  elif action == "activatenocode":
+    let userID = jn(js, "userid")
+    let key    = jn(js, "key")
+
+    let userIDcheck = getValue(db, sql"SELECT userid FROM session WHERE userid = ? AND key = ?", userID, key)
+    let userStatus = getValue(db, sql"SELECT status FROM person WHERE id = ?", userIDcheck)
+
+    if userStatus != "Admin":
+      mqttSend("alarm", "wss/to", "{\"handler\": \"response\", \"value\": \"You cannot change the alarm status\", \"error\": \"true\"}")
+      return
+
+    let status = jn(js, "status")
+
+    if status in ["armAway", "armHome"]:
+      alarm[3] = $toInt(epochTime())
+      alarmSetStatus(status, "user", "", userID)
+
+    elif status == "disarmed":
+      alarm[3] = $toInt(epochTime())
+      alarmSetStatus(status, "user", "", userID)
+
+    mqttSend("alarm", "wss/to", "{\"handler\": \"action\", \"element\": \"alarm\", \"action\": \"setstatus\", \"value\": \"" & status & "\"}")
+
   elif action == "activate":
     let userID = jn(js, "userid")
     var passOk = false

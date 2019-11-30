@@ -52,7 +52,8 @@
                   </select>
                   <br>
                 # end if
-
+                
+                # if c.rank != Admin:
                 <div class="row">
                   <div class="col-12">
                     <input type="password" disabled="disabled" class="form-control form-control-sm password" />
@@ -103,6 +104,8 @@
                     <button type="button" class="btn btn-primary btn-sm alarmpad" data-num="9">9</button>
                   </div>
                 </div>
+
+                # end if
 
               </div>
             </div>
