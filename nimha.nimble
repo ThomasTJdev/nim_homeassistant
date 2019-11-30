@@ -1,5 +1,5 @@
 # Package
-version       = "0.4.4"
+version       = "0.4.5"
 author        = "Thomas T. Jarløv (https://github.com/ThomasTJdev)"
 description   = "Nim Home Assistant"
 license       = "GPLv3"
@@ -10,15 +10,15 @@ installDirs   = @["config", "public", "nimhapkg"]
 
 
 # Dependencies
-requires "nim >= 0.19.0"
-requires "jester 0.4.1"
-requires "httpbeast 0.2.1"
+requires "nim >= 1.0.4"
+requires "jester 0.4.3"
+requires "httpbeast 0.2.2"
 requires "recaptcha >= 1.0.2"
 requires "bcrypt >= 0.2.1"
 requires "multicast 0.1.4"
-requires "websocket 0.3.5"
+requires "websocket 0.4.1"
 requires "wiringPiNim >= 0.1.0"
-requires "xiaomi >= 0.1.3"
+requires "xiaomi >= 0.1.4"
 
 
 import distros

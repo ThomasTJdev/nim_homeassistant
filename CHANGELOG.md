@@ -1,5 +1,8 @@
-# Master
-- New column in dbAlarm database:
+# 0.4.5
+- Updated to Nim 1.0.4
+- Alarm: Alarm log available
+- Alarm: Admin user can change status without password, but still needs to be logged in.
+- Alarm: New column in dbAlarm database:
 ```
 sqlite3 data/dbAlarm.db
 ALTER TABLE alarm_password ADD COLUMN name VARCHAR(300);
