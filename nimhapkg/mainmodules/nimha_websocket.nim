@@ -297,7 +297,9 @@ proc onRequest*(req: Request) {.async,gcsafe.} =
               discard
             else:
               logit("websocket", "DEBUG", "Client message: " & data)
-              asyncCheck mqttSendAsync("wss", jn(parseJson(data), "element"), data)
+              var dataReady = js
+              dataReady["hostname"] = %* hostname
+              asyncCheck mqttSendAsync("wss", jn(parseJson(data), "element"), $dataReady)
 
           of Opcode.Close:
             let (closeCode, reason) = extractCloseData(data)

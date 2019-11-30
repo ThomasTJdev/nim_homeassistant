@@ -155,7 +155,7 @@ proc alarmParseMqtt*(payload: string) {.async.} =
 
   let js = parseJson(payload)
   let action = jn(js, "action")
-
+  echo payload
 
   if action == "adddevice":
     alarmLoadActions()
@@ -177,7 +177,7 @@ proc alarmParseMqtt*(payload: string) {.async.} =
     let userID = jn(js, "userid")
     let key    = jn(js, "key")
 
-    let userIDcheck = getValue(db, sql"SELECT userid FROM session WHERE userid = ? AND key = ?", userID, key)
+    let userIDcheck = getValue(db, sql"SELECT userid FROM session WHERE ip = ? AND userid = ? AND key = ?", jn(js, "hostname"), userID, key)
     let userStatus = getValue(db, sql"SELECT status FROM person WHERE id = ?", userIDcheck)
 
     if userStatus != "Admin":
